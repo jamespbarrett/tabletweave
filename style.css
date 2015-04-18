@@ -1,0 +1,10 @@
+body {
+    background-color:darkgray;
+    color: white;
+}
+
+.draftcanvas {
+    border:1px solid #000000;
+    width: 500px;
+    height: 100%
+}
