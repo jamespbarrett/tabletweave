@@ -14,9 +14,9 @@ var fgcol = "none";
 var bgcol = "none";
 
 var defaultcell = {
-    background_color: "#FFFFFF",
-    color: "#000000",
-    direction:"left"
+    "background_color": "#FFFFFF",
+    "color": "#000000",
+    "direction":"left"
 };
 
 function redrawCanvas() {
@@ -35,11 +35,11 @@ function redrawCanvas() {
 
     for (y = 0; y < nRowsMain; y++) {
         for (x = 0; x < nCols; x++) {
-            ctx.fillStyle = main_cells[y][x].background_color;
+            ctx.fillStyle = main_cells[y][x]["background_color"];
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
-            ctx.strokeStyle = main_cells[y][x].color;
+            ctx.strokeStyle = main_cells[y][x]["color"];
             ctx.beginPath();
-            if (main_cells[y][x].direction == "left") {
+            if (main_cells[y][x]["direction"] == "left") {
                 ctx.moveTo(labelwidth + cellborder + (cellborder + cellwidth)*x, cellborder + (cellborder + cellheight)*y);
                 ctx.lineTo(labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth, cellborder + (cellborder + cellheight)*y + cellheight);
             } else {
@@ -52,11 +52,11 @@ function redrawCanvas() {
     }
     for (y = 0; y < nRowsLow; y++) {
         for (x = 0; x < nCols; x++) {
-            ctx.fillStyle = lower_cells[y][x].background_color;
+            ctx.fillStyle = lower_cells[y][x]["background_color"];
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
-            ctx.strokeStyle = lower_cells[y][x].color;
+            ctx.strokeStyle = lower_cells[y][x]["color"];
             ctx.beginPath();
-            if (lower_cells[y][x].direction == "left") {
+            if (lower_cells[y][x]["direction"] == "left") {
                 ctx.moveTo(labelwidth + cellborder + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y);
                 ctx.lineTo(labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth, (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight);
             } else {
@@ -95,6 +95,8 @@ function redrawCanvas() {
     for (y = 0; y < nRowsLow; y++) {
         ctx.fillText(labels[y], 2, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 15)/2);
     }
+
+    Cookies.set("tablet-draft", { "main" : main_cells, "lower" : lower_cells });
 }
 
 function updateSizes(m,l,c) {
@@ -117,7 +119,7 @@ function updateSizes(m,l,c) {
         for (y = main_cells.length; y < m; y++) {
             var row = [];
             for (x = 0; x < c; x++) {
-                row[x] = Object.create(defaultcell);
+                row[x] = JSON.parse(JSON.stringify(defaultcell));
             }
             main_cells[y] = row;
         }
@@ -129,7 +131,7 @@ function updateSizes(m,l,c) {
         for (y = lower_cells.length; y < l; y++) {
             var row = [];
             for (x = 0; x < c; x++) {
-                row[x] = Object.create(defaultcell);
+                row[x] = JSON.parse(JSON.stringify(defaultcell));
             }
             lower_cells[y] = row;
         }
@@ -140,7 +142,7 @@ function updateSizes(m,l,c) {
             main_cells[y] = main_cells[y].slice(0,c);
         } else if (main_cells[y].length < c) {
             for (x = main_cells[y].length; x < c; x++) {
-                main_cells[y][x] = Object.create(defaultcell);
+                main_cells[y][x] = JSON.parse(JSON.stringify(defaultcell));
             }
         }
     }
@@ -150,7 +152,7 @@ function updateSizes(m,l,c) {
             lower_cells[y] = lower_cells[y].slice(0,c);
         } else if (lower_cells[y].length < c) {
             for (x = lower_cells[y].length; x < c; x++) {
-                lower_cells[y][x] = Object.create(defaultcell);
+                lower_cells[y][x] = JSON.parse(JSON.stringify(defaultcell));
             }
         }
     }
@@ -168,16 +170,16 @@ function cellClick(g,x,y) {
 
 
     if (fgcol != "none") {
-        cell.color = fgcol;
+        cell["color"] = fgcol;
     }
     if (bgcol != "none") {
-        cell.background_color = bgcol;
+        cell["background_color"] = bgcol;
     }
 
-    if (cell.direction == "left") {
-        cell.direction = "right";
+    if (cell["direction"] == "left") {
+        cell["direction"] = "right";
     } else {
-        cell.direction = "left";
+        cell["direction"] = "left";
     }
 
     redrawCanvas();
@@ -241,11 +243,36 @@ function setBackgroundColor(id) {
     $("#palete #bg #" + id).addClass("selected");
 }
 
-$(function() {
-    // Setup the initial cells
-    main_cells[0] = [ Object.create(defaultcell) ];
+function exportImage(mimetype) {
+    var c = $("#draftcanvas")[0];
+    var image = c.toDataURL(mimetype);
+    window.open(image);
+}
 
-    lower_cells[0] = [ Object.create(defaultcell) ];
+$(function() {
+    Cookies.json = true;
+    if (Cookies.get("tablet-draft") == undefined) {
+
+        // Setup the initial cells
+        main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+
+        lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+
+        Cookies.set("tablet-draft", { "main" : main_cells, "lower" : lower_cells}, { expires: 366 });
+    } else {
+        var data = Cookies.get("tablet-draft");
+        main_cells = data["main"];
+        lower_cells = data["lower"];
+        Cookies.set("tablet-draft", { "main" : main_cells, "lower" : lower_cells}, { expires: 366 });
+    }
+
+    $("#clear").click(function() {
+        main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+
+        lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+
+        updateSizes(1,1,1);
+    });
 
     $("#mainrowcontrols .readout").val(main_cells[0].length);
     $("#lowrowcontrols .readout").val(lower_cells[0].length);
@@ -288,6 +315,8 @@ $(function() {
     $("#palete #bg .colorbox").click(function() {
         setBackgroundColor($(this).attr("id"));
     });
+
+    $("#export #jpeg").click(function() { exportImage("image/jpeg"); });
 
     $("#draftcanvas").mousedown(canvasClick);
     redrawCanvas();

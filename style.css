@@ -3,6 +3,29 @@ body {
     color: white;
 }
 
+#mainsection {
+    background-color:lightgrey;
+    display: inline-block;
+}
+
+#controlbar {
+    position: fixed;
+    top: 10px;
+    right: 0px;
+    width: 30%;
+}
+
+#controlbar div {
+    width: 80%;
+    display: inline-block;
+    background-color:lightgrey;
+}
+
+#controlpanel span:after {
+    content:'\A';
+    white-space:pre;
+}
+
 .draftcanvas {
     border:1px solid #000000;
 }
