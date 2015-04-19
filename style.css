@@ -6,3 +6,7 @@ body {
 .draftcanvas {
     border:1px solid #000000;
 }
+
+.readout {
+    width: 4em;
+}

@@ -10,6 +10,12 @@ var labelwidth = 20;
 var cellborder = 2;
 var intertablegap = 25;
 
+var defaultcell = {
+    background_color: "#FFFFFF",
+    color: "#000000",
+    direction:"left"
+};
+
 function redrawCanvas() {
     var c = $("#draftcanvas");
     var ctx = c[0].getContext("2d");
@@ -47,7 +53,7 @@ function redrawCanvas() {
             ctx.fillRect(labelwidth + cellborder + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y, cellwidth, cellheight);
             ctx.strokeStyle = lower_cells[y][x].color;
             ctx.beginPath();
-            if (main_cells[y][x].direction == "left") {
+            if (lower_cells[y][x].direction == "left") {
                 ctx.moveTo(labelwidth + cellborder + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y);
                 ctx.lineTo(labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth, (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight);
             } else {
@@ -77,7 +83,7 @@ function redrawCanvas() {
     }
     for (x = 0; x < nCols + 1; x++) {
         ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap);
-        ctx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsMain);
+        ctx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow);
     }
     ctx.lineWidth = cellborder;
     ctx.stroke();
@@ -88,18 +94,124 @@ function redrawCanvas() {
     }
 }
 
+function updateSizes(m,l,c) {
+    if (m < 1)
+        m = 1;
+    if (l < 1)
+        l = 1;
+    if (l > 8)
+        l = 8;
+    if (c < 1)
+        c = 1;
+
+    $("#mainrowcontrols .readout").val(m);
+    $("#lowrowcontrols .readout").val(l);
+    $("#colcontrols .readout").val(c);
+
+    if (main_cells.length > m) {
+        main_cells = main_cells.slice(0,m);
+    } else if (main_cells.length < m) {
+        for (y = main_cells.length; y < m; y++) {
+            var row = [];
+            for (x = 0; x < c; x++) {
+                row[x] = Object.create(defaultcell);
+            }
+            main_cells[y] = row;
+        }
+    }
+
+    if (lower_cells.length > l) {
+        lower_cells = lower_cells.slice(0,l);
+    } else if (lower_cells.length < l) {
+        for (y = lower_cells.length; y < l; y++) {
+            var row = [];
+            for (x = 0; x < c; x++) {
+                row[x] = Object.create(defaultcell);
+            }
+            lower_cells[y] = row;
+        }
+    }
+
+    for (y = 0; y < main_cells.length; y++) {
+        if (main_cells[y].length > c) {
+            main_cells[y] = main_cells[y].slice(0,c);
+        } else if (main_cells[y].length < c) {
+            for (x = main_cells[y].length; x < c; x++) {
+                main_cells[y][x] = Object.create(defaultcell);
+            }
+        }
+    }
+
+    for (y = 0; y < lower_cells.length; y++) {
+        if (lower_cells[y].length > c) {
+            lower_cells[y] = lower_cells[y].slice(0,c);
+        } else if (lower_cells[y].length < c) {
+            for (x = lower_cells[y].length; x < c; x++) {
+                lower_cells[y][x] = Object.create(defaultcell);
+            }
+        }
+    }
+
+    redrawCanvas();
+}
+
 $(function() {
     // Setup the initial cells
-    main_cells[0] = [ {
-        background_color: "#FFFFFF",
-        color: "#000000",
-        direction:"left"
-    } ];
+    main_cells[0] = [ Object.create(defaultcell) ];
 
-    lower_cells[0] = [ {
-        background_color: "#FFFFFF",
-        color: "#000000",
-        direction:"left"
-    } ];
+    lower_cells[0] = [ Object.create(defaultcell) ];
+
+    $("#mainrowcontrols .readout").val(main_cells[0].length);
+    $("#lowrowcontrols .readout").val(lower_cells[0].length);
+    $("#colcontrols .readout").val(main_cells.length);
+
+    $("#mainrowcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
+                                                                   parseInt($("#lowrowcontrols .readout").val()),
+                                                                   parseInt($("#colcontrols .readout").val())) });
+    $("#mainrowcontrols .minus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()) - 1,
+                                                                parseInt($("#lowrowcontrols .readout").val()),
+                                                                parseInt($("#colcontrols .readout").val())) });
+    $("#mainrowcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()) + 1,
+                                                               parseInt($("#lowrowcontrols .readout").val()),
+                                                               parseInt($("#colcontrols .readout").val())) });
+    
+    $("#lowrowcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
+                                                                  parseInt($("#lowrowcontrols .readout").val()),
+                                                                  parseInt($("#colcontrols .readout").val())) });
+    $("#lowrowcontrols .minus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
+                                                                parseInt($("#lowrowcontrols .readout").val()) - 1,
+                                                                parseInt($("#colcontrols .readout").val())) });
+    $("#lowrowcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
+                                                               parseInt($("#lowrowcontrols .readout").val()) + 1,
+                                                               parseInt($("#colcontrols .readout").val())) });
+    
+    $("#colcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
+                                                               parseInt($("#lowrowcontrols .readout").val()),
+                                                               parseInt($("#colcontrols .readout").val())) });
+    $("#colcontrols .minus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
+                                                                parseInt($("#lowrowcontrols .readout").val()),
+                                                                parseInt($("#colcontrols .readout").val()) - 1) });
+    $("#colcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
+                                                               parseInt($("#lowrowcontrols .readout").val()),
+                                                               parseInt($("#colcontrols .readout").val()) + 1) });
+    
+/*    $("#addrow").click( function() {
+        var row = [];
+        for (x = 0; x < main_cells[0].length; x++) {
+            row[x] = Object.create(defaultcell);
+        }
+        main_cells[main_cells.length] = row;
+        redrawCanvas();
+    });*/
+
+/*    $("#addcol").click( function() {
+        for (y = 0; y < main_cells.length; y++) {
+            main_cells[y][main_cells[y].length] = Object.create(defaultcell);
+        }
+        for (y = 0; y < lower_cells.length; y++) {
+            lower_cells[y][lower_cells[y].length] = Object.create(defaultcell);
+        }
+        redrawCanvas();
+    });*/
     redrawCanvas();
 })
