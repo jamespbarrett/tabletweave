@@ -10,6 +10,9 @@ var labelwidth = 20;
 var cellborder = 2;
 var intertablegap = 25;
 
+var fgcol = "none";
+var bgcol = "none";
+
 var defaultcell = {
     background_color: "#FFFFFF",
     color: "#000000",
@@ -33,7 +36,7 @@ function redrawCanvas() {
     for (y = 0; y < nRowsMain; y++) {
         for (x = 0; x < nCols; x++) {
             ctx.fillStyle = main_cells[y][x].background_color;
-            ctx.fillRect(labelwidth + cellborder + (cellborder + cellwidth)*x, cellborder + (cellborder + cellheight)*y, cellwidth, cellheight);
+            ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
             ctx.strokeStyle = main_cells[y][x].color;
             ctx.beginPath();
             if (main_cells[y][x].direction == "left") {
@@ -50,7 +53,7 @@ function redrawCanvas() {
     for (y = 0; y < nRowsLow; y++) {
         for (x = 0; x < nCols; x++) {
             ctx.fillStyle = lower_cells[y][x].background_color;
-            ctx.fillRect(labelwidth + cellborder + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y, cellwidth, cellheight);
+            ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
             ctx.strokeStyle = lower_cells[y][x].color;
             ctx.beginPath();
             if (lower_cells[y][x].direction == "left") {
@@ -163,6 +166,14 @@ function cellClick(g,x,y) {
         cell = lower_cells[y][x];
     }
 
+
+    if (fgcol != "none") {
+        cell.color = fgcol;
+    }
+    if (bgcol != "none") {
+        cell.background_color = bgcol;
+    }
+
     if (cell.direction == "left") {
         cell.direction = "right";
     } else {
@@ -192,6 +203,42 @@ function canvasClick(e) {
         var row = Math.floor((y - (cellborder + cellheight)*nRowsMain - intertablegap - cellborder)/(cellheight + cellborder));
         cellClick(1,col,row);
     }
+}
+
+function setForegroundColor(id) {
+    if (id == "EMPTYBOX") {
+        fgcol = "none";
+    } else if (id == "WHITEBOX") {
+        fgcol = "#ffffff";
+    } else if (id == "BLACKBOX") {
+        fgcol = "#000000";
+    } else if (id == "REDBOX") {
+        fgcol = "#ff0000";
+    } else if (id == "GREENBOX") {
+        fgcol = "#00ff00";
+    } else if (id == "BLUEBOX") {
+        fgcol = "#0000ff";
+    }
+
+    $("#palete #fg .colorbox").each(function() {
+        $(this).removeClass("selected");
+    });
+    $("#palete #fg #" + id).addClass("selected");
+}
+
+function setBackgroundColor(id) {
+    if (id == "EMPTYBOX") {
+        bgcol = "none";
+    } else if (id == "WHITEBOX") {
+        bgcol = "#ffffff";
+    } else if (id == "GREYBOX") {
+        bgcol = "#cccccc";
+    }
+
+    $("#palete #bg .colorbox").each(function() {
+        $(this).removeClass("selected");
+    });
+    $("#palete #bg #" + id).addClass("selected");
 }
 
 $(function() {
@@ -233,6 +280,14 @@ $(function() {
     $("#colcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                            parseInt($("#lowrowcontrols .readout").val()),
                                                            parseInt($("#colcontrols .readout").val()) + 1) });
+
+    $("#palete #fg .colorbox").click(function() {
+        setForegroundColor($(this).attr("id"));
+    });
+
+    $("#palete #bg .colorbox").click(function() {
+        setBackgroundColor($(this).attr("id"));
+    });
 
     $("#draftcanvas").mousedown(canvasClick);
     redrawCanvas();

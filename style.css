@@ -10,3 +10,42 @@ body {
 .readout {
     width: 4em;
 }
+
+.colorbox {
+    width: 20px;
+    height: 20px;
+    font-size: 50%;
+    border: 2px solid transparent;
+}
+
+.selected {
+    border: 2px solid black;
+}
+
+#BLACKBOX.selected {
+    border: 2px solid white;
+}
+
+#WHITEBOX {
+    background-color: #ffffff;
+}
+
+#BLACKBOX {
+    background-color: #000000;
+}
+
+#REDBOX {
+    background-color: #ff0000;
+}
+
+#GREENBOX {
+    background-color: #00ff00;
+}
+
+#BLUEBOX {
+    background-color: #0000ff;
+}
+
+#GREYBOX {
+    background-color: #cccccc;
+}
