@@ -29,7 +29,7 @@ function drawOval(ctx, x, y, length, bredth, angle) {
 }
 
 function redrawCanvas() {
-    Cookies.set("tablet-draft", { "main" : main_cells, "lower" : lower_cells}, { expires: 366 });
+    save();
 
     var c = $("#draftcanvas");
     var ctx = c[0].getContext("2d");
@@ -267,8 +267,28 @@ function setBackgroundColor(id) {
     $("#palete #bg #" + id).addClass("selected");
 }
 
+function save() {
+    localStorage.setItem("tablet-draft-main", JSON.stringify(main_cells));
+    localStorage.setItem("tablet-draft-lower", JSON.stringify(lower_cells));
+}
+
+function load() {
+    if (localStorage.getItem("tablet-draft-main") == undefined) {
+
+        // Setup the initial cells
+        main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+
+        lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+    } else {
+        main_cells  = JSON.parse(localStorage.getItem("tablet-draft-main"));
+        lower_cells = JSON.parse(localStorage.getItem("tablet-draft-lower"));
+    }
+
+    save();
+}
+
 function exportImage(mimetype) {
-    Cookies.set("tablet-draft", { "main" : main_cells, "lower" : lower_cells}, { expires: 366 });
+    save();
     var c = $("#draftcanvas")[0];
     var image = c.toDataURL(mimetype);
     window.open(image);
@@ -276,20 +296,7 @@ function exportImage(mimetype) {
 
 $(function() {
     Cookies.json = true;
-    if (Cookies.get("tablet-draft") == undefined) {
-
-        // Setup the initial cells
-        main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
-
-        lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
-
-        Cookies.set("tablet-draft", { "main" : main_cells, "lower" : lower_cells}, { expires: 366 });
-    } else {
-        var data = Cookies.get("tablet-draft");
-        main_cells = data["main"];
-        lower_cells = data["lower"];
-        Cookies.set("tablet-draft", { "main" : main_cells, "lower" : lower_cells}, { expires: 366 });
-    }
+    load();
 
     $("#clear").click(function() {
         main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
