@@ -6,12 +6,15 @@ body {
 #mainsection {
     background-color:lightgrey;
     display: inline-block;
+    position: relative;
+    left: 30%;
+    top: 80px;
 }
 
 #controlbar {
     position: fixed;
-    top: 10px;
-    right: 0px;
+    top: 80px;
+    left: 0px;
     width: 30%;
 }
 
@@ -62,7 +65,7 @@ body {
 }
 
 #GREENBOX {
-    background-color: #00ff00;
+    background-color: #009900;
 }
 
 #BLUEBOX {
@@ -71,4 +74,20 @@ body {
 
 #GREYBOX {
     background-color: #cccccc;
+}
+
+#YELLOWBOX {
+    background-color: #ffff00;
+}
+
+#CYANBOX {
+    background-color: #00ffff;
+}
+
+#MAGENTABOX {
+    background-color: #990099;
+}
+
+#ORANGEBOX {
+    background-color: #ff8800;
 }
