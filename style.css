@@ -73,7 +73,11 @@ body {
 }
 
 #GREYBOX {
-    background-color: #cccccc;
+    background-color: #dddddd;
+}
+
+#DARKGREYBOX {
+    background-color: #999999;
 }
 
 #YELLOWBOX {

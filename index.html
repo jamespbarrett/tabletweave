@@ -20,7 +20,8 @@
 <div id="controlpanel">
   <h3>Controls</h3>
   <div>
-    <span><button id="clear">Clear</button></span>
+    <span><button id="reset">Reset All</button></span>
+    <span><button id="clear">Clear Pattern</button></span>
     <span id="mainrowcontrols"><label>Pattern Rows:</label><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span>
     <span id="lowrowcontrols"><label>Draft:</label><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span>
     <span id="colcontrols"><label>Tablets:</label><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span>
@@ -28,13 +29,14 @@
 </div>
 
 <div id="palete">
-  <h3>Palete</h3>
+  <h3>Palette</h3>
   <div id="fg">
     <label>Forground Colour:</label>
     <table>
       <tr>
         <td class="colorbox selected" id="EMPTYBOX">None</td>
         <td class="colorbox" id="WHITEBOX"></td>
+        <td class="colorbox" id="DARKGREYBOX"></td>
         <td class="colorbox" id="BLACKBOX"></td>
         <td class="colorbox" id="REDBOX"></td>
         <td class="colorbox" id="ORANGEBOX"></td>

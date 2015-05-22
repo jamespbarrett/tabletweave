@@ -49,6 +49,7 @@ function redrawCanvas() {
             ctx.fillStyle = main_cells[y][x]["background_color"];
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
             ctx.fillStyle = main_cells[y][x]["color"];
+            ctx.strokeStyle = "0x000000";
             ctx.beginPath();
             if (main_cells[y][x]["direction"] == "left") {
                 drawOval(ctx,
@@ -61,8 +62,9 @@ function redrawCanvas() {
                          cellborder + (cellborder + cellheight)*y + cellheight/2,
                          cellwidth, cellwidth/2, Math.PI/4);
             }
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 1;
             ctx.fill();
+            ctx.stroke();
         }
     }
     for (y = 0; y < nRowsLow; y++) {
@@ -70,6 +72,7 @@ function redrawCanvas() {
             ctx.fillStyle = "#ffffff";//lower_cells[y][x]["background_color"];
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
             ctx.fillStyle = lower_cells[y][x]["color"];
+            ctx.strokeStyle = "0x000000";
             ctx.beginPath();
             if (lower_cells[y][x]["direction"] == "left") {
                 drawOval(ctx,
@@ -82,8 +85,9 @@ function redrawCanvas() {
                          (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
                          cellwidth, cellwidth/2, Math.PI/4);
             }
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 1;
             ctx.fill();
+            ctx.stroke();
         }
     }
     ctx.strokeStyle = "#000000";
@@ -258,10 +262,8 @@ function setForegroundColor(id) {
 function setBackgroundColor(id) {
     if (id == "EMPTYBOX") {
         bgcol = "none";
-    } else if (id == "WHITEBOX") {
-        bgcol = "#ffffff";
-    } else if (id == "GREYBOX") {
-        bgcol = "#cccccc";
+    } else {
+        bgcol = $("#palete #bg #" + id).css('backgroundColor');
     }
 
     $("#palete #bg .colorbox").each(function() {
@@ -301,12 +303,24 @@ $(function() {
     Cookies.json = true;
     load();
 
-    $("#clear").click(function() {
+    $("#reset").click(function() {
+        updateSizes(1,1,1);
+
         main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
 
         lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
 
-        updateSizes(1,1,1);
+        redrawCanvas();
+    });
+
+    $("#clear").click(function() {
+        for (y = 0; y < main_cells.length; y++) {
+            for (x = 0; x < main_cells[y].length; x++) {
+                main_cells[y][x] = JSON.parse(JSON.stringify(defaultcell));
+            }
+        }
+
+        redrawCanvas();
     });
 
     $("#mainrowcontrols .readout").val(main_cells.length);
