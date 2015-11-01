@@ -39,10 +39,10 @@ function redrawCanvas() {
     var nCols     = main_cells[0].length;
 
     c.attr("width",  labelwidth + cellborder + (cellborder + cellwidth)*nCols);
-    c.attr("height", cellborder + (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*nRowsLow);
+    c.attr("height", cellborder + (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow + 1));
 
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0,0, labelwidth + cellborder + (cellborder + cellwidth)*nCols, cellborder + (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*nRowsLow);
+    ctx.fillRect(0,0, labelwidth + cellborder + (cellborder + cellwidth)*nCols, cellborder + (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow + 1));
 
     for (y = 0; y < nRowsMain; y++) {
         for (x = 0; x < nCols; x++) {
@@ -121,6 +121,15 @@ function redrawCanvas() {
     for (y = 0; y < nRowsLow; y++) {
         ctx.fillText(labels[y], 2, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 15)/2);
     }
+    for (x = 0; x < nCols; x++) {
+        if (lower_cells[0][x]["direction"] == "left") {
+            ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
+                         (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
+        } else {
+            ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
+                         (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
+        }
+    }
 }
 
 function updateSizes(m,l,c) {
@@ -181,6 +190,12 @@ function updateSizes(m,l,c) {
         }
     }
 
+    for (y = 1; y < lower_cells.length; y++) {
+        for (x = 0; x < lower_cells[y].length; x++) {
+            lower_cells[y][x]["direction"] = lower_cells[0][x]["direction"];
+        }
+    }
+
     redrawCanvas();
 }
 
@@ -204,11 +219,11 @@ function cellClick(g,x,y) {
             }
         }
     } else {
-        cell = lower_cells[y][x];
-
-        if (fgcol != "none") {
+        if (y < lower_cells.length && fgcol != "none") {
+            cell = lower_cells[y][x];
             cell["color"] = fgcol;
         } else {
+            cell = lower_cells[0][x];
             if (cell["direction"] == "left") {
                 for (Y = 0; Y < lower_cells.length; Y++) {
                     lower_cells[Y][x]["direction"] = "right";
