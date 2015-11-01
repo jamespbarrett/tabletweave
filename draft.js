@@ -9,6 +9,8 @@ var cellheight = 20;
 var labelwidth = 20;
 var cellborder = 2;
 var intertablegap = 25;
+var copyrightheight = 20;
+var copyrightwidth = 416;
 
 var fgcol = "none";
 var bgcol = "none";
@@ -28,6 +30,8 @@ function drawOval(ctx, x, y, length, bredth, angle) {
     ctx.restore();
 }
 
+function max(a,b) { return (a > b)?a:b; }
+
 function redrawCanvas() {
     save();
 
@@ -38,11 +42,17 @@ function redrawCanvas() {
     var nRowsLow  = lower_cells.length;
     var nCols     = main_cells[0].length;
 
-    c.attr("width",  labelwidth + cellborder + (cellborder + cellwidth)*nCols);
-    c.attr("height", cellborder + (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow + 1));
+    var fullheight = cellborder + (cellborder + cellheight)*nRowsMain +
+        intertablegap +
+        cellborder + (cellborder + cellheight)*(nRowsLow + 1)
+        + copyrightheight;
+    var fullwidth = max(labelwidth + cellborder + (cellborder + cellwidth)*nCols, copyrightwidth);
+
+    c.attr("width",  fullwidth);
+    c.attr("height", fullheight);
 
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0,0, labelwidth + cellborder + (cellborder + cellwidth)*nCols, cellborder + (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow + 1));
+    ctx.fillRect(0,0, fullwidth, fullheight);
 
     for (y = 0; y < nRowsMain; y++) {
         for (x = 0; x < nCols; x++) {
@@ -130,6 +140,11 @@ function redrawCanvas() {
                          (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
         }
     }
+
+    ctx.font = "10px Arial";
+    ctx.fillText("Made using Tablet Weaving Draft Designer v0.1 http://http://www.bazzalisk.org/tabletweave/",
+                 2,
+                 fullheight - 10);
 }
 
 function updateSizes(m,l,c) {
@@ -222,7 +237,7 @@ function cellClick(g,x,y) {
         if (y < lower_cells.length && fgcol != "none") {
             cell = lower_cells[y][x];
             cell["color"] = fgcol;
-        } else {
+        } else if (y <= lower_cells.length) {
             cell = lower_cells[0][x];
             if (cell["direction"] == "left") {
                 for (Y = 0; Y < lower_cells.length; Y++) {

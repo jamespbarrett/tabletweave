@@ -11,20 +11,34 @@
 <body>
 <h1>Tablet Weaving Draft Designer</h1>
 
+<div id="explanation">Simply set the size and shape of your draft in
+  the control panel, and click on the canvas to change the direction
+  of your picks. You can also change colours using the pallette.</div>
+
 <div id="mainsection">
   <canvas id="draftcanvas" class="draftcanvas">
   </canvas>
+  <br>
+  <br>
+  <br>
 </div>
 
 <div id="controlbar">
 <div id="controlpanel">
   <h3>Controls</h3>
   <div>
-    <span><button id="reset">Reset All</button></span>
-    <span><button id="clear">Clear Pattern</button></span>
-    <span id="mainrowcontrols"><label>Picks:</label><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span>
-    <span id="lowrowcontrols"><label>Number of Holes:</label><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span>
-    <span id="colcontrols"><label>Number of Tablets:</label><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span>
+    <span id="mainrowcontrols"><label>Picks:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+    <span id="lowrowcontrols"><label>Number of Holes:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+    <span id="colcontrols"><label>Number of Tablets:</label><span><button
+    class="minus">-</button><input class="readout"
+    value="0"></input><button class="plus">+</button><span></span>
+  </div>
+</div>
+
+<div id="resets">
+  <h3>Resets</h3>
+  <div>
+    <span><button id="reset">Reset All</button><button id="clear">Clear Pattern</button></span>
   </div>
 </div>
 
@@ -62,11 +76,15 @@
 
 <div id="export">
   <h3>Export</h3>
-  <button id="jpeg">JPEG</button>
+  <div>
+    <span><button id="jpeg">JPEG</button></span>
+  </div>
 </div>
 </div>
 
 
-
+<div id="copyright">Tablet Weaving Draft Designer Copyright (C) 2015
+  James P. Weaver and Catherine Weaver. The copyright of drafts designed with this
+  software rests with the designer of the draft, not of the software.</div>
 
 </body> </html>
