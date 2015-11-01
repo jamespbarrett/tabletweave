@@ -1,10 +1,10 @@
 body {
-    background-color:purple;
-    color: white;
+    background-color:#CCCCFF;
+    color: darkblue;
 }
 
 h1,h3 {
-    color: lightgreen;
+/*    color: green;*/
     text-align: center;
     font-variant: small-caps;
 }
@@ -24,10 +24,14 @@ h1,h3 {
     border: 1px solid black;
 }
 
+#controlbar label {
+/*    color: darkblue;*/
+}
+
 #controlbar > div {
     width: 100%;
     display: inline-block;
-    background-color:#CC55FF;
+    background-color:#EEEEFF;
 }
 
 #controlpanel > div {
@@ -131,7 +135,7 @@ h1,h3 {
 
 
 #copyright {
-    background-color:#CC55FF;
+    background-color:#EEEEFF;
     border: 1px, solid, black;
     display: block;
     width: 100%;
