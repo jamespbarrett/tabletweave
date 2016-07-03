@@ -13,12 +13,12 @@ var copyrightheight = 20;
 var copyrightwidth = 416;
 
 var fgcol = "none";
-var bgcol = "none";
+var reverse = "false";
 
 var defaultcell = {
-    "background_color": "#FFFFFF",
     "color": "#000000",
-    "direction":"left"
+    "direction":"left",
+    "reverse" : "false"
 };
 
 function drawOval(ctx, x, y, length, bredth, angle) {
@@ -56,12 +56,16 @@ function redrawCanvas() {
 
     for (y = 0; y < nRowsMain; y++) {
         for (x = 0; x < nCols; x++) {
-            ctx.fillStyle = main_cells[y][x]["background_color"];
+            if (main_cells[y][x]["reverse"] == "true") {
+                ctx.fillStyle = "#dddddd";
+            } else {
+                ctx.fillStyle = "#ffffff";
+            }
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
             ctx.fillStyle = main_cells[y][x]["color"];
             ctx.strokeStyle = "0x000000";
             ctx.beginPath();
-            if (main_cells[y][x]["direction"] == "left") {
+            if (((lower_cells[0][x]["direction"] == "left") != (main_cells[y][x]["reverse"] == "true"))) {
                 drawOval(ctx,
                          labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
                          cellborder + (cellborder + cellheight)*y + cellheight/2,
@@ -222,17 +226,21 @@ function cellClick(g,x,y) {
         if (fgcol != "none") {
             cell["color"] = fgcol;
         }
-        if (bgcol != "none") {
-            cell["background_color"] = bgcol;
+        if (reverse == "true") {
+            if (cell["reverse"] == "true") {
+                cell["reverse"] = "false";
+            } else {
+                cell["reverse"] = "true";
+            }
         }
 
-        if (fgcol == "none" && bgcol == "none") {
+        /*if (fgcol == "none" && bgcol == "none") {
             if (cell["direction"] == "left") {
                 cell["direction"] = "right";
             } else {
                 cell["direction"] = "left";
             }
-        }
+        }*/
     } else {
         if (y < lower_cells.length && fgcol != "none") {
             cell = lower_cells[y][x];
@@ -291,9 +299,9 @@ function setForegroundColor(id) {
 
 function setBackgroundColor(id) {
     if (id == "EMPTYBOX") {
-        bgcol = "none";
+        reverse = "false";
     } else {
-        bgcol = $("#palete #bg #" + id).css('backgroundColor');
+        reverse = "true";
     }
 
     $("#palete #bg .colorbox").each(function() {
