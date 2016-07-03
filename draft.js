@@ -53,10 +53,10 @@ function redrawCanvas() {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0,0, fullwidth, fullheight);
 
-    n = nRowsLow - 1;
-    reverse = 0;
-    dir = "left";
     for (x = 0; x < nCols; x++) {
+        n = nRowsLow - 1;
+        reverse = 0;
+        dir = "left";
         for (y = nRowsMain - 1; y >= 0; y--) {
             if (!reverse && !main_cells[y][x]) {
                 bg = "#ffffff";
