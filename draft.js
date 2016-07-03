@@ -18,7 +18,6 @@ var reverse = "false";
 var defaultcell = {
     "color": "#000000",
     "direction":"left",
-    "reverse" : "false"
 };
 
 function drawOval(ctx, x, y, length, bredth, angle) {
@@ -54,18 +53,44 @@ function redrawCanvas() {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0,0, fullwidth, fullheight);
 
-    for (y = 0; y < nRowsMain; y++) {
-        for (x = 0; x < nCols; x++) {
-            if (main_cells[y][x]["reverse"] == "true") {
-                ctx.fillStyle = "#dddddd";
+    n = nRowsLow - 1;
+    reverse = 0;
+    dir = "left";
+    for (x = 0; x < nCols; x++) {
+        for (y = nRowsMain - 1; y >= 0; y--) {
+            if (!reverse && !main_cells[y][x]) {
+                bg = "#ffffff";
+                fg = lower_cells[n][x]["color"];
+                dir = lower_cells[n][x]["direction"];
+                reverse = false;
+                n = (nRowsLow + n - 1) % nRowsLow;
+            } else if (reverse && !main_cells[y][x]) {
+                bg = "#cccccc";
+                fg = lower_cells[n][x]["color"];
+                dir = lower_cells[n][x]["direction"];
+                reverse = true;
+                n = (n + 1) % nRowsLow;
+            } else if (!reverse && main_cells[y][x]) {
+                bg = "#cccccc";
+                reverse = true;
+                n = (n + 1) % nRowsLow;
+                fg = lower_cells[n][x]["color"];
+                dir = lower_cells[n][x]["direction"];
+                n = (n + 1) % nRowsLow;
             } else {
-                ctx.fillStyle = "#ffffff";
+                bg = "#ffffff";
+                n = (nRowsLow + n - 1) % nRowsLow;
+                reverse = false;
+                fg = lower_cells[n][x]["color"];
+                dir = lower_cells[n][x]["direction"];
+                n = (nRowsLow + n - 1) % nRowsLow;
             }
+            ctx.fillStyle = bg;
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
-            ctx.fillStyle = main_cells[y][x]["color"];
+            ctx.fillStyle = fg;
             ctx.strokeStyle = "0x000000";
             ctx.beginPath();
-            if (((lower_cells[0][x]["direction"] == "left") != (main_cells[y][x]["reverse"] == "true"))) {
+            if (((dir == "left") != (reverse))) {
                 drawOval(ctx,
                          labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
                          cellborder + (cellborder + cellheight)*y + cellheight/2,
@@ -171,7 +196,7 @@ function updateSizes(m,l,c) {
         for (y = 0; y < m - main_cells.length; y++) {
             var row = [];
             for (x = 0; x < c; x++) {
-                row[x] = JSON.parse(JSON.stringify(defaultcell));
+                row[x] = 0;
             }
             main_cells.unshift(row);
         }
@@ -194,7 +219,7 @@ function updateSizes(m,l,c) {
             main_cells[y] = main_cells[y].slice(0,c);
         } else if (main_cells[y].length < c) {
             for (x = main_cells[y].length; x < c; x++) {
-                main_cells[y][x] = JSON.parse(JSON.stringify(defaultcell));
+                main_cells[y][x] = 0;
             }
         }
     }
@@ -221,26 +246,7 @@ function updateSizes(m,l,c) {
 function cellClick(g,x,y) {
     var cell;
     if (g == 0) {
-        cell = main_cells[y][x];
-
-        if (fgcol != "none") {
-            cell["color"] = fgcol;
-        }
-        if (reverse == "true") {
-            if (cell["reverse"] == "true") {
-                cell["reverse"] = "false";
-            } else {
-                cell["reverse"] = "true";
-            }
-        }
-
-        /*if (fgcol == "none" && bgcol == "none") {
-            if (cell["direction"] == "left") {
-                cell["direction"] = "right";
-            } else {
-                cell["direction"] = "left";
-            }
-        }*/
+        main_cells[y][x] = !main_cells[y][x];
     } else {
         if (y < lower_cells.length && fgcol != "none") {
             cell = lower_cells[y][x];
@@ -297,19 +303,6 @@ function setForegroundColor(id) {
     $("#palete #fg #" + id).addClass("selected");
 }
 
-function setBackgroundColor(id) {
-    if (id == "EMPTYBOX") {
-        reverse = "false";
-    } else {
-        reverse = "true";
-    }
-
-    $("#palete #bg .colorbox").each(function() {
-        $(this).removeClass("selected");
-    });
-    $("#palete #bg #" + id).addClass("selected");
-}
-
 function save() {
     localStorage.setItem("tablet-draft-main", JSON.stringify(main_cells));
     localStorage.setItem("tablet-draft-lower", JSON.stringify(lower_cells));
@@ -344,7 +337,7 @@ $(function() {
     $("#reset").click(function() {
         updateSizes(1,1,1);
 
-        main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+        main_cells[0] = [ false ];
 
         lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
 
@@ -354,7 +347,7 @@ $(function() {
     $("#clear").click(function() {
         for (y = 0; y < main_cells.length; y++) {
             for (x = 0; x < main_cells[y].length; x++) {
-                main_cells[y][x] = JSON.parse(JSON.stringify(defaultcell));
+                main_cells[y][x] = false;
             }
         }
 
@@ -397,10 +390,6 @@ $(function() {
 
     $("#palete #fg .colorbox").click(function() {
         setForegroundColor($(this).attr("id"));
-    });
-
-    $("#palete #bg .colorbox").click(function() {
-        setBackgroundColor($(this).attr("id"));
     });
 
     $("#export #jpeg").click(function() { exportImage("image/jpeg"); });
