@@ -154,6 +154,10 @@ function redrawCanvas() {
     ctx.stroke();
 
     ctx.font = "15px Arial";
+    for (x = 0; x < nCols; x++) {
+        ctx.fillText(x + 1,  labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
+                     (cellborder + cellheight)*nRowsMain + intertablegap - 3);
+    }
     for (y = 0; y < nRowsMain; y++) {
         ctx.fillText("" + (nRowsMain - y), 2, (cellborder + cellheight)*y + (cellheight + 15)/2);
     }
