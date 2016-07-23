@@ -18,7 +18,7 @@ h1,h3 {
 
 #controlbar {
     position: fixed;
-    top: 150px;
+    top: 140px;
     left: 0px;
     width: 350px;
     border: 1px solid black;
@@ -56,13 +56,13 @@ h1,h3 {
     width: 100%;
 }
 
-#resets div span, #export div span {
+#resets div span, #export div span, #fileio div span, #loaddiv div span {
     display: block;
     margin: auto;
     width: 30%;
 }
 
-#export button, #resets button {
+#export button, #resets button, #fileio button, #loaddiv input{
     width:100%;
 }
 

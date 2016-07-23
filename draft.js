@@ -308,6 +308,35 @@ function save() {
     localStorage.setItem("tablet-draft-lower", JSON.stringify(lower_cells));
 }
 
+function save_file() {
+    var tmp = { 'main_cells' : main_cells,
+                'lower_cells' : lower_cells };
+    var link = document.createElement('a');
+    link.download = "draft.json";
+    link.href = 'data:application/json;charset=utf-8,' + escape(JSON.stringify(tmp));
+    link.click();
+}
+
+function load_file() {
+    var x = document.getElementById("load");
+
+    if (x.files.length > 0) {
+        var reader = new FileReader();
+        reader.onload = (function(f) {
+            return function (e) {
+                tmp = JSON.parse(e.target.result);
+                main_cells = tmp['main_cells'];
+                lower_cells = tmp['lower_cells'];
+                updateSizes(main_cells.length, lower_cells.length, main_cells[0].length);
+                save();
+                redrawCanvas();
+            };
+        })(x.files[0]);
+
+        reader.readAsText(x.files[0]);
+    }
+}
+
 function load() {
     if (localStorage.getItem("tablet-draft-main") == undefined) {
 
@@ -393,6 +422,10 @@ $(function() {
     });
 
     $("#export #jpeg").click(function() { exportImage("image/jpeg"); });
+
+    $("#fileio #save").click(function() { save_file(); });
+
+    $("#loaddiv #load").change(function() { load_file(); });
 
     $("#draftcanvas").mousedown(canvasClick);
     redrawCanvas();
