@@ -425,7 +425,7 @@ $(function() {
 
     $("#fileio #save").click(function() { save_file(); });
 
-    $("#loaddiv #load").change(function() { load_file(); });
+    $("#fileio #load").change(function() { load_file(); });
 
     $("#draftcanvas").mousedown(canvasClick);
     redrawCanvas();
