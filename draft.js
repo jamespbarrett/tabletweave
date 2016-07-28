@@ -15,6 +15,8 @@ var copyrightwidth = 416;
 var fgcol = "none";
 var reverse = "false";
 
+var greycolour = "#909090";
+
 var defaultcell = {
     "color": "#000000",
     "direction":"left",
@@ -65,13 +67,13 @@ function redrawCanvas() {
                 reverse = false;
                 n = (nRowsLow + n - 1) % nRowsLow;
             } else if (reverse && !main_cells[y][x]) {
-                bg = "#cccccc";
+                bg = greycolour;
                 fg = lower_cells[n][x]["color"];
                 dir = lower_cells[n][x]["direction"];
                 reverse = true;
                 n = (n + 1) % nRowsLow;
             } else if (!reverse && main_cells[y][x]) {
-                bg = "#cccccc";
+                bg = greycolour;
                 reverse = true;
                 n = (n + 1) % nRowsLow;
                 fg = lower_cells[n][x]["color"];
