@@ -428,6 +428,7 @@ $(function() {
     });
 
     $("#export #jpeg").click(function() { exportImage("image/jpeg"); });
+    $("#export #png").click(function() { exportImage("image/png"); });
 
     $("#fileio #save").click(function() { save_file(); });
 
