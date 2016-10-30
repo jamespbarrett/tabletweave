@@ -3,6 +3,8 @@
 var main_cells  = [];
 var lower_cells = [];
 var labels = [ "A", "B", "C", "D", "E", "F", "G", "H" ];
+var palette = [ ];
+var default_palette = [ 'rgb(255, 255, 255)', 'rgb(0, 0, 0)', 'rgb(255, 0, 0)', 'rgb(0, 153, 0)', 'rgb(0, 0, 255)', 'rgb(221, 221, 221)', 'rgb(153, 153, 153)', 'rgb(255, 255, 0)', 'rgb(0, 255, 255)', 'rgb(153, 0, 153)', 'rgb(255, 136, 0)', 'rgb(255, 136, 136)' ];
 
 var cellwidth = 20;
 var cellheight = 20;
@@ -13,12 +15,14 @@ var copyrightheight = 20;
 var copyrightwidth = 416;
 
 var fgcol = "none";
+var fgid = 0;
 var reverse = "false";
 
 var greycolour = "#909090";
 
 var defaultcell = {
-    "color": "#000000",
+    "colorid" : 1,
+    "color": "rgb(0, 0, 0)",
     "direction":"left",
 };
 
@@ -62,13 +66,13 @@ function redrawCanvas() {
         for (y = nRowsMain - 1; y >= 0; y--) {
             if (!reverse && !main_cells[y][x]) {
                 bg = "#ffffff";
-                fg = lower_cells[n][x]["color"];
+                fg = palette[lower_cells[n][x]["colorid"]];
                 dir = lower_cells[n][x]["direction"];
                 reverse = false;
                 n = (nRowsLow + n - 1) % nRowsLow;
             } else if (reverse && !main_cells[y][x]) {
                 bg = greycolour;
-                fg = lower_cells[n][x]["color"];
+                fg = palette[lower_cells[n][x]["colorid"]];
                 dir = lower_cells[n][x]["direction"];
                 reverse = true;
                 n = (n + 1) % nRowsLow;
@@ -76,17 +80,18 @@ function redrawCanvas() {
                 bg = greycolour;
                 reverse = true;
                 n = (n + 1) % nRowsLow;
-                fg = lower_cells[n][x]["color"];
+                fg = palette[lower_cells[n][x]["colorid"]];
                 dir = lower_cells[n][x]["direction"];
                 n = (n + 1) % nRowsLow;
             } else {
                 bg = "#ffffff";
                 n = (nRowsLow + n - 1) % nRowsLow;
                 reverse = false;
-                fg = lower_cells[n][x]["color"];
+                fg = palette[lower_cells[n][x]["colorid"]];
                 dir = lower_cells[n][x]["direction"];
                 n = (nRowsLow + n - 1) % nRowsLow;
             }
+            lower_cells[n][x]["color"] = fg;
             ctx.fillStyle = bg;
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
             ctx.fillStyle = fg;
@@ -112,7 +117,7 @@ function redrawCanvas() {
         for (x = 0; x < nCols; x++) {
             ctx.fillStyle = "#ffffff";//lower_cells[y][x]["background_color"];
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
-            ctx.fillStyle = lower_cells[y][x]["color"];
+            ctx.fillStyle = palette[lower_cells[y][x]["colorid"]];
             ctx.strokeStyle = "0x000000";
             ctx.beginPath();
             if (lower_cells[y][x]["direction"] == "left") {
@@ -180,6 +185,17 @@ function redrawCanvas() {
     ctx.fillText("Made using Tablet Weaving Draft Designer v0.1 http://http://www.bazzalisk.org/tabletweave/",
                  2,
                  fullheight - 10);
+
+    for (clr = 0; clr < palette.length; clr++) {
+        n = 0;
+        for (row = 0; row < lower_cells.length; row++) {
+            for (col = 0; col < lower_cells[row].length; col++) {
+                if (lower_cells[row][col]['colorid'] == clr)
+                    n++;
+            }
+        }
+        $("#NUM" + (clr + 1)).text(n);
+    }
 }
 
 function updateSizes(m,l,c) {
@@ -257,6 +273,7 @@ function cellClick(g,x,y) {
         if (y < lower_cells.length && fgcol != "none") {
             cell = lower_cells[y][x];
             cell["color"] = fgcol;
+            cell["colorid"] = fgid;
         } else if (y <= lower_cells.length) {
             cell = lower_cells[0][x];
             if (cell["direction"] == "left") {
@@ -299,24 +316,39 @@ function canvasClick(e) {
 function setForegroundColor(id) {
     if (id == "EMPTYBOX") {
         fgcol = "none";
+        fgid = -1;
     } else {
         fgcol = $("#palete #fg #" + id).css('backgroundColor');
+        fgid = parseInt(id.slice(3)) - 1;
     }
 
     $("#palete #fg .colorbox").each(function() {
         $(this).removeClass("selected");
     });
     $("#palete #fg #" + id).addClass("selected");
+
+    var rgb = /rgb\((\d+), (\d+), (\d+)\)/.exec(fgcol);
+
+    $("#REDSLIDE").val(rgb[1]);
+    $("#REDVAL").val(rgb[1]);
+
+    $("#GREENSLIDE").val(rgb[2]);
+    $("#GREENVAL").val(rgb[2]);
+
+    $("#BLUESLIDE").val(rgb[3]);
+    $("#BLUEVAL").val(rgb[3]);
 }
 
 function save() {
     localStorage.setItem("tablet-draft-main", JSON.stringify(main_cells));
     localStorage.setItem("tablet-draft-lower", JSON.stringify(lower_cells));
+    localStorage.setItem("tablet-draft-palette", JSON.stringify(palette));
 }
 
 function save_file() {
-    var tmp = { 'main_cells' : main_cells,
-                'lower_cells' : lower_cells };
+    var tmp = { 'main_cells'  : main_cells,
+                'lower_cells' : lower_cells,
+                'palette'     : palette };
     var link = document.createElement('a');
     link.download = "draft.json";
     link.href = 'data:application/json;charset=utf-8,' + escape(JSON.stringify(tmp));
@@ -333,6 +365,25 @@ function load_file() {
                 tmp = JSON.parse(e.target.result);
                 main_cells = tmp['main_cells'];
                 lower_cells = tmp['lower_cells'];
+                if (tmp['palette'] != undefined) {
+                    palette = tmp['palette'];
+                } else {
+                    palette = JSON.parse(JSON.stringify(default_palette));
+                }
+                for (r = 0; r < lower_cells.length; r++) {
+                    for (c = 0; c < lower_cells[r].length; c++) {
+                        if (lower_cells[r][c]['colorid'] == undefined) {
+                            for (i = 0; i < palette.length; i++) {
+                                if (lower_cells[r][c]['color'] == palette[i]) {
+                                    lower_cells[r][c]['colorid'] = i;
+                                }
+                            }
+                            if (lower_cells[r][c]['colorid'] == undefined) {
+                                lower_cells[r][c]['colorid'] = 0;
+                            }
+                        }
+                    }
+                }
                 updateSizes(main_cells.length, lower_cells.length, main_cells[0].length);
                 save();
                 redrawCanvas();
@@ -355,6 +406,26 @@ function load() {
         lower_cells = JSON.parse(localStorage.getItem("tablet-draft-lower"));
     }
 
+    if (localStorage.getItem("tablet-draft-palette") == undefined) {
+        palette = JSON.parse(JSON.stringify(default_palette));
+    } else {
+        paletter = JSON.parse(localStorage.getItem("tablet-draft-palette"));
+    }
+    for (r = 0; r < lower_cells.length; r++) {
+        for (c = 0; c < lower_cells[r].length; c++) {
+            if (lower_cells[r][c]['colorid'] == undefined) {
+                for (i = 0; i < palette.length; i++) {
+                    if (lower_cells[r][c]['color'] == palette[i]) {
+                        lower_cells[r][c]['colorid'] = i;
+                    }
+                }
+                if (lower_cells[r][c]['colorid'] == undefined) {
+                    lower_cells[r][c]['colorid'] = 0;
+                }
+            }
+        }
+    }
+
     save();
 }
 
@@ -365,8 +436,21 @@ function exportImage(mimetype) {
     window.open(image);
 }
 
+function updatePalette(r,g,b) {
+    palette[fgid] = "rgb(" + r + ", " + g + " ," + b + ")";
+    $("#REDSLIDE").val(r);
+    $("#REDVAL").val(r);
+    $("#GREENSLIDE").val(g);
+    $("#GREENVAL").val(g);
+    $("#BLUESLIDE").val(b);
+    $("#BLUEVAL").val(b);
+    $("#BOX" + (fgid + 1)).css("background-color", palette[fgid]);
+    redrawCanvas();
+}
+
 $(function() {
     Cookies.json = true;
+    palette = JSON.parse(JSON.stringify(default_palette));
     load();
 
     $("#reset").click(function() {
@@ -375,6 +459,8 @@ $(function() {
         main_cells[0] = [ false ];
 
         lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+
+        palette = JSON.parse(JSON.stringify(default_palette));
 
         redrawCanvas();
     });
@@ -392,6 +478,13 @@ $(function() {
     $("#mainrowcontrols .readout").val(main_cells.length);
     $("#lowrowcontrols .readout").val(lower_cells.length);
     $("#colcontrols .readout").val(main_cells[0].length);
+
+    $("#REDSLIDE").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENSLIDE").val(), $("#BLUESLIDE").val()); });
+    $("#REDVAL").change(function() { updatePalette($("#REDVAL").val(), $("#GREENSLIDE").val(), $("#BLUESLIDE").val()); });
+    $("#GREENSLIDE").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENSLIDE").val(), $("#BLUESLIDE").val()); });
+    $("#GREENVAL").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENVAL").val(), $("#BLUESLIDE").val()); });
+    $("#BLUESLIDE").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENSLIDE").val(), $("#BLUESLIDE").val()); });
+    $("#BLUEVAL").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENSLIDE").val(), $("#BLUEVAL").val()); });
 
     $("#mainrowcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                                    parseInt($("#lowrowcontrols .readout").val()),
@@ -422,6 +515,12 @@ $(function() {
     $("#colcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                            parseInt($("#lowrowcontrols .readout").val()),
                                                            parseInt($("#colcontrols .readout").val()) + 1) });
+
+    $("#palete #fg .colorbox").each(function() {
+        for (i = 0; i < palette.length; i++)
+            if ($(this).attr("id") == "BOX" + (i + 1))
+                $(this).css("background-color", palette[i]);
+    });
 
     $("#palete #fg .colorbox").click(function() {
         setForegroundColor($(this).attr("id"));
