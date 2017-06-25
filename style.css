@@ -69,6 +69,15 @@ h1,h3 {
     width:100%;
 }
 
+#instructions {
+    width:100%;
+}
+
+.instructionlink {
+    font-size: 200%;
+    text-align: center;
+}
+
 .draftcanvas {
     border:1px solid #000000;
 }
