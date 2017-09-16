@@ -433,7 +433,9 @@ function exportImage(mimetype) {
     save();
     var c = $("#draftcanvas")[0];
     var image = c.toDataURL(mimetype);
-    window.open(image);
+    $("#preview").attr("src", image);
+    $("#messagepopup").show();
+    $(".closepreview").focus();
 }
 
 function updatePalette(r,g,b) {
@@ -515,6 +517,7 @@ $(function() {
     $("#colcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                            parseInt($("#lowrowcontrols .readout").val()),
                                                            parseInt($("#colcontrols .readout").val()) + 1) });
+    $("#messagepopup .closepreview").click(function() { $("#messagepopup").hide(); });
 
     $("#palete #fg .colorbox").each(function() {
         for (i = 0; i < palette.length; i++)

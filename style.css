@@ -9,6 +9,11 @@ h1,h3 {
     font-variant: small-caps;
 }
 
+.instructionlink a {
+    font-size: x-large;
+    font-variant: small-caps;
+}
+
 #mainsection {
     display: inline-block;
     position: absolute;
@@ -163,4 +168,22 @@ h1,h3 {
     z-index: -1;
     text-align: center;
     font-size: smaller;
+}
+
+#messagepopup {
+    background-color:#FFFFFF;
+    border:1px solid #999999;
+    cursor:default;
+    display:none;
+    margin-top: 15px;
+    position:absolute;
+    text-align:left;
+    width:80%;
+    z-index:50;
+    padding: 25px 25px 20px;
+}
+
+#previewcontainer {
+    padding: 5px 5px 5px;
+    border: 1px solid #999999;
 }
