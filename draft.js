@@ -40,6 +40,8 @@ function max(a,b) { return (a > b)?a:b; }
 function redrawCanvas() {
     save();
 
+    var showovals = $("#showovals").prop("checked");
+
     var c = $("#draftcanvas");
     var ctx = c[0].getContext("2d");
 
@@ -94,23 +96,25 @@ function redrawCanvas() {
             lower_cells[n][x]["color"] = fg;
             ctx.fillStyle = bg;
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
-            ctx.fillStyle = fg;
-            ctx.strokeStyle = "0x000000";
-            ctx.beginPath();
-            if (((dir == "left") != (reverse))) {
-                drawOval(ctx,
-                         labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                         cellborder + (cellborder + cellheight)*y + cellheight/2,
-                         cellwidth, cellwidth/2, -Math.PI/4);
-            } else {
-                drawOval(ctx,
-                         labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                         cellborder + (cellborder + cellheight)*y + cellheight/2,
-                         cellwidth, cellwidth/2, Math.PI/4);
+            if (showovals) {
+                ctx.fillStyle = fg;
+                ctx.strokeStyle = "0x000000";
+                ctx.beginPath();
+                if (((dir == "left") != (reverse))) {
+                    drawOval(ctx,
+                             labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                             cellborder + (cellborder + cellheight)*y + cellheight/2,
+                             cellwidth, cellwidth/2, -Math.PI/4);
+                } else {
+                    drawOval(ctx,
+                             labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                             cellborder + (cellborder + cellheight)*y + cellheight/2,
+                             cellwidth, cellwidth/2, Math.PI/4);
+                }
+                ctx.lineWidth = 1;
+                ctx.fill();
+                ctx.stroke();
             }
-            ctx.lineWidth = 1;
-            ctx.fill();
-            ctx.stroke();
         }
     }
     for (y = 0; y < nRowsLow; y++) {
@@ -476,6 +480,8 @@ $(function() {
 
         redrawCanvas();
     });
+
+    $("#showovals").change(function() { redrawCanvas(); });
 
     $("#mainrowcontrols .readout").val(main_cells.length);
     $("#lowrowcontrols .readout").val(lower_cells.length);

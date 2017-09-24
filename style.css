@@ -42,21 +42,21 @@ h1,h3 {
     background-color:#EEEEFF;
 }
 
-#controlpanel > div {
+div.controlpanel > div {
     display: table;
     width: 80%;
     margin: auto;
 }
 
-#controlpanel > div > span {
+div.controlpanel > div > span {
     display: table-row;
 }
 
-#controlpanel > div > span > label {
+div.controlpanel > div > span > label {
     display: table-cell;
 }
 
-#controlpanel > div > span > span {
+div.controlpanel > div > span > span {
     display: table-cell;
 }
 
