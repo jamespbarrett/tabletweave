@@ -436,7 +436,7 @@ function load() {
 function exportImage(mimetype) {
     save();
     var c = $("#draftcanvas")[0];
-    var image = c.toDataURL(mimetype);
+    var image = c.toDataURL(mimetype, 1.0);
     $("#preview").attr("src", image);
     $("#messagepopup").show();
     $(".closepreview").focus();
