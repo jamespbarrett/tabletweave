@@ -41,6 +41,7 @@ function redrawCanvas() {
     save();
 
     var showovals = $("#showovals").prop("checked");
+    var showlower = $("#showlower").prop("checked");
 
     var c = $("#draftcanvas");
     var ctx = c[0].getContext("2d");
@@ -50,9 +51,10 @@ function redrawCanvas() {
     var nCols     = main_cells[0].length;
 
     var fullheight = cellborder + (cellborder + cellheight)*nRowsMain +
-        intertablegap +
-        cellborder + (cellborder + cellheight)*(nRowsLow + 1)
         + copyrightheight;
+    if (showlower) {
+        fullheight += intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow + 1);
+    }
     var fullwidth = max(labelwidth + cellborder + (cellborder + cellwidth)*nCols, copyrightwidth);
 
     c.attr("width",  fullwidth);
@@ -117,27 +119,29 @@ function redrawCanvas() {
             }
         }
     }
-    for (y = 0; y < nRowsLow; y++) {
-        for (x = 0; x < nCols; x++) {
-            ctx.fillStyle = "#ffffff";//lower_cells[y][x]["background_color"];
-            ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
-            ctx.fillStyle = palette[lower_cells[y][x]["colorid"]];
-            ctx.strokeStyle = "0x000000";
-            ctx.beginPath();
-            if (lower_cells[y][x]["direction"] == "left") {
-                drawOval(ctx,
-                         labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                         (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
-                         cellwidth, cellwidth/2, -Math.PI/4);
-            } else {
-                drawOval(ctx,
-                         labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                         (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
-                         cellwidth, cellwidth/2, Math.PI/4);
+    if (showlower) {
+        for (y = 0; y < nRowsLow; y++) {
+            for (x = 0; x < nCols; x++) {
+                ctx.fillStyle = "#ffffff";//lower_cells[y][x]["background_color"];
+                ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
+                ctx.fillStyle = palette[lower_cells[y][x]["colorid"]];
+                ctx.strokeStyle = "0x000000";
+                ctx.beginPath();
+                if (lower_cells[y][x]["direction"] == "left") {
+                    drawOval(ctx,
+                             labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                             (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
+                             cellwidth, cellwidth/2, -Math.PI/4);
+                } else {
+                    drawOval(ctx,
+                             labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                             (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
+                             cellwidth, cellwidth/2, Math.PI/4);
+                }
+                ctx.lineWidth = 1;
+                ctx.fill();
+                ctx.stroke();
             }
-            ctx.lineWidth = 1;
-            ctx.fill();
-            ctx.stroke();
         }
     }
     ctx.strokeStyle = "#000000";
@@ -153,35 +157,39 @@ function redrawCanvas() {
         ctx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain);
     }
 
-    for (y = 0; y < nRowsLow + 1; y++) {
-        ctx.moveTo(labelwidth, (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight));
-        ctx.lineTo(labelwidth + (cellborder + cellwidth)*nCols, (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight))
-    }
-    for (x = 0; x < nCols + 1; x++) {
-        ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap);
-        ctx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow);
+    if (showlower) {
+        for (y = 0; y < nRowsLow + 1; y++) {
+            ctx.moveTo(labelwidth, (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight));
+            ctx.lineTo(labelwidth + (cellborder + cellwidth)*nCols, (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight))
+        }
+        for (x = 0; x < nCols + 1; x++) {
+            ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap);
+            ctx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow);
+        }
     }
     ctx.lineWidth = cellborder;
     ctx.stroke();
 
     ctx.font = "15px Arial";
-    for (x = 0; x < nCols; x++) {
-        ctx.fillText(x + 1,  labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
-                     (cellborder + cellheight)*nRowsMain + intertablegap - 3);
-    }
     for (y = 0; y < nRowsMain; y++) {
         ctx.fillText("" + (nRowsMain - y), 2, (cellborder + cellheight)*y + (cellheight + 15)/2);
     }
-    for (y = 0; y < nRowsLow; y++) {
-        ctx.fillText(labels[y], 2, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 15)/2);
-    }
-    for (x = 0; x < nCols; x++) {
-        if (lower_cells[0][x]["direction"] == "left") {
-            ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
-                         (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
-        } else {
-            ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
-                         (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
+    if (showlower) {
+        for (x = 0; x < nCols; x++) {
+            ctx.fillText(x + 1,  labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
+                         (cellborder + cellheight)*nRowsMain + intertablegap - 3);
+        }
+        for (y = 0; y < nRowsLow; y++) {
+            ctx.fillText(labels[y], 2, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 15)/2);
+        }
+        for (x = 0; x < nCols; x++) {
+            if (lower_cells[0][x]["direction"] == "left") {
+                ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
+                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
+            } else {
+                ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
+                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
+            }
         }
     }
 
@@ -190,15 +198,17 @@ function redrawCanvas() {
                  2,
                  fullheight - 10);
 
-    for (clr = 0; clr < palette.length; clr++) {
-        n = 0;
-        for (row = 0; row < lower_cells.length; row++) {
-            for (col = 0; col < lower_cells[row].length; col++) {
-                if (lower_cells[row][col]['colorid'] == clr)
-                    n++;
+    if (showlower) {
+        for (clr = 0; clr < palette.length; clr++) {
+            n = 0;
+            for (row = 0; row < lower_cells.length; row++) {
+                for (col = 0; col < lower_cells[row].length; col++) {
+                    if (lower_cells[row][col]['colorid'] == clr)
+                        n++;
+                }
             }
+            $("#NUM" + (clr + 1)).text(n);
         }
-        $("#NUM" + (clr + 1)).text(n);
     }
 }
 
@@ -482,6 +492,7 @@ $(function() {
     });
 
     $("#showovals").change(function() { redrawCanvas(); });
+    $("#showlower").change(function() { redrawCanvas(); });
 
     $("#mainrowcontrols .readout").val(main_cells.length);
     $("#lowrowcontrols .readout").val(lower_cells.length);
