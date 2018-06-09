@@ -51,9 +51,10 @@ function redrawCanvas() {
     var nCols     = main_cells[0].length;
 
     var fullheight = cellborder + (cellborder + cellheight)*nRowsMain +
+        cellborder + cellheight
         + copyrightheight;
     if (showlower) {
-        fullheight += intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow + 1);
+        fullheight += intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow);
     }
     var fullwidth = max(labelwidth + cellborder + (cellborder + cellwidth)*nCols, copyrightwidth);
 
