@@ -172,23 +172,26 @@ function redrawCanvas() {
 
     ctx.font = "30px Arial";
     for (y = 0; y < nRowsMain; y++) {
-        ctx.fillText("" + (nRowsMain - y), 2, (cellborder + cellheight)*y + (cellheight + 15)/2);
+        ctx.fillText("" + (nRowsMain - y), 2, (cellborder + cellheight)*y + (cellheight + 30)/2);
+    }
+    var h = (cellborder + cellheight)*(nRowsMain + 1) - 6;
+    if (showlower)
+        h += intertablegap - cellheight - cellborder;
+    for (x = 0; x < nCols; x++) {
+        var w = ctx.measureText(x + 1).width;
+        ctx.fillText(x + 1,  labelwidth + (cellborder + cellwidth)*x +  (cellwidth)/2 - w/2, h);
     }
     if (showlower) {
-        for (x = 0; x < nCols; x++) {
-            ctx.fillText(x + 1,  labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
-                         (cellborder + cellheight)*nRowsMain + intertablegap - 3);
-        }
         for (y = 0; y < nRowsLow; y++) {
-            ctx.fillText(labels[y], 2, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 15)/2);
+            ctx.fillText(labels[y], 2, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 30)/2);
         }
         for (x = 0; x < nCols; x++) {
             if (lower_cells[0][x]["direction"] == "left") {
-                ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
+                ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 16)/2,
+                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 30)/2);
             } else {
-                ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8)/2,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15)/2);
+                ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 16)/2,
+                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 30)/2);
             }
         }
     }
