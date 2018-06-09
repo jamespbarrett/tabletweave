@@ -170,7 +170,7 @@ function redrawCanvas() {
     ctx.lineWidth = cellborder;
     ctx.stroke();
 
-    ctx.font = "15px Arial";
+    ctx.font = "30px Arial";
     for (y = 0; y < nRowsMain; y++) {
         ctx.fillText("" + (nRowsMain - y), 2, (cellborder + cellheight)*y + (cellheight + 15)/2);
     }
