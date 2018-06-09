@@ -6,13 +6,13 @@ var labels = [ "A", "B", "C", "D", "E", "F", "G", "H" ];
 var palette = [ ];
 var default_palette = [ 'rgb(255, 255, 255)', 'rgb(0, 0, 0)', 'rgb(255, 0, 0)', 'rgb(0, 153, 0)', 'rgb(0, 0, 255)', 'rgb(221, 221, 221)', 'rgb(153, 153, 153)', 'rgb(255, 255, 0)', 'rgb(0, 255, 255)', 'rgb(153, 0, 153)', 'rgb(255, 136, 0)', 'rgb(255, 136, 136)' ];
 
-var cellwidth = 20;
-var cellheight = 20;
-var labelwidth = 20;
-var cellborder = 2;
-var intertablegap = 25;
-var copyrightheight = 20;
-var copyrightwidth = 416;
+var cellwidth = 40;
+var cellheight = 40;
+var labelwidth = 40;
+var cellborder = 4;
+var intertablegap = 50;
+var copyrightheight = 40;
+var copyrightwidth = 832;
 
 var fgcol = "none";
 var fgid = 0;
