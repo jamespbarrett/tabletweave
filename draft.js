@@ -12,6 +12,8 @@ var reverse = "false";
 
 var greycolour = "#909090";
 
+var exportMimetype = "image/png";
+
 var defaultcell = {
     "colorid" : 1,
     "color": "rgb(0, 0, 0)",
@@ -29,10 +31,10 @@ function drawOval(ctx, x, y, length, bredth, angle) {
 
 function max(a,b) { return (a > b)?a:b; }
 
-function redrawCanvas() {
+function redrawCanvas(scale) {
     save();
 
-    var scale = $("#scalecontrols .readout").val();
+    scale = ( typeof scale === 'undefined') ? $("#scalecontrols .readout").val() : scale;
 
     var cellwidth = 20*scale;
     var cellheight = 20*scale;
@@ -224,6 +226,17 @@ function updateScale(s) {
 
     $("#scalecontrols .readout").val(s);
 
+    redrawCanvas();
+}
+
+function updateQuality(s) {
+    if (s < 1)
+        s = 1;
+
+    $("#qualitycontrols .readout").val(s);
+
+    redrawCanvas(s);
+    redrawPreview();
     redrawCanvas();
 }
 
@@ -466,11 +479,16 @@ function load() {
     save();
 }
 
+function redrawPreview() {
+    var c = $("#draftcanvas")[0];
+    var image = c.toDataURL(exportMimetype, 1.0);
+    $("#preview").attr("src", image);
+}
+
 function exportImage(mimetype) {
     save();
-    var c = $("#draftcanvas")[0];
-    var image = c.toDataURL(mimetype, 1.0);
-    $("#preview").attr("src", image);
+    exportMimetype = mimetype;
+    updateQuality($("#scalecontrols .readout").val());
     $("#messagepopup").show();
     $(".closepreview").focus();
 }
@@ -558,9 +576,16 @@ $(function() {
                                                            parseInt($("#lowrowcontrols .readout").val()),
                                                            parseInt($("#colcontrols .readout").val()) + 1) });
 
-    $("#scalecontrols .readout").change(function() { updateScale(parseInt($("#scalecontrols .readout").val())) });
-    $("#scalecontrols .minus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) - 1) });
-    $("#scalecontrols .plus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) + 1) });
+    $("#scalecontrols .readout").change(function() { updateScale(parseInt($("#scalecontrols .readout").val()));
+                                                     redrawPreview();});
+    $("#scalecontrols .minus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) - 1);
+                                                  redrawPreview();});
+    $("#scalecontrols .plus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) + 1);
+                                                 redrawPreview();});
+
+    $("#qualitycontrols .readout").change(function() { updateQuality(parseInt($("#qualitycontrols .readout").val())); });
+    $("#qualitycontrols .minus").click(function() { updateQuality(parseInt($("#qualitycontrols .readout").val()) - 1); });
+    $("#qualitycontrols .plus").click(function() { updateQuality(parseInt($("#qualitycontrols .readout").val()) + 1); });
 
     
     $("#messagepopup .closepreview").click(function() { $("#messagepopup").hide(); });
