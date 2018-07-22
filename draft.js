@@ -6,14 +6,6 @@ var labels = [ "A", "B", "C", "D", "E", "F", "G", "H" ];
 var palette = [ ];
 var default_palette = [ 'rgb(255, 255, 255)', 'rgb(0, 0, 0)', 'rgb(255, 0, 0)', 'rgb(0, 153, 0)', 'rgb(0, 0, 255)', 'rgb(221, 221, 221)', 'rgb(153, 153, 153)', 'rgb(255, 255, 0)', 'rgb(0, 255, 255)', 'rgb(153, 0, 153)', 'rgb(255, 136, 0)', 'rgb(255, 136, 136)' ];
 
-var cellwidth = 40;
-var cellheight = 40;
-var labelwidth = 40;
-var cellborder = 4;
-var intertablegap = 50;
-var copyrightheight = 40;
-var copyrightwidth = 832;
-
 var fgcol = "none";
 var fgid = 0;
 var reverse = "false";
@@ -39,6 +31,16 @@ function max(a,b) { return (a > b)?a:b; }
 
 function redrawCanvas() {
     save();
+
+    var scale = $("#scalecontrols .readout").val();
+
+    var cellwidth = 20*scale;
+    var cellheight = 20*scale;
+    var labelwidth = 20*scale;
+    var cellborder = 2*scale;
+    var intertablegap = 25*scale;
+    var copyrightheight = 20*scale;
+    var copyrightwidth = 416*scale;
 
     var showovals = $("#showovals").prop("checked");
     var showlower = $("#showlower").prop("checked");
@@ -171,11 +173,11 @@ function redrawCanvas() {
     ctx.lineWidth = cellborder;
     ctx.stroke();
 
-    ctx.font = "30px Arial";
+    ctx.font = "" + 15*scale + "px Arial";
     for (y = 0; y < nRowsMain; y++) {
-        ctx.fillText("" + (nRowsMain - y), 2, (cellborder + cellheight)*y + (cellheight + 30)/2);
+        ctx.fillText("" + (nRowsMain - y), 1*scale, (cellborder + cellheight)*y + (cellheight + 15*scale)/2);
     }
-    var h = (cellborder + cellheight)*(nRowsMain + 1) - 6;
+    var h = (cellborder + cellheight)*(nRowsMain + 1) - 3*scale;
     if (showlower)
         h += intertablegap - cellheight - cellborder;
     for (x = 0; x < nCols; x++) {
@@ -184,23 +186,23 @@ function redrawCanvas() {
     }
     if (showlower) {
         for (y = 0; y < nRowsLow; y++) {
-            ctx.fillText(labels[y], 2, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 30)/2);
+            ctx.fillText(labels[y], 1*scale, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 15*scale)/2);
         }
         for (x = 0; x < nCols; x++) {
             if (lower_cells[0][x]["direction"] == "left") {
-                ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 16)/2,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 30)/2);
+                ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8*scale)/2,
+                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15*scale)/2);
             } else {
-                ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 16)/2,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 30)/2);
+                ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8*scale)/2,
+                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15*scale)/2);
             }
         }
     }
 
-    ctx.font = "20px Arial";
+    ctx.font = "" + 10*scale + "px Arial";
     ctx.fillText("Made using Tablet Weaving Draft Designer v0.1 http://http://www.bazzalisk.org/tabletweave/",
-                 2,
-                 fullheight - 10);
+                 1*scale,
+                 fullheight - 5*scale);
 
     if (showlower) {
         for (clr = 0; clr < palette.length; clr++) {
@@ -214,6 +216,15 @@ function redrawCanvas() {
             $("#NUM" + (clr + 1)).text(n);
         }
     }
+}
+
+function updateScale(s) {
+    if (s < 1)
+        s = 1;
+
+    $("#scalecontrols .readout").val(s);
+
+    redrawCanvas();
 }
 
 function updateSizes(m,l,c) {
@@ -538,6 +549,12 @@ $(function() {
     $("#colcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                            parseInt($("#lowrowcontrols .readout").val()),
                                                            parseInt($("#colcontrols .readout").val()) + 1) });
+
+    $("#scalecontrols .readout").change(function() { updateScale(parseInt($("#scalecontrols .readout").val())) });
+    $("#scalecontrols .minus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) - 1) });
+    $("#scalecontrols .plus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) + 1) });
+
+    
     $("#messagepopup .closepreview").click(function() { $("#messagepopup").hide(); });
 
     $("#palete #fg .colorbox").each(function() {
