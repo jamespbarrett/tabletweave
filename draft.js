@@ -244,7 +244,7 @@ function updateSizes(m,l,c) {
     if (main_cells.length > m) {
         main_cells = main_cells.slice(main_cells.length - m, main_cells.length);
     } else if (main_cells.length < m) {
-        for (y = 0; y < m - main_cells.length; y++) {
+        for (y = main_cells.length; y < m; y++) {
             var row = [];
             for (x = 0; x < c; x++) {
                 row[x] = 0;
