@@ -202,7 +202,7 @@ function redrawCanvas(scale) {
     }
 
     ctx.font = "" + 10*scale + "px Arial";
-    ctx.fillText("Made using Tablet Weaving Draft Designer v0.1 http://http://www.bazzalisk.org/tabletweave/",
+    ctx.fillText("Made using Tablet Weaving Draft Designer v0.2 http://http://www.bazzalisk.org/tabletweave/",
                  1*scale,
                  fullheight - 5*scale);
 
