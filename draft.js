@@ -321,6 +321,14 @@ function cellClick(g,x,y) {
 }
 
 function canvasClick(e) {
+    var scale = $("#scalecontrols .readout").val();
+
+    var cellwidth = 20*scale;
+    var cellheight = 20*scale;
+    var labelwidth = 20*scale;
+    var cellborder = 2*scale;
+    var intertablegap = 25*scale;
+
     var offs = $(this).offset();
     var x = e.pageX - offs.left;
     var y = e.pageY - offs.top;
