@@ -14,16 +14,21 @@ h1,h3 {
     font-variant: small-caps;
 }
 
+.blogvert a {
+    font-size: x-large;
+    font-variant: small-caps;
+}
+
 #mainsection {
     display: inline-block;
     position: absolute;
     left: 400px;
-    top: 150px;
+    top: 170px;
 }
 
 #controlbar {
     position: fixed;
-    top: 140px;
+    top: 160px;
     left: 0px;
     width: 350px;
     bottom: 28px;
@@ -78,8 +83,18 @@ div.controlpanel > div > span > span {
     width:100%;
 }
 
+#blogvert {
+    width:100%;
+}
+
 .instructionlink {
     font-size: 200%;
+    text-align: center;
+    margin-bottom: 0em;
+}
+
+.blogvert {
+    font-size: 100%;
     text-align: center;
 }
 
