@@ -118,7 +118,7 @@ function redrawCanvas(scale) {
                              cellborder + (cellborder + cellheight)*y + cellheight/2,
                              cellwidth, cellwidth/2, Math.PI/4);
                 }
-                ctx.lineWidth = 1;
+                ctx.lineWidth = scale;
                 ctx.fill();
                 ctx.stroke();
             }
@@ -143,7 +143,7 @@ function redrawCanvas(scale) {
                              (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
                              cellwidth, cellwidth/2, Math.PI/4);
                 }
-                ctx.lineWidth = 1;
+                ctx.lineWidth = scale;
                 ctx.fill();
                 ctx.stroke();
             }
