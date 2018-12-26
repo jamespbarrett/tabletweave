@@ -75,13 +75,13 @@ function redrawCanvas(scale) {
         for (y = nRowsMain - 1; y >= 0; y--) {
             if (!reverse && !main_cells[y][x]) {
                 bg = "#ffffff";
-                fg = palette[lower_cells[n][x]["colorid"]];
+                fg = lower_cells[n][x]["colorid"];
                 dir = lower_cells[n][x]["direction"];
                 reverse = false;
                 n = (nRowsLow + n - 1) % nRowsLow;
             } else if (reverse && !main_cells[y][x]) {
                 bg = greycolour;
-                fg = palette[lower_cells[n][x]["colorid"]];
+                fg = lower_cells[n][x]["colorid"];
                 dir = lower_cells[n][x]["direction"];
                 reverse = true;
                 n = (n + 1) % nRowsLow;
@@ -89,22 +89,23 @@ function redrawCanvas(scale) {
                 bg = greycolour;
                 reverse = true;
                 n = (n + 1) % nRowsLow;
-                fg = palette[lower_cells[n][x]["colorid"]];
+                fg = lower_cells[n][x]["colorid"];
                 dir = lower_cells[n][x]["direction"];
                 n = (n + 1) % nRowsLow;
             } else {
                 bg = "#ffffff";
                 n = (nRowsLow + n - 1) % nRowsLow;
                 reverse = false;
-                fg = palette[lower_cells[n][x]["colorid"]];
+                fg = lower_cells[n][x]["colorid"];
                 dir = lower_cells[n][x]["direction"];
                 n = (nRowsLow + n - 1) % nRowsLow;
             }
-            lower_cells[n][x]["color"] = fg;
+            if (fg != -1)
+                lower_cells[n][x]["color"] = palette[fg];
             ctx.fillStyle = bg;
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
-            if (showovals) {
-                ctx.fillStyle = fg;
+            if (showovals && fg != -1) {
+                ctx.fillStyle = palette[fg];
                 ctx.strokeStyle = "0x000000";
                 ctx.beginPath();
                 if (((dir == "left") != (reverse))) {
@@ -129,22 +130,24 @@ function redrawCanvas(scale) {
             for (x = 0; x < nCols; x++) {
                 ctx.fillStyle = "#ffffff";//lower_cells[y][x]["background_color"];
                 ctx.fillRect(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y, cellwidth + cellborder, cellheight + cellborder);
-                ctx.fillStyle = palette[lower_cells[y][x]["colorid"]];
-                ctx.strokeStyle = "0x000000";
-                ctx.beginPath();
-                if (lower_cells[y][x]["direction"] == "left") {
-                    drawOval(ctx,
-                             labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
-                             cellwidth, cellwidth/2, -Math.PI/4);
-                } else {
-                    drawOval(ctx,
-                             labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
-                             cellwidth, cellwidth/2, Math.PI/4);
+                if (lower_cells[y][x]["colorid"] != -1) {
+                    ctx.fillStyle = palette[lower_cells[y][x]["colorid"]];
+                    ctx.strokeStyle = "0x000000";
+                    ctx.beginPath();
+                    if (lower_cells[y][x]["direction"] == "left") {
+                        drawOval(ctx,
+                                 labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                                 (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
+                                 cellwidth, cellwidth/2, -Math.PI/4);
+                    } else {
+                        drawOval(ctx,
+                                 labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                                 (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
+                                 cellwidth, cellwidth/2, Math.PI/4);
+                    }
+                    ctx.lineWidth = scale;
+                    ctx.fill();
                 }
-                ctx.lineWidth = scale;
-                ctx.fill();
                 ctx.stroke();
             }
         }
@@ -207,7 +210,7 @@ function redrawCanvas(scale) {
                  fullheight - 5*scale);
 
     if (showlower) {
-        for (clr = 0; clr < palette.length; clr++) {
+        for (clr = -1; clr < palette.length; clr++) {
             n = 0;
             for (row = 0; row < lower_cells.length; row++) {
                 for (col = 0; col < lower_cells[row].length; col++) {
@@ -312,20 +315,17 @@ function cellClick(g,x,y) {
     if (g == 0) {
         main_cells[y][x] = !main_cells[y][x];
     } else {
-        if (y < lower_cells.length && fgcol != "none") {
+        if (y < lower_cells.length) {
             cell = lower_cells[y][x];
             cell["color"] = fgcol;
             cell["colorid"] = fgid;
-        } else if (y <= lower_cells.length) {
-            cell = lower_cells[0][x];
-            if (cell["direction"] == "left") {
-                for (Y = 0; Y < lower_cells.length; Y++) {
-                    lower_cells[Y][x]["direction"] = "right";
-                }
-            } else {
-                for (Y = 0; Y < lower_cells.length; Y++) {
-                    lower_cells[Y][x]["direction"] = "left";
-                }
+        } else {
+            for (y = 0; y < lower_cells.length; y++) {
+                cell = lower_cells[y][x];
+                if (cell["direction"] == "left")
+                    cell["direction"] = "right";
+                else
+                    cell["direction"] = "left";
             }
         }
     }
@@ -608,5 +608,8 @@ $(function() {
     $("#fileio #load").change(function() { load_file(); });
 
     $("#draftcanvas").mousedown(canvasClick);
+
+    setForegroundColor("BOX1");
+    
     redrawCanvas();
 })
