@@ -459,7 +459,7 @@ function load() {
     if (localStorage.getItem("tablet-draft-palette") == undefined) {
         palette = JSON.parse(JSON.stringify(default_palette));
     } else {
-        paletter = JSON.parse(localStorage.getItem("tablet-draft-palette"));
+        palette = JSON.parse(localStorage.getItem("tablet-draft-palette"));
     }
     for (r = 0; r < lower_cells.length; r++) {
         for (c = 0; c < lower_cells[r].length; c++) {
