@@ -198,6 +198,9 @@ function redrawCanvas(scale) {
         }
     }
 
+    ctx.fillStyle = "#000000";
+    ctx.strokeStyle = "#000000";
+
     ctx.font = "" + 15*scale + "px Arial";
     for (y = 0; y < nRowsMain; y++) {
         ctx.fillText("" + (nRowsMain - y), 1*scale, (cellborder + cellheight)*y + (cellheight + 15*scale)/2);
