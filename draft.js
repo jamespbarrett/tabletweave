@@ -4,7 +4,18 @@ var main_cells  = [];
 var lower_cells = [];
 var labels = [ "A", "B", "C", "D", "E", "F", "G", "H" ];
 var palette = [ ];
-var default_palette = [ 'rgb(255, 255, 255)', 'rgb(0, 0, 0)', 'rgb(255, 0, 0)', 'rgb(0, 153, 0)', 'rgb(0, 0, 255)', 'rgb(221, 221, 221)', 'rgb(153, 153, 153)', 'rgb(255, 255, 0)', 'rgb(0, 255, 255)', 'rgb(153, 0, 153)', 'rgb(255, 136, 0)', 'rgb(255, 136, 136)' ];
+var default_palette = [ 'rgb(255, 255, 255)',
+                        'rgb(0, 0, 0)',
+                        'rgb(255, 0, 0)',
+                        'rgb(0, 153, 0)',
+                        'rgb(0, 0, 255)',
+                        'rgb(221, 221, 221)',
+                        'rgb(153, 153, 153)',
+                        'rgb(255, 255, 0)',
+                        'rgb(0, 255, 255)',
+                        'rgb(153, 0, 153)',
+                        'rgb(255, 136, 0)',
+                        'rgb(255, 136, 136)' ];
 
 var fgcol = "none";
 var fgid = 0;
@@ -86,12 +97,16 @@ function redrawCanvas(scale) {
 
     if (showlower) {
         for (y = 0; y < nRowsLow + 1; y++) {
-            ctx.moveTo(labelwidth, (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight));
-            ctx.lineTo(labelwidth + (cellborder + cellwidth)*nCols, (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight))
+            ctx.moveTo(labelwidth,
+                       (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight));
+            ctx.lineTo(labelwidth + (cellborder + cellwidth)*nCols,
+                       (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight))
         }
         for (x = 0; x < nCols + 1; x++) {
-            ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap);
-            ctx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow);
+            ctx.moveTo(labelwidth + (cellborder + cellwidth)*x,
+                       (cellborder + cellheight)*nRowsMain + intertablegap);
+            ctx.lineTo(labelwidth + (cellborder + cellwidth)*x,
+                       (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow);
         }
     }
     ctx.lineWidth = cellborder;
@@ -135,7 +150,8 @@ function redrawCanvas(scale) {
             if (fg != -1)
                 lower_cells[n][x]["color"] = palette[fg];
             ctx.fillStyle = bg;
-            ctx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale, (cellborder + cellheight)*y + 1*scale, cellwidth + cellborder - 2*scale, cellheight + cellborder - 2*scale);
+            ctx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale, (cellborder + cellheight)*y + 1*scale,
+                         cellwidth + cellborder - 2*scale, cellheight + cellborder - 2*scale);
             if (showovals && fg != -1) {
                 ctx.fillStyle = palette[fg];
                 ctx.strokeStyle = "0x000000";
@@ -172,7 +188,8 @@ function redrawCanvas(scale) {
             for (x = 0; x < nCols; x++) {
                 ctx.fillStyle = "#ffffff";//lower_cells[y][x]["background_color"];
                 ctx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + 1*scale,
+                             (cellborder + cellheight)*nRowsMain +
+                             intertablegap + (cellborder + cellheight)*y + 1*scale,
                              cellwidth + cellborder - 2*scale,
                              cellheight + cellborder - 2*scale);
                 if (lower_cells[y][x]["colorid"] != -1) {
@@ -182,12 +199,14 @@ function redrawCanvas(scale) {
                     if (lower_cells[y][x]["direction"] == "left") {
                         drawOval(ctx,
                                  labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                                 (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
+                                 (cellborder + cellheight)*nRowsMain +
+                                 intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
                                  cellwidth, cellwidth/2, -Math.PI/4);
                     } else {
                         drawOval(ctx,
                                  labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                                 (cellborder + cellheight)*nRowsMain + intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
+                                 (cellborder + cellheight)*nRowsMain +
+                                 intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
                                  cellwidth, cellwidth/2, Math.PI/4);
                     }
                     ctx.lineWidth = scale;
@@ -214,15 +233,19 @@ function redrawCanvas(scale) {
     }
     if (showlower) {
         for (y = 0; y < nRowsLow; y++) {
-            ctx.fillText(labels[y], 1*scale, (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*y + (cellheight + 15*scale)/2);
+            ctx.fillText(labels[y], 1*scale,
+                         (cellborder + cellheight)*nRowsMain +
+                         intertablegap + (cellborder + cellheight)*y + (cellheight + 15*scale)/2);
         }
         for (x = 0; x < nCols; x++) {
             if (lower_cells[0][x]["direction"] == "left") {
                 ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8*scale)/2,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15*scale)/2);
+                             (cellborder + cellheight)*nRowsMain +
+                             intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15*scale)/2);
             } else {
                 ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8*scale)/2,
-                             (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15*scale)/2);
+                             (cellborder + cellheight)*nRowsMain +
+                             intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15*scale)/2);
             }
         }
     }
@@ -381,7 +404,8 @@ function canvasClick(e) {
 
     if (x > labelwidth && y > (cellborder + cellheight)*nRowsMain + intertablegap) {
         var col = Math.floor((x - labelwidth - cellborder)/(cellwidth + cellborder));
-        var row = Math.floor((y - (cellborder + cellheight)*nRowsMain - intertablegap - cellborder)/(cellheight + cellborder));
+        var row = Math.floor((y - (cellborder + cellheight)*nRowsMain -
+                              intertablegap - cellborder)/(cellheight + cellborder));
         cellClick(1,col,row);
     }
 }
@@ -413,20 +437,26 @@ function setForegroundColor(id) {
 }
 
 function save() {
-    localStorage.setItem("tablet-draft-main", JSON.stringify(main_cells));
-    localStorage.setItem("tablet-draft-lower", JSON.stringify(lower_cells));
-    localStorage.setItem("tablet-draft-palette", JSON.stringify(palette));
-    localStorage.setItem("tablet-draft-greyslider", JSON.stringify($('#GREYSLIDER').val()));
+    try {
+        localStorage.setItem("tablet-draft-main", JSON.stringify(main_cells));
+        localStorage.setItem("tablet-draft-lower", JSON.stringify(lower_cells));
+        localStorage.setItem("tablet-draft-palette", JSON.stringify(palette));
+        localStorage.setItem("tablet-draft-greyslider", JSON.stringify($('#GREYSLIDER').val()));
+    } catch (err) {
+    }
 }
 
 function save_file() {
-    var tmp = { 'main_cells'  : main_cells,
-                'lower_cells' : lower_cells,
-                'palette'     : palette };
-    var link = document.createElement('a');
-    link.download = "draft.json";
-    link.href = 'data:application/json;charset=utf-8,' + escape(JSON.stringify(tmp));
-    link.click();
+    try {
+        var tmp = { 'main_cells'  : main_cells,
+                    'lower_cells' : lower_cells,
+                    'palette'     : palette };
+        var link = document.createElement('a');
+        link.download = "draft.json";
+        link.href = 'data:application/json;charset=utf-8,' + escape(JSON.stringify(tmp));
+        link.click();
+    } catch (err) {
+    }
 }
 
 function load_file() {
@@ -436,27 +466,32 @@ function load_file() {
         var reader = new FileReader();
         reader.onload = (function(f) {
             return function (e) {
-                tmp = JSON.parse(e.target.result);
-                main_cells = tmp['main_cells'];
-                lower_cells = tmp['lower_cells'];
-                if (tmp['palette'] != undefined) {
-                    palette = tmp['palette'];
-                } else {
-                    palette = JSON.parse(JSON.stringify(default_palette));
-                }
-                for (r = 0; r < lower_cells.length; r++) {
-                    for (c = 0; c < lower_cells[r].length; c++) {
-                        if (lower_cells[r][c]['colorid'] == undefined) {
-                            for (i = 0; i < palette.length; i++) {
-                                if (lower_cells[r][c]['color'] == palette[i]) {
-                                    lower_cells[r][c]['colorid'] = i;
-                                }
-                            }
+                try {
+                    tmp = JSON.parse(e.target.result);
+                    main_cells = tmp['main_cells'];
+                    lower_cells = tmp['lower_cells'];
+                    if (tmp['palette'] != undefined) {
+                        palette = tmp['palette'];
+                    } else {
+                        palette = JSON.parse(JSON.stringify(default_palette));
+                    }
+                    for (r = 0; r < lower_cells.length; r++) {
+                        for (c = 0; c < lower_cells[r].length; c++) {
                             if (lower_cells[r][c]['colorid'] == undefined) {
-                                lower_cells[r][c]['colorid'] = 0;
+                                for (i = 0; i < palette.length; i++) {
+                                    if (lower_cells[r][c]['color'] == palette[i]) {
+                                        lower_cells[r][c]['colorid'] = i;
+                                    }
+                                }
+                                if (lower_cells[r][c]['colorid'] == undefined) {
+                                    lower_cells[r][c]['colorid'] = 0;
+                                }
                             }
                         }
                     }
+                } catch (err) {
+                    alert("File is corrupted and could not be loaded.");
+                    return;
                 }
                 updateSizes(main_cells.length, lower_cells.length, main_cells[0].length);
                 save();
@@ -469,41 +504,48 @@ function load_file() {
 }
 
 function load() {
-    if (localStorage.getItem("tablet-draft-main") == undefined) {
+    try {
+        if (localStorage.getItem("tablet-draft-main") == undefined) {
 
-        // Setup the initial cells
-        main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+            // Setup the initial cells
+            main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
 
-        lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
-    } else {
-        main_cells  = JSON.parse(localStorage.getItem("tablet-draft-main"));
-        lower_cells = JSON.parse(localStorage.getItem("tablet-draft-lower"));
-    }
+            lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+        } else {
+            main_cells  = JSON.parse(localStorage.getItem("tablet-draft-main"));
+            lower_cells = JSON.parse(localStorage.getItem("tablet-draft-lower"));
+        }
 
-    if (localStorage.getItem("tablet-draft-palette") == undefined) {
-        palette = JSON.parse(JSON.stringify(default_palette));
-    } else {
-        palette = JSON.parse(localStorage.getItem("tablet-draft-palette"));
-    }
-    for (r = 0; r < lower_cells.length; r++) {
-        for (c = 0; c < lower_cells[r].length; c++) {
-            if (lower_cells[r][c]['colorid'] == undefined) {
-                for (i = 0; i < palette.length; i++) {
-                    if (lower_cells[r][c]['color'] == palette[i]) {
-                        lower_cells[r][c]['colorid'] = i;
-                    }
-                }
+        if (localStorage.getItem("tablet-draft-palette") == undefined) {
+            palette = JSON.parse(JSON.stringify(default_palette));
+        } else {
+            palette = JSON.parse(localStorage.getItem("tablet-draft-palette"));
+        }
+        for (r = 0; r < lower_cells.length; r++) {
+            for (c = 0; c < lower_cells[r].length; c++) {
                 if (lower_cells[r][c]['colorid'] == undefined) {
-                    lower_cells[r][c]['colorid'] = 0;
+                    for (i = 0; i < palette.length; i++) {
+                        if (lower_cells[r][c]['color'] == palette[i]) {
+                            lower_cells[r][c]['colorid'] = i;
+                        }
+                    }
+                    if (lower_cells[r][c]['colorid'] == undefined) {
+                        lower_cells[r][c]['colorid'] = 0;
+                    }
                 }
             }
         }
-    }
 
-    if (localStorage.getItem("tablet-draft-greyslider") == undefined) {
+        if (localStorage.getItem("tablet-draft-greyslider") == undefined) {
+            $("#GREYSLIDER").val(144);
+        } else {
+            $("#GREYSLIDER").val(JSON.parse(localStorage.getItem("tablet-draft-greyslider")));
+        }
+    } catch (err) {
+        main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+        lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+        palette = JSON.parse(JSON.stringify(default_palette));
         $("#GREYSLIDER").val(144);
-    } else {
-        $("#GREYSLIDER").val(JSON.parse(localStorage.getItem("tablet-draft-greyslider")));
     }
 
     save();
@@ -571,12 +613,24 @@ $(function() {
     $("#lowrowcontrols .readout").val(lower_cells.length);
     $("#colcontrols .readout").val(main_cells[0].length);
 
-    $("#REDSLIDE").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENSLIDE").val(), $("#BLUESLIDE").val()); });
-    $("#REDVAL").change(function() { updatePalette($("#REDVAL").val(), $("#GREENSLIDE").val(), $("#BLUESLIDE").val()); });
-    $("#GREENSLIDE").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENSLIDE").val(), $("#BLUESLIDE").val()); });
-    $("#GREENVAL").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENVAL").val(), $("#BLUESLIDE").val()); });
-    $("#BLUESLIDE").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENSLIDE").val(), $("#BLUESLIDE").val()); });
-    $("#BLUEVAL").change(function() { updatePalette($("#REDSLIDE").val(), $("#GREENSLIDE").val(), $("#BLUEVAL").val()); });
+    $("#REDSLIDE").change(function() { updatePalette($("#REDSLIDE").val(),
+                                                     $("#GREENSLIDE").val(),
+                                                     $("#BLUESLIDE").val()); });
+    $("#REDVAL").change(function() { updatePalette($("#REDVAL").val(),
+                                                   $("#GREENSLIDE").val(),
+                                                   $("#BLUESLIDE").val()); });
+    $("#GREENSLIDE").change(function() { updatePalette($("#REDSLIDE").val(),
+                                                       $("#GREENSLIDE").val(),
+                                                       $("#BLUESLIDE").val()); });
+    $("#GREENVAL").change(function() { updatePalette($("#REDSLIDE").val(),
+                                                     $("#GREENVAL").val(),
+                                                     $("#BLUESLIDE").val()); });
+    $("#BLUESLIDE").change(function() { updatePalette($("#REDSLIDE").val(),
+                                                      $("#GREENSLIDE").val(),
+                                                      $("#BLUESLIDE").val()); });
+    $("#BLUEVAL").change(function() { updatePalette($("#REDSLIDE").val(),
+                                                    $("#GREENSLIDE").val(),
+                                                    $("#BLUEVAL").val()); });
 
     $("#mainrowcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                                    parseInt($("#lowrowcontrols .readout").val()),
@@ -587,7 +641,7 @@ $(function() {
     $("#mainrowcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()) + 1,
                                                                parseInt($("#lowrowcontrols .readout").val()),
                                                                parseInt($("#colcontrols .readout").val())) });
-    
+
     $("#lowrowcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                                   parseInt($("#lowrowcontrols .readout").val()),
                                                                   parseInt($("#colcontrols .readout").val())) });
@@ -597,7 +651,7 @@ $(function() {
     $("#lowrowcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                               parseInt($("#lowrowcontrols .readout").val()) + 1,
                                                               parseInt($("#colcontrols .readout").val())) });
-    
+
     $("#colcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
                                                                parseInt($("#lowrowcontrols .readout").val()),
                                                                parseInt($("#colcontrols .readout").val())) });
@@ -615,11 +669,17 @@ $(function() {
     $("#scalecontrols .plus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) + 1);
                                                  redrawPreview();});
 
-    $("#qualitycontrols .readout").change(function() { updateQuality(parseInt($("#qualitycontrols .readout").val())); });
-    $("#qualitycontrols .minus").click(function() { updateQuality(parseInt($("#qualitycontrols .readout").val()) - 1); });
-    $("#qualitycontrols .plus").click(function() { updateQuality(parseInt($("#qualitycontrols .readout").val()) + 1); });
+    $("#qualitycontrols .readout").change(function() {
+        updateQuality(parseInt($("#qualitycontrols .readout").val()));
+    });
+    $("#qualitycontrols .minus").click(function() {
+        updateQuality(parseInt($("#qualitycontrols .readout").val()) - 1);
+    });
+    $("#qualitycontrols .plus").click(function() {
+        updateQuality(parseInt($("#qualitycontrols .readout").val()) + 1);
+    });
 
-    
+
     $("#messagepopup .closepreview").click(function() { $("#messagepopup").hide(); });
 
     $("#palete #fg .colorbox").each(function() {
@@ -642,6 +702,6 @@ $(function() {
     $("#draftcanvas").mousedown(canvasClick);
 
     setForegroundColor("BOX1");
-    
+
     redrawCanvas();
 })
