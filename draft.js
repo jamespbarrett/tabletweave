@@ -49,6 +49,7 @@ function redrawCanvas(scale) {
     var cellheight = 20*scale;
     var labelwidth = 20*scale;
     var cellborder = 2*scale;
+    var rulerwidth = 3*cellborder;
     var intertablegap = 25*scale;
     var copyrightheight = 20*scale;
     var copyrightwidth = 416*scale;
@@ -60,6 +61,8 @@ function redrawCanvas(scale) {
     var showovals = $("#showovals").prop("checked");
     var showlower = $("#showlower").prop("checked");
     var showreversal = $("#showreversal").prop("checked");
+    var showhruler = $("#showhruler").prop("checked");
+    var showvruler = $("#showvruler").prop("checked");
 
     var c = $("#draftcanvas");
     var ctx = c[0].getContext("2d");
@@ -67,6 +70,9 @@ function redrawCanvas(scale) {
     var nRowsMain = main_cells.length;
     var nRowsLow  = lower_cells.length;
     var nCols     = main_cells[0].length;
+
+    var hruler = parseInt($("#hruler .readout").val());
+    var vruler = parseInt($("#vruler .readout").val());
 
     var fullheight = cellborder + (cellborder + cellheight)*nRowsMain +
         cellborder + cellheight
@@ -171,12 +177,25 @@ function redrawCanvas(scale) {
                 ctx.fill();
                 ctx.stroke();
             }
+            if (showhruler && y == nRowsMain - hruler) {
+                ctx.strokeStyle = "#000000";
+                ctx.beginPath();
+                ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, (y+1)*(cellborder + cellheight));
+                ctx.lineTo(labelwidth + (cellborder + cellwidth)*(x+1), (y+1)*(cellborder + cellheight));
+                ctx.lineWidth = rulerwidth;
+                ctx.stroke();
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = scale;
+            }
             if (showreversal && reversed && y != nRowsMain - 1) {
                 ctx.strokeStyle = "#FF0000";
                 ctx.beginPath();
                 ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, (y+1)*(cellborder + cellheight));
                 ctx.lineTo(labelwidth + (cellborder + cellwidth)*(x+1), (y+1)*(cellborder + cellheight));
-                ctx.lineWidth = 2*scale;
+                if (showhruler && y == nRowsMain - hruler)
+                    ctx.lineWidth = rulerwidth;
+                else
+                    ctx.lineWidth = cellborder;
                 ctx.stroke();
                 ctx.strokeStyle = "#000000";
                 ctx.lineWidth = scale;
@@ -215,6 +234,28 @@ function redrawCanvas(scale) {
                 ctx.stroke();
             }
         }
+    }
+
+    if (showhruler || showvruler) {
+        ctx.strokeStyle = "#000000";
+        ctx.fillStyle = "#000000";
+        ctx.beginPath();
+        if (showhruler && hruler <= 0) {
+            var y = -hruler;
+            ctx.moveTo(labelwidth,
+                       (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight));
+            ctx.lineTo(labelwidth + (cellborder + cellwidth)*nCols,
+                       (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight))
+        }
+        if (showvruler) {
+            var x = vruler - 1;
+            ctx.moveTo(labelwidth + (cellborder + cellwidth)*x,
+                       0);
+            ctx.lineTo(labelwidth + (cellborder + cellwidth)*x,
+                       (cellborder + cellheight)*nRowsMain + intertablegap + nRowsLow*(cellborder + cellheight));
+        }
+        ctx.lineWidth = rulerwidth;
+        ctx.stroke();
     }
 
     ctx.fillStyle = "#000000";
@@ -274,6 +315,43 @@ function updateScale(s) {
         s = 1;
 
     $("#scalecontrols .readout").val(s);
+
+    redrawCanvas();
+}
+
+function updateRulers(h, v) {
+    if (h === undefined)
+        h = parseInt($("#hruler .readout").val());
+    if (v === undefined)
+        v = parseInt($("#vruler .readout").val());
+
+    if (h < -parseInt($("#lowrowcontrols .readout").val()))
+        h = -parseInt($("#lowrowcontrols .readout").val());
+    if (v < 1)
+        v = 1;
+
+    cols = parseInt($("#colcontrols .readout").val()) + 1;
+    rows = parseInt($("#mainrowcontrols .readout").val()) + 1;
+
+    if (h > rows)
+        h = rows;
+    if (v > cols)
+        v = cols;
+
+    $("#hruler .readout").val(h);
+    $("#vruler .readout").val(v);
+
+    if ($("#showhruler").prop("checked")) {
+        $("#hruler").show();
+    } else {
+        $("#hruler").hide();
+    }
+
+    if ($("#showvruler").prop("checked")) {
+        $("#vruler").show();
+    } else {
+        $("#vruler").hide();
+    }
 
     redrawCanvas();
 }
@@ -353,7 +431,7 @@ function updateSizes(m,l,c) {
         }
     }
 
-    redrawCanvas();
+    updateRulers();
 }
 
 function cellClick(g,x,y) {
@@ -442,6 +520,10 @@ function save() {
         localStorage.setItem("tablet-draft-lower", JSON.stringify(lower_cells));
         localStorage.setItem("tablet-draft-palette", JSON.stringify(palette));
         localStorage.setItem("tablet-draft-greyslider", JSON.stringify($('#GREYSLIDER').val()));
+        localStorage.setItem("tablet-draft-hruler", JSON.stringify(parseInt($("#hruler .readout").val())));
+        localStorage.setItem("tablet-draft-vruler", JSON.stringify(parseInt($("#vruler .readout").val())));
+        localStorage.setItem("tablet-draft-showhruler", JSON.stringify($("#showhruler").prop("checked")));
+        localStorage.setItem("tablet-draft-showvruler", JSON.stringify($("#showvruler").prop("checked")));
     } catch (err) {
     }
 }
@@ -536,10 +618,34 @@ function load() {
             }
         }
 
-        if (localStorage.getItem("tablet-draft-greyslider") == undefined) {
+        if (localStorage.getItem("tablet-draft-greyslider") == null) {
             $("#GREYSLIDER").val(144);
         } else {
             $("#GREYSLIDER").val(JSON.parse(localStorage.getItem("tablet-draft-greyslider")));
+        }
+
+        if (localStorage.getItem("tablet-draft-hruler") == null) {
+            $("#hruler .readout").val(0);
+        } else {
+            $("#hruler .readout").val(localStorage.getItem("tablet-draft-hruler"));
+        }
+
+        if (localStorage.getItem("tablet-draft-vruler") == null) {
+            $("#vruler .readout").val(0);
+        } else {
+            $("#vruler .readout").val(localStorage.getItem("tablet-draft-vruler"));
+        }
+
+        if (localStorage.getItem("tablet-draft-showhruler") == null) {
+            $("#showhruler").prop(checked, false);
+        } else {
+            $("#showhruler").prop("checked", JSON.parse(localStorage.getItem("tablet-draft-showhruler")));
+        }
+
+        if (localStorage.getItem("tablet-draft-showvruler") == null) {
+            $("#showvruler").prop(checked, false);
+        } else {
+            $("#showvruler").prop("checked", JSON.parse(localStorage.getItem("tablet-draft-showvruler")));
         }
     } catch (err) {
         main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
@@ -607,6 +713,8 @@ $(function() {
     $("#showovals").change(function() { redrawCanvas(); });
     $("#showlower").change(function() { redrawCanvas(); });
     $("#showreversal").change(function() { redrawCanvas(); });
+    $("#showhruler").change(function() { updateRulers(); });
+    $("#showvruler").change(function() { updateRulers(); });
     $("#GREYSLIDER").change(function() { redrawCanvas(); });
 
     $("#mainrowcontrols .readout").val(main_cells.length);
@@ -662,6 +770,26 @@ $(function() {
                                                            parseInt($("#lowrowcontrols .readout").val()),
                                                            parseInt($("#colcontrols .readout").val()) + 1) });
 
+    $("#hruler .readout").change(function() { updateRulers(parseInt($('#hruler .readout').val()),
+                                                           parseInt($('#vruler .readout').val()));
+                                              redrawPreview();});
+    $("#hruler .minus").click(function() { updateRulers(parseInt($('#hruler .readout').val()) - 1,
+                                                        parseInt($('#vruler .readout').val()));
+                                           redrawPreview();});
+    $("#hruler .plus").click(function() { updateRulers(parseInt($('#hruler .readout').val()) + 1,
+                                                       parseInt($('#vruler .readout').val()));
+                                          redrawPreview();});
+
+    $("#vruler .readout").change(function() { updateRulers(parseInt($('#hruler .readout').val()),
+                                                           parseInt($('#vruler .readout').val()));
+                                              redrawPreview();});
+    $("#vruler .minus").click(function() { updateRulers(parseInt($('#hruler .readout').val()),
+                                                        parseInt($('#vruler .readout').val()) - 1);
+                                           redrawPreview();});
+    $("#vruler .plus").click(function() { updateRulers(parseInt($('#hruler .readout').val()),
+                                                       parseInt($('#vruler .readout').val()) + 1);
+                                          redrawPreview();});
+
     $("#scalecontrols .readout").change(function() { updateScale(parseInt($("#scalecontrols .readout").val()));
                                                      redrawPreview();});
     $("#scalecontrols .minus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) - 1);
@@ -703,5 +831,5 @@ $(function() {
 
     setForegroundColor("BOX1");
 
-    redrawCanvas();
+    updateRulers();
 })
