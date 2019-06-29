@@ -48,24 +48,22 @@ function json_to_tdd(json) {
   }
 
   /* The turning diagram can now be decoded (since it needed the threading diagram first) */
-  var direction = [];
-  for (var dir of r.threading) {
-    if (dir == "Z")
-      direction.push('\\');
-    else
-      direction.push('/');
+  r.turning = [];
+  for (var y = 0; y < json['main_cells'].length; y++) {
+    r.turning[y] = [];
+    for (var x = 0; x < json['main_cells'][y].length; x++) {
+      r.turning[y][x] = '\\';
+    }
   }
 
-  r.turning = [];
-  for (var y of json['main_cells']) {
-    var row = [];
-    for (var x = 0; x < y.length; x++) {
-      if (y[x]) {
-        direction[x] = (direction[x] == '/')?'\\':'/';
+  for (var x = 0; x < r.turning[0].length; x++) {
+    var dir = (r.threading[x] == 'Z') ? '\\' : '/';;
+    for (var y = r.turning.length - 1; y >= 0; y--) {
+      if (json.main_cells[y][x]) {
+        dir = (dir == '\\')?'/':'\\';
       }
-      row.push(direction[x]);
+      r.turning[y][x] = dir;
     }
-    r.turning.push(row);
   }
 
   return r;
