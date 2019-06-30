@@ -9,8 +9,23 @@
 <script src="tdd.js"></script>
 <script src="tdd_to_svg.js"></script>
 <script>
+function saveSvg(svgEl, name) {
+    svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    var svgData = svgEl.outerHTML;
+    var preface = '<?xml version="1.0" standalone="no"?>\r\n';
+    var svgBlob = new Blob([preface, svgData], {type:"image/svg+xml;charset=utf-8"});
+    var svgUrl = URL.createObjectURL(svgBlob);
+    var downloadLink = document.createElement("a");
+    downloadLink.href = svgUrl;
+    downloadLink.download = name;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
 function render() {
   var draft = TDDDraftFromString($('#rawtdd').val());
+  $('#name').val(draft.name);
   $('#svgdiv').text("");
   $('#svgdiv').append(tdd_to_svg(draft));
 }
@@ -20,12 +35,16 @@ $(function() {
     render();
   });
   render();
+
+  $("#save").click(function() {
+    saveSvg($("svg")[0], $('#name').val() + ".svg");
+  });
 });
 </script>
 </head>
 
 <body>
-  <div><button id="render">Render</button></div>
+  <div><button id="render">Render</button><button id="save">Save as SVG</button><input type="text" id="name"></text></div>
   <div><textarea id="rawtdd" style="font-family: monospace; width: 360px; height: 720px; float: left;">
 # tdd v0.1
 # draft 18
