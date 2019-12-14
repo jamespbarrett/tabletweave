@@ -1,5 +1,7 @@
 // The main script for the draft designer
 
+var repeats = 3;
+var max_cols = 20;
 var main_cells  = [];
 var lower_cells = [];
 var labels = [ "A", "B", "C", "D", "E", "F", "G", "H" ];
@@ -67,6 +69,9 @@ function redrawCanvas(scale) {
     var c = $("#draftcanvas");
     var ctx = c[0].getContext("2d");
 
+    var r = $("#repeatcanvas");
+    var rtx = r[0].getContext("2d");
+
     var nRowsMain = main_cells.length;
     var nRowsLow  = lower_cells.length;
     var nCols     = main_cells[0].length;
@@ -77,16 +82,27 @@ function redrawCanvas(scale) {
     var fullheight = cellborder + (cellborder + cellheight)*nRowsMain +
         cellborder + cellheight
         + copyrightheight;
+
+    var tableheight = (cellborder + cellheight)*nRowsMain;
+    var fullheightrepeats = tableheight*repeats+20;
+
     if (showlower) {
         fullheight += intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow);
     }
     var fullwidth = max(labelwidth + cellborder + (cellborder + cellwidth)*nCols, copyrightwidth);
+    var fullwidthrepeats = labelwidth + cellborder + (cellborder + cellwidth)*nCols + 20;
 
     c.attr("width",  fullwidth);
     c.attr("height", fullheight);
 
+    r.attr("width",  fullwidthrepeats);
+    r.attr("height", fullheightrepeats);
+
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0,0, fullwidth, fullheight);
+
+    rtx.fillStyle = "#ffffff";
+    rtx.fillRect(0,0, fullwidthrepeats, fullheightrepeats);
 
     ctx.strokeStyle = "#000000";
     ctx.fillStyle = "#000000";
@@ -99,6 +115,16 @@ function redrawCanvas(scale) {
     for (x = 0; x < nCols + 1; x++) {
         ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, 0);
         ctx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain);
+    }
+
+    rtx.beginPath();
+    for (y = 0; y < nRowsMain*repeats + 1; y++) {
+        rtx.moveTo(labelwidth, y*(cellborder + cellheight));
+        rtx.lineTo(labelwidth + (cellborder + cellwidth)*nCols, y*(cellborder + cellheight))
+    }
+    for (x = 0; x < nCols + 1; x++) {
+        rtx.moveTo(labelwidth + (cellborder + cellwidth)*x, 0);
+        rtx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain*repeats);
     }
 
     if (showlower) {
@@ -117,6 +143,9 @@ function redrawCanvas(scale) {
     }
     ctx.lineWidth = cellborder;
     ctx.stroke();
+
+    rtx.lineWidth = cellborder;
+    rtx.stroke();
 
     for (x = 0; x < nCols; x++) {
         n = nRowsLow - 1;
@@ -155,6 +184,7 @@ function redrawCanvas(scale) {
             }
             if (fg != -1)
                 lower_cells[n][x]["color"] = palette[fg];
+
             ctx.fillStyle = bg;
             ctx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale, (cellborder + cellheight)*y + 1*scale,
                          cellwidth + cellborder - 2*scale, cellheight + cellborder - 2*scale);
@@ -177,6 +207,36 @@ function redrawCanvas(scale) {
                 ctx.fill();
                 ctx.stroke();
             }
+
+            for (z=0; z<repeats; z++){
+              rtx.fillStyle = "#ffffff";
+              rtx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale,
+                (cellborder + cellheight)*y + 1*scale + z*tableheight,
+                cellwidth + cellborder - 2*scale,
+                cellheight + cellborder - 2*scale);
+
+              if (showovals && fg != -1) {
+                rtx.fillStyle = palette[fg];
+                rtx.strokeStyle = "0x000000";
+                rtx.beginPath();
+
+                if (((dir == "left") != (reverse))) {
+                  drawOval(rtx,
+                    labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                    cellborder + (cellborder + cellheight)*y + z*tableheight + cellheight/2,
+                    cellwidth, cellwidth/2, -Math.PI/4);
+                } else {
+                  drawOval(rtx,
+                    labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                    cellborder + (cellborder + cellheight)*y + z*tableheight + cellheight/2,
+                    cellwidth, cellwidth/2, Math.PI/4);
+                }
+                rtx.lineWidth = scale;
+                rtx.fill();
+                rtx.stroke();
+              }
+            }
+
             if (showhruler && y == nRowsMain - hruler) {
                 ctx.strokeStyle = "#000000";
                 ctx.beginPath();
@@ -307,6 +367,16 @@ function redrawCanvas(scale) {
             }
             $("#NUM" + (clr + 1)).text(n);
         }
+    }
+
+    // drop #repeatsection below #mainsection if more than 20 tablets or window too small
+    repeatDiv = document.getElementById('repeatsection');
+    if (nCols > max_cols || window.innerWidth < $("#controlbar").width() + $("#mainsection").width()*2) {
+      repeatDiv.style.top = $("#mainsection").height()+190+"px";
+      repeatDiv.style.left = "400px";
+    } else {
+      repeatDiv.style.top = "";
+      repeatDiv.style.left = "";
     }
 }
 
