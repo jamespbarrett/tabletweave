@@ -1,6 +1,5 @@
 // The main script for the draft designer
 
-var repeats = 3;
 var max_cols = 20;
 var main_cells  = [];
 var lower_cells = [];
@@ -77,6 +76,7 @@ function redrawCanvas(scale) {
     var nRowsLow  = lower_cells.length;
     var nCols     = main_cells[0].length;
 
+    var repeats = parseInt($("#repeats .readout").val());
     var repeatfrom = nRowsMain - parseInt($("#repeatpicks #repeatfrom .readout").val());
     var repeatto = nRowsMain - parseInt($("#repeatpicks #repeatto .readout").val());
 
@@ -389,9 +389,13 @@ function redrawCanvas(scale) {
     if (showrepeat) {
         $("#repeatsection").show();
         $("#repeatexport").show();
+        $("#repeatpicks").show();
+        $("#repeats").show();
     } else {
         $("#repeatexport").hide();
         $("#repeatsection").hide();
+        $("#repeatpicks").hide();
+        $("#repeats").hide();
     }
 }
 
@@ -452,11 +456,14 @@ function updateQuality(s) {
     redrawCanvas();
 }
 
-function updateRepeats(f, t) {
+function updateRepeats(f, t, r) {
     if (f < 1)
         f = 1;
     if (t < 1)
         t = 1;
+    if (r < 1)
+        r = 1;
+
     if (f > t)
         f = t;
     if (t > main_cells.length)
@@ -464,6 +471,7 @@ function updateRepeats(f, t) {
 
     $("#repeatpicks #repeatfrom .readout").val(f);
     $("#repeatpicks #repeatto .readout").val(t);
+    $("#repeats .readout").val(r);
 
     redrawCanvas();
 }
@@ -906,19 +914,26 @@ $(function() {
     $("#scalecontrols .plus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) + 1);
                                                  redrawPreview();});
 
-    $("#repeatpicks #repeatfrom .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()));
+    $("#repeatpicks #repeatfrom .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
                                                                redrawPreview();});
-    $("#repeatpicks #repeatfrom .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()) - 1, parseInt($("#repeatpicks #repeatto .readout").val()));
+    $("#repeatpicks #repeatfrom .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()) - 1, parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
                                                             redrawPreview();});
-    $("#repeatpicks #repeatfrom .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()) + 1, parseInt($("#repeatpicks #repeatto .readout").val()));
+    $("#repeatpicks #repeatfrom .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()) + 1, parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
                                                            redrawPreview();});
 
-    $("#repeatpicks #repeatto .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()));
+    $("#repeatpicks #repeatto .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
                                                                redrawPreview();});
-    $("#repeatpicks #repeatto .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()) - 1);
+    $("#repeatpicks #repeatto .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()) - 1, parseInt($("#repeats .readout").val()));
                                                             redrawPreview();});
-    $("#repeatpicks #repeatto .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()) + 1);
+    $("#repeatpicks #repeatto .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()) + 1, parseInt($("#repeats .readout").val()));
                                                            redrawPreview();});
+
+    $("#repeats .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
+                                                                redrawPreview();});
+    $("#repeats .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()) - 1);
+                                                                redrawPreview();});
+    $("#repeats .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()) + 1);
+                                                            redrawPreview();});
 
     $("#qualitycontrols .readout").change(function() {
         updateQuality(parseInt($("#qualitycontrols .readout").val()));
