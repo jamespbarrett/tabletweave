@@ -65,6 +65,7 @@ function redrawCanvas(scale) {
     var showreversal = $("#showreversal").prop("checked");
     var showhruler = $("#showhruler").prop("checked");
     var showvruler = $("#showvruler").prop("checked");
+    var showrepeat = $("#showrepeat").prop("checked");
 
     var c = $("#draftcanvas");
     var ctx = c[0].getContext("2d");
@@ -377,6 +378,12 @@ function redrawCanvas(scale) {
     } else {
       repeatDiv.style.top = "";
       repeatDiv.style.left = "";
+    }
+
+    if (showrepeat) {
+        $("#repeatsection").show();
+    } else {
+        $("#repeatsection").hide();
     }
 }
 
@@ -785,6 +792,7 @@ $(function() {
     $("#showreversal").change(function() { redrawCanvas(); });
     $("#showhruler").change(function() { updateRulers(); });
     $("#showvruler").change(function() { updateRulers(); });
+    $("#showrepeat").change(function() { redrawCanvas(); });
     $("#GREYSLIDER").change(function() { redrawCanvas(); });
 
     $("#mainrowcontrols .readout").val(main_cells.length);
