@@ -75,7 +75,7 @@ div.controlpanel > div > span > label {
 
 div.controlpanel > div > span > span {
     display: table-cell;
-    width: 5em;
+    white-space:nowrap;
 }
 
 #resets div {
@@ -120,7 +120,7 @@ div.controlpanel > div > span > span {
 }
 
 .readout {
-    width: 3em;
+    width: 4em;
 }
 
 .colorbox {
