@@ -382,7 +382,9 @@ function redrawCanvas(scale) {
 
     if (showrepeat) {
         $("#repeatsection").show();
+        $("#repeatexport").show();
     } else {
+        $("#repeatexport").hide();
         $("#repeatsection").hide();
     }
 }
