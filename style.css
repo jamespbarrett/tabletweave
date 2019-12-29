@@ -61,7 +61,7 @@ h4 {
 
 div.controlpanel > div {
     display: table;
-    width: 80%;
+    width: 95%;
     margin: auto;
 }
 
@@ -75,6 +75,7 @@ div.controlpanel > div > span > label {
 
 div.controlpanel > div > span > span {
     display: table-cell;
+    width: 5em;
 }
 
 #resets div {
@@ -119,7 +120,7 @@ div.controlpanel > div > span > span {
 }
 
 .readout {
-    width: 4em;
+    width: 3em;
 }
 
 .colorbox {

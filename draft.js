@@ -77,6 +77,9 @@ function redrawCanvas(scale) {
     var nRowsLow  = lower_cells.length;
     var nCols     = main_cells[0].length;
 
+    var repeatfrom = nRowsMain - parseInt($("#repeatpicks #repeatfrom .readout").val());
+    var repeatto = nRowsMain - parseInt($("#repeatpicks #repeatto .readout").val());
+
     var hruler = parseInt($("#hruler .readout").val());
     var vruler = parseInt($("#vruler .readout").val());
 
@@ -85,7 +88,8 @@ function redrawCanvas(scale) {
         + copyrightheight;
 
     var tableheight = (cellborder + cellheight)*nRowsMain;
-    var fullheightrepeats = tableheight*repeats+20;
+    var eachrepeatheight = (cellborder + cellheight)*(repeatfrom + 1 - repeatto);
+    var fullheightrepeats = eachrepeatheight*repeats+20;
 
     if (showlower) {
         fullheight += intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow);
@@ -119,13 +123,13 @@ function redrawCanvas(scale) {
     }
 
     rtx.beginPath();
-    for (y = 0; y < nRowsMain*repeats + 1; y++) {
+    for (y = 0; y < (repeatfrom + 1 - repeatto)*repeats + 1; y++) {
         rtx.moveTo(labelwidth, y*(cellborder + cellheight));
         rtx.lineTo(labelwidth + (cellborder + cellwidth)*nCols, y*(cellborder + cellheight))
     }
     for (x = 0; x < nCols + 1; x++) {
         rtx.moveTo(labelwidth + (cellborder + cellwidth)*x, 0);
-        rtx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain*repeats);
+        rtx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*(repeatfrom + 1 - repeatto)*repeats);
     }
 
     if (showlower) {
@@ -209,33 +213,35 @@ function redrawCanvas(scale) {
                 ctx.stroke();
             }
 
-            for (z=0; z<repeats; z++){
-              rtx.fillStyle = "#ffffff";
-              rtx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale,
-                (cellborder + cellheight)*y + 1*scale + z*tableheight,
-                cellwidth + cellborder - 2*scale,
-                cellheight + cellborder - 2*scale);
+            if (y <= repeatfrom && y >= repeatto) {
+                for (z=0; z<repeats; z++){
+                    rtx.fillStyle = "#ffffff";
+                    rtx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale,
+                                 (cellborder + cellheight)*(y - repeatfrom - 1) + 1*scale + (z + 1)*eachrepeatheight,
+                                  cellwidth + cellborder - 2*scale,
+                                  cellheight + cellborder - 2*scale);
 
-              if (showovals && fg != -1) {
-                rtx.fillStyle = palette[fg];
-                rtx.strokeStyle = "0x000000";
-                rtx.beginPath();
+                    if (showovals && fg != -1) {
+                        rtx.fillStyle = palette[fg];
+                        rtx.strokeStyle = "0x000000";
+                        rtx.beginPath();
 
-                if (((dir == "left") != (reverse))) {
-                  drawOval(rtx,
-                    labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                    cellborder + (cellborder + cellheight)*y + z*tableheight + cellheight/2,
-                    cellwidth, cellwidth/2, -Math.PI/4);
-                } else {
-                  drawOval(rtx,
-                    labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                    cellborder + (cellborder + cellheight)*y + z*tableheight + cellheight/2,
-                    cellwidth, cellwidth/2, Math.PI/4);
+                        if (((dir == "left") != (reverse))) {
+                            drawOval(rtx,
+                                labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                                cellborder + (cellborder + cellheight)*(y - repeatfrom - 1) + (z + 1)*eachrepeatheight + cellheight/2,
+                                cellwidth, cellwidth/2, -Math.PI/4);
+                        } else {
+                            drawOval(rtx,
+                                labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                                cellborder + (cellborder + cellheight)*(y - repeatfrom - 1) + (z + 1)*eachrepeatheight + cellheight/2,
+                                cellwidth, cellwidth/2, Math.PI/4);
+                        }
+                        rtx.lineWidth = scale;
+                        rtx.fill();
+                        rtx.stroke();
+                    }
                 }
-                rtx.lineWidth = scale;
-                rtx.fill();
-                rtx.stroke();
-              }
             }
 
             if (showhruler && y == nRowsMain - hruler) {
@@ -443,6 +449,22 @@ function updateQuality(s) {
 
     redrawCanvas(s);
     redrawPreview();
+    redrawCanvas();
+}
+
+function updateRepeats(f, t) {
+    if (f < 1)
+        f = 1;
+    if (t < 1)
+        t = 1;
+    if (f > t)
+        f = t;
+    if (t > main_cells.length)
+        t = main_cells.length;
+
+    $("#repeatpicks #repeatfrom .readout").val(f);
+    $("#repeatpicks #repeatto .readout").val(t);
+
     redrawCanvas();
 }
 
@@ -883,6 +905,20 @@ $(function() {
                                                   redrawPreview();});
     $("#scalecontrols .plus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) + 1);
                                                  redrawPreview();});
+
+    $("#repeatpicks #repeatfrom .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()));
+                                                               redrawPreview();});
+    $("#repeatpicks #repeatfrom .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()) - 1, parseInt($("#repeatpicks #repeatto .readout").val()));
+                                                            redrawPreview();});
+    $("#repeatpicks #repeatfrom .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()) + 1, parseInt($("#repeatpicks #repeatto .readout").val()));
+                                                           redrawPreview();});
+
+    $("#repeatpicks #repeatto .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()));
+                                                               redrawPreview();});
+    $("#repeatpicks #repeatto .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()) - 1);
+                                                            redrawPreview();});
+    $("#repeatpicks #repeatto .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()) + 1);
+                                                           redrawPreview();});
 
     $("#qualitycontrols .readout").change(function() {
         updateQuality(parseInt($("#qualitycontrols .readout").val()));
