@@ -734,16 +734,23 @@ function load() {
     save();
 }
 
-function redrawPreview() {
-    var c = $("#draftcanvas")[0];
+function redrawPreview(repeatsection) {
+    if (repeatsection) {
+        var c = $("#repeatcanvas")[0];
+    } else {
+        var c = $("#draftcanvas")[0];
+    }
     var image = c.toDataURL(exportMimetype, 1.0);
     $("#preview").attr("src", image);
 }
 
-function exportImage(mimetype) {
+function exportImage(mimetype, repeatsection) {
     save();
     exportMimetype = mimetype;
     updateQuality($("#scalecontrols .readout").val());
+    if (repeatsection) {
+        redrawPreview(repeatsection);
+    }
     $("#messagepopup").show();
     $(".closepreview").focus();
 }
@@ -898,8 +905,11 @@ $(function() {
         setForegroundColor($(this).attr("id"));
     });
 
-    $("#export #jpeg").click(function() { exportImage("image/jpeg"); });
-    $("#export #png").click(function() { exportImage("image/png"); });
+    $("#export #draftexport #jpeg").click(function() { exportImage("image/jpeg"); });
+    $("#export #draftexport #png").click(function() { exportImage("image/png"); });
+
+    $("#export #repeatexport #jpeg").click(function() { exportImage("image/jpeg", true); });
+    $("#export #repeatexport #png").click(function() { exportImage("image/png", true); });
 
     $("#fileio #save").click(function() { save_file(); });
 
