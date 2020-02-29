@@ -44,11 +44,21 @@ function max(a,b) { return (a > b)?a:b; }
 function redrawCanvas(scale) {
     save();
 
+    var c = $("#draftcanvas");
+    var ctx = c[0].getContext("2d");
+
     scale = ( typeof scale === 'undefined') ? $("#scalecontrols .readout").val() : scale;
+
+    var nRowsMain = main_cells.length;
+    var nRowsLow  = lower_cells.length;
+    var nCols     = main_cells[0].length;
 
     var cellwidth = 20*scale;
     var cellheight = 20*scale;
+    ctx.font = "" + 15*scale + "px Arial";
     var labelwidth = 20*scale;
+    if (nRowsMain > 99)
+        labelwidth = 30*scale;
     var cellborder = 2*scale;
     var rulerwidth = 3*cellborder;
     var intertablegap = 25*scale;
@@ -66,15 +76,8 @@ function redrawCanvas(scale) {
     var showvruler = $("#showvruler").prop("checked");
     var showrepeat = $("#showrepeat").prop("checked");
 
-    var c = $("#draftcanvas");
-    var ctx = c[0].getContext("2d");
-
     var r = $("#repeatcanvas");
     var rtx = r[0].getContext("2d");
-
-    var nRowsMain = main_cells.length;
-    var nRowsLow  = lower_cells.length;
-    var nCols     = main_cells[0].length;
 
     var repeats = parseInt($("#repeats .readout").val());
     var repeatfrom = nRowsMain - parseInt($("#repeatpicks #repeatfrom .readout").val());
