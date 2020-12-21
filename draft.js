@@ -37,6 +37,16 @@ function redraw() {
     var bbox = $('#draftcanvas svg')[0].getBBox();
     $('#draftcanvas svg').width(bbox.width * scale);
     $('#draftcanvas svg').height(bbox.height * scale);
+
+    $('#draftcanvas svg').click(draftClick);
+}
+
+function draftClick(e) {
+    const pt = this.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const svgP = pt.matrixTransform( this.getScreenCTM().inverse() );
+    alert("(" + svg_coord_to_tablet(svgP.x) + ", " + svg_coord_to_pick(svgP.y, draft) + ", " + svg_coord_to_hole(svgP.y, draft) + ")");
 }
 
 function setupNumberInput(id, min_val, max_val, callback) {
