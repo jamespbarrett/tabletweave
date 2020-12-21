@@ -8,6 +8,7 @@
 <script src="Colour.js"></script>
 <script src="tdd.js"></script>
 <script src="tdd_to_svg.js"></script>
+<script src="tdd_to_img.js"></script>
 <script>
 function saveSvg(svgEl, name) {
     svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -28,6 +29,16 @@ function render() {
   $('#name').val(draft.name);
   $('#svgdiv').text("");
   $('#svgdiv').append(tdd_to_svg(draft));
+  var width = 1024;
+  var svg = $('#svgdiv svg')[0];
+  var bbox = svg.getBBox();
+  var scale = width / bbox.width;
+  $('#svgdiv svg').width(width);
+  $('#svgdiv svg').height(bbox.height * scale);
+
+  tdd_to_img(draft, 'image/png', width, function (url) {
+    $('#preview').attr('src', url);
+  });
 }
 
 $(function() {
@@ -101,5 +112,8 @@ ZSZSZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZSZSZ
 a - #ff8800
 b - #ff8888
   </textarea></div>
-  <div id="svgdiv" style="float:left;"></div>
+  <div id="svgdiv"></div>
+  <div id="canvasdiv">
+    <img id="preview"></img>
+  </div>
 </body> </html>

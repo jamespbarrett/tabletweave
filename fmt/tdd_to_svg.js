@@ -54,6 +54,8 @@ function tdd_to_svg(
   $(svg.root()).width(fullwidth);
   $(svg.root()).height(fullheight);
 
+  svg.root().setAttribute('viewBox', '0 0 ' + fullwidth + ' ' + fullheight);
+
   // Background
   svg.rect(0, 0, fullwidth, fullheight,
     {fill: "#ffffff", stroke: "#000000", strokeWidth: 0});
