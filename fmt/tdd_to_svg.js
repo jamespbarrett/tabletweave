@@ -114,13 +114,15 @@ function tdd_to_svg(
     );
   }
 
-  for (var y = 0; y < draft.holes(); y++) {
-    svg.text(
-      labelwidth - 3,
-      threading_start_y + (cellborder + cellheight)*(y + 1) - 5,
-      labels[y],
-      {stroke: "#000000", style: "font: 15px Arial; text-anchor: end;"}
-    );
+  if (show_threading) {
+    for (var y = 0; y < draft.holes(); y++) {
+      svg.text(
+        labelwidth - 3,
+        threading_start_y + (cellborder + cellheight)*(y + 1) - 5,
+        labels[y],
+        {stroke: "#000000", style: "font: 15px Arial; text-anchor: end;"}
+      );
+    }
   }
 
   // Next draw the ovals. This is essentially
@@ -209,47 +211,51 @@ function tdd_to_svg(
     // The tablet numbers
     svg.text(
       labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-      threading_start_y - cellborder - 1,
+      threading_start_y - cellborder - 2,
       "" + (x + 1),
       {stroke: "#000000", style: "font: 15px Arial; text-anchor: middle;"}
     );
 
     // The ovals for the threading diagrame
-    var dir = (draft.threading[x] == 'Z')?'\\':'/';
-    for (var y = 0; y < draft.holes(); y++) {
-      var fg = draft.threadingColours[y][x];
+    if (show_threading) {
+      var dir = (draft.threading[x] == 'Z')?'\\':'/';
+      for (var y = 0; y < draft.holes(); y++) {
+        var fg = draft.threadingColours[y][x];
 
-      if (show_ovals && fg != ' ') {
-        const X_coord = labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2;
-        const Y_coord = threading_start_y + cellborder + (cellborder + cellheight)*y + cellheight/2;
+        if (show_ovals && fg != ' ') {
+          const X_coord = labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2;
+          const Y_coord = threading_start_y + cellborder + (cellborder + cellheight)*y + cellheight/2;
 
-        var g = svg.group({
-          transform: "translate(" + X_coord + "," + Y_coord + ") " +
-            "rotate(" + (dir == '\\'?"45":"-45") + ")"
-        });
+          var g = svg.group({
+            transform: "translate(" + X_coord + "," + Y_coord + ") " +
+              "rotate(" + (dir == '\\'?"45":"-45") + ")"
+          });
 
-        svg.ellipse(
-          g,
-          0,
-          0,
-          cellheight/2,
-          cellheight/4,
-          {
-            fill: draft.palette[fg].getCSSHexadecimalRGB(),
-            stroke: "#000000",
-            strokeWidth: 1
-          }
-        );
+          svg.ellipse(
+            g,
+            0,
+            0,
+            cellheight/2,
+            cellheight/4,
+            {
+              fill: draft.palette[fg].getCSSHexadecimalRGB(),
+              stroke: "#000000",
+              strokeWidth: 1
+            }
+          );
+        }
       }
     }
 
-    // The tablet numbers
-    svg.text(
-      labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-      threading_start_y + (cellborder + cellheight)*draft.holes() + 15,
-      draft.threading[x],
-      {stroke: "#000000", style: "font: 15px Arial; text-anchor: middle;"}
-    );
+    if (show_threading) {
+      // The tablet threading direction
+      svg.text(
+        labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+        threading_start_y + (cellborder + cellheight)*draft.holes() + 15,
+        draft.threading[x],
+        {stroke: "#000000", style: "font: 15px Arial; text-anchor: middle;"}
+      );
+    }
   }
 
   return svg.root();

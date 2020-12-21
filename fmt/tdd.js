@@ -67,6 +67,63 @@ class TDDDraft {
   picks() { return this.turning.length; }
   tablets() { return this.turning[0].length; }
   holes() { return this.threadingColours.length; }
+
+  addPicks(num) {
+    var i;
+    for (i=0; i < num; i++) {
+      var arr = this.turning[this.picks() - 1].slice();
+      this.turning.push(arr);
+    }
+  }
+
+  removePicks(num) {
+    this.turning = this.turning.slice(0, this.picks() - num);
+  }
+
+  addHoles(num) {
+    var i;
+    for (i=0; i < num; i++) {
+      var arr = this.threadingColours[this.holes() - 1].slice();
+      this.threadingColours.push(arr);
+    }
+  }
+
+  removeHoles(num) {
+    this.threadingColours = this.threadingColours.slice(0, this.holes() - num);
+  }
+
+  addTablets(num) {
+    var i;
+    var j;
+    var arr = [];
+
+    for (i=0; i < num; i++) {
+      arr.push('\\');
+    }
+
+    for (i=0; i < this.picks(); i++) {
+      this.turning[i] = this.turning[i].concat(arr);
+    }
+
+    for (j=0; j < num; j++) {
+      this.threading.push(this.threading[this.threading.length - 1]);
+
+      for (i=0; i < this.threadingColours.length; i++) {
+        this.threadingColours[i].push(this.threadingColours[i][this.threadingColours[i].length - 1]);
+      }
+    }
+  }
+
+  removeTablets(num) {
+    var i;
+    for (i=0; i < this.picks(); i++) {
+      this.turning[i] = this.turning[i].slice(0, this.turning[i].length - num);
+    }
+    for (i=0; i < this.holes(); i++) {
+      this.threadingColours[i] = this.threadingColours[i].slice(0, this.threadingColours[i].length - num);
+    }
+    this.threading = this.threading.slice(0, this.threading.length - num);
+  }
 }
 
 function TDDDraftFromString(raw) {
