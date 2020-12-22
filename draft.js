@@ -169,6 +169,35 @@ function setControlsFromDraft() {
     $("#colcontrols .readout").val(draft.tablets());
 }
 
+function loadFile() {
+    var files = $('#fileio #load')[0].files;
+    if (files.length > 0) {
+        var reader = new FileReader();
+
+        reader.onload = (function(is_tdd) {
+            return function (e) {
+                try {
+                    var data = e.target.result;
+
+                    if (is_tdd) {
+                        draft = TDDDraftFromString(data);
+                    } else {
+                        draft = json_to_tdd(JSON.parse(data));
+                    }
+                } catch(err) {
+                    alert("File is corrupted and could not be loaded.");
+                    return;
+                }
+                setControlsFromDraft();
+                redrawControls();
+                redraw();
+            };
+        })(/^.*\.tdd$/.test(files[0].name));
+
+        reader.readAsText(files[0]);
+    }
+}
+
 $(function() {
     Cookies.json = true;
 
@@ -197,6 +226,8 @@ $(function() {
     $('#BLUESLIDE').change(function() { updateBlue($('#BLUESLIDE').val()); redraw(); redrawControls(); });
 
     $('#GREYSLIDER').change(function() { redraw(); });
+
+    $("#fileio #load").change(function() { loadFile(); });
 
     setControlsFromDraft();
     redraw();
