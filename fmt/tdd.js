@@ -20,6 +20,9 @@ class TDDDraft {
       'b': new RGBColour(255, 136, 136)
     };
     this.threadingColours = [
+      ['1'],
+      ['1'],
+      ['1'],
       ['1']
     ];
     this.threading = [
@@ -81,15 +84,16 @@ class TDDDraft {
   }
 
   addHoles(num) {
+    var n = Math.min(num, 8 - this.holes());
     var i;
-    for (i=0; i < num; i++) {
+    for (i=0; i < n; i++) {
       var arr = this.threadingColours[this.holes() - 1].slice();
       this.threadingColours.push(arr);
     }
   }
 
   removeHoles(num) {
-    this.threadingColours = this.threadingColours.slice(0, this.holes() - num);
+    this.threadingColours = this.threadingColours.slice(0, Math.max(this.holes() - num), 1);
   }
 
   addTablets(num) {
@@ -117,12 +121,68 @@ class TDDDraft {
   removeTablets(num) {
     var i;
     for (i=0; i < this.picks(); i++) {
-      this.turning[i] = this.turning[i].slice(0, this.turning[i].length - num);
+      this.turning[i] = this.turning[i].slice(0, Math.max(this.turning[i].length - num, 1));
     }
     for (i=0; i < this.holes(); i++) {
-      this.threadingColours[i] = this.threadingColours[i].slice(0, this.threadingColours[i].length - num);
+      this.threadingColours[i] = this.threadingColours[i].slice(0, Math.max(this.threadingColours[i].length - num, 1));
     }
-    this.threading = this.threading.slice(0, this.threading.length - num);
+    this.threading = this.threading.slice(0, Math.max(this.threading.length - num, 1));
+  }
+
+  colour(num) {
+    if (num >= 0 && num < 10) {
+      return this.palette[num];
+    } else if (num == 10) {
+      return this.palette['a'];
+    } else if (num == 11) {
+      return this.palette['b'];
+    } else {
+      return undefined;
+    }
+  }
+
+  setColour(num, c) {
+    if (num >= 0 && num < 10) {
+      this.palette[num] = c;
+    } else if (num == 10) {
+      this.palette['a'] = c;
+    } else if (num == 11) {
+      this.palette['b'] = c;
+    }
+  }
+
+  reverse(tablet, pick) {
+    var i;
+    for (i=0; i < this.picks() - pick; i++) {
+      var a = this.turning[i][tablet];
+      if (a == '\\') {
+        this.turning[i][tablet] = '/';
+      } else if (a == '/') {
+        this.turning[i][tablet] = '\\';
+      }
+    }
+  }
+
+  setThreadColour(tablet, hole, c) {
+    if (c >= 0 && c < 10) {
+      this.threadingColours[hole][tablet] = "" + c;
+    } else if (c == 10) {
+      this.threadingColours[hole][tablet] = "a";
+    } else if (c == 11) {
+      this.threadingColours[hole][tablet] = "b";
+    } else {
+      this.threadingColours[hole][tablet] = " ";
+    }
+  }
+
+  flip(tablet) {
+    if (this.threading[tablet] == "S") {
+      this.threading[tablet] = "Z";
+    } else {
+      this.threading[tablet] = "S";
+    }
+
+    this.reverse(tablet, 0);
   }
 }
 
