@@ -3,6 +3,42 @@
 var draft = new TDDDraft();
 var fgcol = -1;
 
+function control_vals() {
+    return {
+        fgcol: fgcol,
+        scale: $('#scalecontrols .readout').val(),
+        showovals: $("#showovals").prop("checked"),
+        showlower: $("#showlower").prop("checked"),
+        showreversal: $("#showreversal").prop("checked"),
+        grey_saturation: $("#GREYSLIDER").val(),
+    };
+}
+
+function saveToLocal() {
+    localStorage.setItem("tdd-controls", JSON.stringify(control_vals()));
+    localStorage.setItem("tdd-draft", draft.toString());
+}
+
+function loadFromLocal() {
+    var local_controls = localStorage.getItem("tdd-controls");
+    var local_draft = localStorage.getItem("tdd-draft");
+
+    if (local_controls != undefined) {
+        var controls = JSON.parse(local_controls);
+
+        fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
+        $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:1);
+        $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
+        $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
+        $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
+        $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
+    }
+
+    if (local_draft != undefined) {
+        draft = TDDDraftFromString(local_draft);
+    }
+}
+
 function updateDraft() {
     var picks   = parseInt($("#mainrowcontrols .readout").val());
     var holes   = parseInt($("#lowrowcontrols .readout").val());
@@ -25,6 +61,8 @@ function updateDraft() {
     } else if (tablets > draft.tablets()) {
         draft.addTablets(tablets - draft.tablets());
     }
+
+    saveToLocal();
 }
 
 function redraw() {
@@ -116,6 +154,7 @@ function draftClick(e) {
             draft.flip(tablet);
         }
 
+        saveToLocal();
         redraw();
     }
 }
@@ -151,16 +190,19 @@ function setupNumberInput(id, min_val, max_val, callback) {
 function updateRed(r) {
     var c = draft.colour(fgcol).getIntegerRGB();
     draft.setColour(fgcol, new RGBColour(r, c.g, c.b));
+    saveToLocal();
 }
 
 function updateGreen(g) {
     var c = draft.colour(fgcol).getIntegerRGB();
     draft.setColour(fgcol, new RGBColour(c.r, g, c.b));
+    saveToLocal();
 }
 
 function updateBlue(b) {
     var c = draft.colour(fgcol).getIntegerRGB();
     draft.setColour(fgcol, new RGBColour(c.r, c.g, b));
+    saveToLocal();
 }
 
 function setControlsFromDraft() {
@@ -189,6 +231,8 @@ function loadFile() {
                     alert("File is corrupted and could not be loaded.");
                     return;
                 }
+
+                saveToLocal();
                 setControlsFromDraft();
                 redrawControls();
                 redraw();
@@ -223,6 +267,7 @@ function reset() {
     $("#showreversal").prop("checked", true);
     $("#GREYSLIDER").val(144);
 
+    saveToLocal();
     setControlsFromDraft();
     redraw();
     redrawControls();
@@ -231,22 +276,22 @@ function reset() {
 $(function() {
     Cookies.json = true;
 
-    $("#draftname .readout").change(function () { draft.name = $("#draftname .readout").val(); });
+    $("#draftname .readout").change(function () { draft.name = $("#draftname .readout").val(); saveToLocal(); });
 
-    setupNumberInput("scalecontrols", 1, undefined, redraw);
+    setupNumberInput("scalecontrols", 1, undefined, function() { saveToLocal(); redraw(); });
     setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
     setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
     setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
 
-    $("#showovals").change(function() { redraw(); });
-    $("#showlower").change(function() { redraw(); });
-    $("#showreversal").change(function() { redraw(); });
+    $("#showovals").change(function() { saveToLocal(); redraw(); });
+    $("#showlower").change(function() { saveToLocal(); redraw(); });
+    $("#showreversal").change(function() { saveToLocal(); redraw(); });
 
-    $('#EMPTYBOX').click(function() { fgcol = -1; redrawControls(); });
+    $('#EMPTYBOX').click(function() { fgcol = -1; saveToLocal(); redrawControls(); });
     var i;
     for (i=0; i<12; i++) {
         (function (i) {
-            $('#BOX' + (i+1)).click(function() { fgcol = i; redrawControls(); });
+            $('#BOX' + (i+1)).click(function() { fgcol = i; saveToLocal(); redrawControls(); });
         })(i);
     }
 
@@ -257,13 +302,15 @@ $(function() {
     $('#BLUEVAL').change(function() { updateBlue($('#BLUEVAL').val()); redraw(); redrawControls(); });
     $('#BLUESLIDE').change(function() { updateBlue($('#BLUESLIDE').val()); redraw(); redrawControls(); });
 
-    $('#GREYSLIDER').change(function() { redraw(); });
+    $('#GREYSLIDER').change(function() { saveToLocal(); redraw(); });
 
-    $("#fileio #load").change(function() { loadFile(); });
+    $("#fileio #load").change(function() { loadFile(); saveToLocal(); });
     $("#fileio #save").click(function() { saveFile(); });
 
-    $("#clear").click(function() { draft = new TDDDraft(); setControlsFromDraft(); redraw(); redrawControls(); });
+    $("#clear").click(function() { draft = new TDDDraft(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
     $("#reset").click(function() { reset(); });
+
+    loadFromLocal();
 
     setControlsFromDraft();
     redraw();
