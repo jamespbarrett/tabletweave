@@ -4,7 +4,7 @@
 
 class TDDDraft {
   constructor() {
-    this.name   = "";
+    this.name   = "untitled draft";
     this.palette = {
       '0': new RGBColour(255, 255, 255),
       '1': new RGBColour(0, 0, 0),

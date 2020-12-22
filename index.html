@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://code.jquery.com/jquery-1.8.2.min.js"></script>
 <script src="js.cookie.js"></script>
+<script src="FileSaver.js"></script>
 <script src="fmt/jquery.svg.js"></script>
 <script src="fmt/jquery.svgdom.js"></script>
 <script src="fmt/Colour.js"></script>
@@ -48,6 +49,10 @@
 
 <div id="controlbar">
 <div class="controlpanel">
+  <h3>Draft Name</h3>
+  <div>
+    <span id="draftname"><input class="readout" value=""></input></span>
+  </div>
   <h3>Controls</h3>
   <div>
     <span id="mainrowcontrols"><label>Picks:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>

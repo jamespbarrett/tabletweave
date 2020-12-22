@@ -123,6 +123,10 @@ div.controlpanel > div > span > span {
     width: 4em;
 }
 
+#draftname .readout {
+    width: 100%;
+}
+
 .colorbox {
     width: 20px;
     height: 20px;
