@@ -331,3 +331,172 @@ function svg_coord_to_hole(y, draft) {
     return -1;
   }
 }
+
+function tdd_to_repeat_svg(
+  draft,
+  show_ovals=true,
+  show_reversals=true,
+  grey_saturation=0x99,
+  repeatfrom=1,
+  repeatto=1,
+  repeats=1
+) {
+  var parent = document.createElement("div");
+  $(parent).svg();
+  var svg = $(parent).svg('get');
+
+  const forwardcolour = new RGBColour(0xFF, 0xFF, 0xFF);
+  const reversecolour = new RGBColour(
+    grey_saturation,
+    grey_saturation,
+    grey_saturation
+  );
+
+  const num_rows_per_repeat = (repeatto + 1 - repeatfrom);
+  const num_rows_total = repeats*num_rows_per_repeat;
+
+  const fullheight = (
+    cellborder +
+    (cellborder + cellheight)*num_rows_total +
+    cellborder
+  );
+
+  const fullwidth = (
+    labelwidth +
+    cellborder +
+    (cellborder + cellwidth)*draft.tablets()
+  );
+
+  $(svg.root()).width(fullwidth);
+  $(svg.root()).height(fullheight);
+
+  svg.root().setAttribute('viewBox', '0 0 ' + fullwidth + ' ' + fullheight);
+
+  // Background
+  svg.rect(0, 0, fullwidth, fullheight,
+    {fill: "#ffffff", stroke: "#000000", strokeWidth: 0});
+
+  // Turning diagram
+  for (var y = 0; y <= num_rows_total; y++) {
+    svg.line(
+      labelwidth,
+      y*(cellborder + cellheight),
+      labelwidth + (cellborder + cellwidth)*draft.tablets(),
+      y*(cellborder + cellheight),
+      {stroke: "#000000", strokeWidth: cellborder}
+    );
+  }
+  for (var x = 0; x < draft.tablets() + 1; x++) {
+    svg.line(
+      labelwidth + (cellborder + cellwidth)*x,
+      0,
+      labelwidth + (cellborder + cellwidth)*x,
+      (cellborder + cellheight)*num_rows_total,
+      {stroke: "#000000", strokeWidth: cellborder}
+    );
+  }
+
+  // Draw some labels
+  for (var r = 0; r < repeats; r++) {
+    for (var y = 0; y < num_rows_per_repeat; y++) {
+      svg.text(
+        labelwidth - 3,
+        (cellborder + cellheight)*(r*num_rows_per_repeat + y + 1) - 5,
+        "" + (repeatto - y),
+        {stroke: "#000000", style: "font: 15px Arial; text-anchor: end;"}
+      );
+    }
+  }
+
+  // Next draw the ovals. This is essentially
+  // a virtual loom that loops through the data
+  // generating the turning diagram and maintaining
+  // tablet state.
+  for (var x = 0; x < draft.tablets(); x++) {
+    /* This represents which hole is uppermost */
+    var tablet_position = draft.holes() - 1;
+    var backwards = undefined;
+
+    // The ovals for the turning diagram
+    for (var y = draft.picks() - 1; draft.picks() - y <= repeatto; y--) {
+      var dir = draft.turning[y][x];
+      var old_backwards = backwards;
+      backwards = (
+        ((draft.threading[x] == 'Z')?'\\':'/') != dir
+      );
+      var fg;
+      if (!backwards)
+        fg = draft.threadingColours[tablet_position][x];
+      else
+        fg = draft.threadingColours[
+          (tablet_position + 1)%draft.holes()
+        ][x];
+
+      const reversal_point = (old_backwards != undefined) && (backwards != old_backwards);
+
+      /* Only draw if we are within the range being repeated */
+      if (draft.picks() - y >= repeatfrom) {
+        for (var r = 0; r < repeats; r++) {
+          const repeat_start_y = (cellheight + cellborder)*num_rows_per_repeat*r;
+          /* Draw the background */
+          if (backwards) {
+            svg.rect(
+              labelwidth + (cellborder + cellwidth)*x + 1,
+              repeat_start_y + (cellborder + cellheight)*(repeatto - draft.picks() + y) + 1,
+              cellwidth + cellborder - 2,
+              cellheight + cellborder - 2,
+              {
+                fill: reversecolour.getCSSHexadecimalRGB(),
+                strokeWidth: 0
+              }
+            );
+          }
+
+          /* Draw the Oval */
+          if (show_ovals && fg != ' ') {
+            const X_coord = labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2;
+            const Y_coord = repeat_start_y + cellborder + (cellborder + cellheight)*(repeatto - draft.picks() + y) + cellheight/2;
+
+            var g = svg.group({
+              transform: "translate(" + X_coord + "," + Y_coord + ") " +
+                "rotate(" + (dir == '\\'?"45":"-45") + ")"
+            });
+
+            svg.ellipse(
+              g,
+              0,
+              0,
+              cellheight/2,
+              cellheight/4,
+              {
+                fill: draft.palette[fg].getCSSHexadecimalRGB(),
+                stroke: "#000000",
+                strokeWidth: 1
+              }
+            );
+          }
+
+          /* Draw the reversal point marker */
+          if (show_reversals && reversal_point) {
+            svg.line(
+              labelwidth + x*(cellborder + cellwidth),
+              repeat_start_y + (repeatto - draft.picks() + y + 1)*(cellborder + cellheight),
+              labelwidth + (x+1)*(cellborder + cellwidth),
+              repeat_start_y + (repeatto - draft.picks() + y + 1)*(cellborder + cellheight),
+              {stroke: "#FF0000", strokeWidth: cellborder}
+            );
+          }
+        }
+      }
+
+      /* Turm the tablet */
+      if (backwards) {
+        tablet_position = (tablet_position + 1) % draft.holes();
+      } else {
+        tablet_position = (tablet_position + draft.holes() - 1) % draft.holes();
+      }
+    }
+  }
+
+  return svg.root();
+}

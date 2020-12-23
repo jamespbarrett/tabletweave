@@ -13,6 +13,10 @@ function control_vals() {
 
     return {
         fgcol: fgcol,
+        showrepeat: $('#showrepeat').prop("checked"),
+        repeatfrom: $('#repeatfrom .readout').val(),
+        repeatto: $('#repeatto .readout').val(),
+        repeats: $('#repeats .readout').val(),
         scale: $('#scalecontrols .readout').val(),
         showovals: $("#showovals").prop("checked"),
         showlower: $("#showlower").prop("checked"),
@@ -40,6 +44,11 @@ function loadFromLocal() {
         var controls = JSON.parse(local_controls);
 
         fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
+
+        $('#showrepeat').prop("checked", ((controls.showrepeat != undefined)?controls.showrepeat:false));
+        $('#repeatfrom .readout').val((controls.repeatfrom != undefined)?controls.repeatfrom:1);
+        $('#repeatto .readout').val((controls.repeatto != undefined)?controls.repeatto:1);
+        $('#repeats .readout').val((controls.repeats != undefined)?controls.repeats:1);
         $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
         $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
         $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
@@ -112,6 +121,10 @@ function redraw() {
     var grey_saturation = 0x100 - $("#GREYSLIDER").val();
     var hruler_position = ($("#showhruler").prop("checked"))?$("#hruler .readout").val():undefined;
     var vruler_position = ($("#showvruler").prop("checked"))?$("#vruler .readout").val():undefined;
+    var showrepeat = $('#showrepeat').prop("checked");
+    var repeatfrom = parseInt($('#repeatfrom .readout').val());
+    var repeatto = parseInt($('#repeatto .readout').val());
+    var repeats = parseInt($('#repeats .readout').val());
 
     $('#draftcanvas').text("");
     $('#draftcanvas').append(tdd_to_svg(
@@ -128,6 +141,24 @@ function redraw() {
     $('#draftcanvas svg').height(bbox.height * scale);
 
     $('#draftcanvas svg').click(draftClick);
+
+    $('#repeatcanvas').text("");
+    if (showrepeat) {
+        var left = $('#mainsection').position().left + bbox.width * scale + 20;
+        $('#repeatcanvas').append(tdd_to_repeat_svg(
+            draft,
+            showovals,
+            showreversal,
+            grey_saturation,
+            repeatfrom,
+            repeatto,
+            repeats
+        ));
+        var bbox = $('#repeatcanvas svg')[0].getBBox();
+        $('#repeatcanvas svg').width(bbox.width * scale);
+        $('#repeatcanvas svg').height(bbox.height * scale);
+        $('#repeatsection').css('left', left);
+    }
 }
 
 function redrawControls() {
@@ -320,6 +351,11 @@ function saveFile() {
 function reset() {
     draft = new TDDDraft();
 
+    $('#showrepeat').prop("checked", false);
+    $('#repeatfrom .readout').val(1);
+    $('#repeatto .readout').val(1);
+    $('#repeats .readout').val(1);
+
     $('#scalecontrols .readout').val(0);
     $("#showovals").prop("checked", true);
     $("#showlower").prop("checked", true);
@@ -407,6 +443,11 @@ $(function() {
     Cookies.json = true;
 
     $("#draftname .readout").change(function () { draft.name = $("#draftname .readout").val(); saveToLocal(); });
+
+    $("#showrepeat").change(function() { saveToLocal(); redraw(); });
+    setupNumberInput("repeatfrom", 1, function() { return $("#repeatto .readout").val(); }, function() { saveToLocal(); redraw(); });
+    setupNumberInput("repeatto", function() { return $("#repeatfrom .readout").val(); }, function() { return draft.picks(); }, function() { saveToLocal(); redraw(); });
+    setupNumberInput("repeats", 1, undefined, function() { saveToLocal(); redraw(); });
 
     setupNumberInput("scalecontrols", -100, 100, function() { saveToLocal(); redraw(); });
     setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
