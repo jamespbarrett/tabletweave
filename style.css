@@ -82,10 +82,45 @@ div.controlpanel > div > span > span {
     width: 100%;
 }
 
-#resets div span, #export > div > span, #fileio div span, #loaddiv div span {
+#resets div span, #export > div > span, #loaddiv div span {
     display: block;
     margin: auto;
     width: 30%;
+}
+
+#fileio > div {
+    display: table;
+    width: 90%;
+}
+
+#fileio > div > span {
+    display: table;
+    width: 90%;
+}
+
+#fileio > div > span > button {
+    display: table-cell;
+}
+
+#fileio > div > span > label {
+    display: table-cell;
+}
+
+#fileio > div > span > input {
+    display: table-cell;
+}
+
+#coloursliders {
+    display: table;
+    width: 90%;
+}
+
+#coloursliders > span {
+    display: table-row;
+}
+
+#coloursliders > span > label, #coloursliders > span > input {
+    display: table-cell;
 }
 
 #export button, #resets button, #fileio button, #loaddiv input{

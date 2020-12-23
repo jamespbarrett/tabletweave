@@ -85,7 +85,7 @@ function updateDraft() {
 }
 
 function redraw() {
-    var scale = Math.pow(2, $('#scalecontrols .readout').val());
+    var scale = Math.pow(2, parseInt($('#scalecontrols .readout').val()) / 10);
     var showovals = $("#showovals").prop("checked");
     var showlower = $("#showlower").prop("checked");
     var showreversal = $("#showreversal").prop("checked");
@@ -354,7 +354,7 @@ $(function() {
 
     $("#draftname .readout").change(function () { draft.name = $("#draftname .readout").val(); saveToLocal(); });
 
-    setupNumberInput("scalecontrols", -10, 10, function() { saveToLocal(); redraw(); }, increment=0.1);
+    setupNumberInput("scalecontrols", -100, 100, function() { saveToLocal(); redraw(); });
     setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
     setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
     setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
