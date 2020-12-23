@@ -4,7 +4,6 @@ body {
 }
 
 h1,h3 {
-/*    color: green;*/
     text-align: center;
     font-variant: small-caps;
 }
@@ -25,6 +24,10 @@ h4 {
     font-variant: small-caps;
 }
 
+.export_width_span {
+    width: 100%;
+}
+
 #mainsection {
     display: inline-block;
     position: absolute;
@@ -38,6 +41,7 @@ h4 {
     left: 900px;
     top: 170px;
 }
+
 #controlbar {
     position: fixed;
     top: 160px;
@@ -47,10 +51,6 @@ h4 {
     border: 1px solid black;
     overflow-y: scroll;
     background-color:#EEEEFF;
-}
-
-#controlbar label {
-/*    color: darkblue;*/
 }
 
 #controlbar > div {
@@ -82,7 +82,7 @@ div.controlpanel > div > span > span {
     width: 100%;
 }
 
-#resets div span, #export div span, #fileio div span, #loaddiv div span {
+#resets div span, #export > div > span, #fileio div span, #loaddiv div span {
     display: block;
     margin: auto;
     width: 30%;
@@ -113,6 +113,7 @@ div.controlpanel > div > span > span {
 
 .draftcanvas {
     border:1px solid #000000;
+    margin-bottom: 30px;
 }
 
 .repeacanvas {
@@ -137,59 +138,6 @@ div.controlpanel > div > span > span {
 .selected {
     border: 2px solid black;
 }
-
-#BLACKBOX.selected {
-    border: 2px solid white;
-}
-
-#WHITEBOX {
-    background-color: #ffffff;
-}
-
-#BLACKBOX {
-    background-color: #000000;
-}
-
-#REDBOX {
-    background-color: #ff0000;
-}
-
-#GREENBOX {
-    background-color: #009900;
-}
-
-#BLUEBOX {
-    background-color: #0000ff;
-}
-
-#GREYBOX {
-    background-color: #dddddd;
-}
-
-#DARKGREYBOX {
-    background-color: #999999;
-}
-
-#YELLOWBOX {
-    background-color: #ffff00;
-}
-
-#CYANBOX {
-    background-color: #00ffff;
-}
-
-#MAGENTABOX {
-    background-color: #990099;
-}
-
-#ORANGEBOX {
-    background-color: #ff8800;
-}
-
-#PINKBOX {
-    background-color: #FF8888;
-}
-
 
 #copyright {
     background-color:#EEEEFF;
@@ -222,4 +170,45 @@ div.controlpanel > div > span > span {
 #previewcontainer {
     padding: 5px 5px 5px;
     border: 1px solid #999999;
+}
+
+.accordion {
+    font-variant: small-caps;
+    font-size: larger;
+    /* background-color: #eee; */
+    background-color:#EEEEFF;
+    color: darkblue;
+    /* color: #444; */
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .accordion:hover {
+    background-color: #CCCCFF;
+}
+
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+    padding: 0 18px;
+    /* background-color: white; */
+    display: none;
+    overflow: hidden;
+}
+
+.accordion:after {
+    content: '\02795'; /* Unicode character for "plus" sign (+) */
+    font-size: 13px;
+    color: #777;
+    float: right;
+    margin-left: 5px;
+}
+
+.active:after {
+    content: "\2796"; /* Unicode character for "minus" sign (-) */
 }

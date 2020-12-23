@@ -4,6 +4,13 @@ var draft = new TDDDraft();
 var fgcol = -1;
 
 function control_vals() {
+    var accordion = {};
+    $('.accordion').each(function () {
+        var id = $(this).parent().attr('id');
+        var active = $(this).hasClass('active');
+        accordion[id] = active;
+    });
+
     return {
         fgcol: fgcol,
         scale: $('#scalecontrols .readout').val(),
@@ -11,6 +18,7 @@ function control_vals() {
         showlower: $("#showlower").prop("checked"),
         showreversal: $("#showreversal").prop("checked"),
         grey_saturation: $("#GREYSLIDER").val(),
+        accordion: accordion,
     };
 }
 
@@ -27,11 +35,22 @@ function loadFromLocal() {
         var controls = JSON.parse(local_controls);
 
         fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
-        $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:1);
+        $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
         $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
         $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
         $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
         $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
+
+        if (controls.accordion) {
+            for (const [key, value] of Object.entries(controls.accordion)) {
+                var but = $("#" + key + " .accordion");
+                if (value) {
+                    but.addClass('active');
+                } else {
+                    but.removeClass('active');
+                }
+            }
+        }
     }
 
     if (local_draft != undefined) {
@@ -66,7 +85,7 @@ function updateDraft() {
 }
 
 function redraw() {
-    var scale = $('#scalecontrols .readout').val();
+    var scale = Math.pow(2, $('#scalecontrols .readout').val());
     var showovals = $("#showovals").prop("checked");
     var showlower = $("#showlower").prop("checked");
     var showreversal = $("#showreversal").prop("checked");
@@ -159,7 +178,7 @@ function draftClick(e) {
     }
 }
 
-function setupNumberInput(id, min_val, max_val, callback) {
+function setupNumberInput(id, min_val, max_val, callback, increment=1) {
     var validate = function(new_val, min_val, max_val) {
         if (min_val != undefined && new_val < min_val) {
             new_val = min_val;
@@ -169,22 +188,22 @@ function setupNumberInput(id, min_val, max_val, callback) {
         return new_val;
     };
     $("#" + id + " .readout").change(function() {
-        var new_val = validate(parseInt($("#" + id + " .readout").val()), min_val, max_val);
+        var new_val = validate(Math.round(parseFloat($("#" + id + " .readout").val())/increment)*increment, min_val, max_val);
         $("#" + id + " .readout").val(new_val);
         callback();
     });
     $("#" + id + " .minus").click(function() {
-        var new_val = validate(parseInt($("#" + id + " .readout").val()) - 1, min_val, max_val);
+        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val())/increment) - 1)*increment, min_val, max_val);
         $("#" + id + " .readout").val(new_val);
         callback();
     });
     $("#" + id + " .plus").click(function() {
-        var new_val = validate(parseInt($("#" + id + " .readout").val()) + 1, min_val, max_val);
+        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val())/increment) + 1)*increment, min_val, max_val);
         $("#" + id + " .readout").val(new_val);
         callback();
     });
 
-    $("#" + id + " .readout").val(validate(parseInt($("#" + id + " .readout").val()), min_val, max_val));
+    $("#" + id + " .readout").val(validate(Math.round(parseFloat($("#" + id + " .readout").val())/increment)*increment, min_val, max_val));
 }
 
 function updateRed(r) {
@@ -261,7 +280,7 @@ function saveFile() {
 function reset() {
     draft = new TDDDraft();
 
-    $('#scalecontrols .readout').val(1);
+    $('#scalecontrols .readout').val(0);
     $("#showovals").prop("checked", true);
     $("#showlower").prop("checked", true);
     $("#showreversal").prop("checked", true);
@@ -273,12 +292,69 @@ function reset() {
     redrawControls();
 }
 
+function exportDraft(mimetype) {
+    var width = parseInt($("#export_width").val());
+    var showovals = $("#showovals").prop("checked");
+    var showlower = $("#showlower").prop("checked");
+    var showreversal = $("#showreversal").prop("checked");
+    var grey_saturation = 0x100 - $("#GREYSLIDER").val();
+
+    var process_blob = function(blob) {
+        var extension;
+        var filename;
+
+        if (mimetype == "image/jpeg") {
+            extension = ".jpg";
+        } else if (mimetype == "image/png") {
+            extension = ".png";
+        } else {
+            extension = "";
+        }
+        if (draft.name != "") {
+            filename = draft.name + extension;
+        } else {
+            filename = "draft" + extension;
+        }
+        saveAs(blob, filename);
+    };
+
+    if (mimetype == "image/svg+xml") {
+        process_blob(
+            tdd_to_svg_blob(
+                draft,
+                showlower,
+                showovals,
+                showreversal,
+                grey_saturation));
+    } else {
+        tdd_to_img_blob(
+            draft,
+            mimetype,
+            width,
+            process_blob,
+            showlower,
+            showovals,
+            showreversal,
+            grey_saturation);
+    }
+}
+
+function applyAccordian() {
+    $(".accordion").each(function () {
+        if ($(this).hasClass("active")) {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
+}
+
 $(function() {
     Cookies.json = true;
 
     $("#draftname .readout").change(function () { draft.name = $("#draftname .readout").val(); saveToLocal(); });
 
-    setupNumberInput("scalecontrols", 1, undefined, function() { saveToLocal(); redraw(); });
+    setupNumberInput("scalecontrols", -10, 10, function() { saveToLocal(); redraw(); }, increment=0.1);
     setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
     setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
     setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
@@ -310,7 +386,15 @@ $(function() {
     $("#clear").click(function() { draft = new TDDDraft(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
     $("#reset").click(function() { reset(); });
 
+    $('#draftexport #svg').click(function() { exportDraft('image/svg+xml'); });
+    $('#draftexport #jpeg').click(function() { exportDraft('image/jpeg'); });
+    $('#draftexport #png').click(function() { exportDraft('image/png'); });
+
+    $('.accordion').click(function() { $(this).toggleClass("active"); applyAccordian(); saveToLocal(); });
+
     loadFromLocal();
+
+    applyAccordian();
 
     setControlsFromDraft();
     redraw();

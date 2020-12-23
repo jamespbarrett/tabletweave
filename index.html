@@ -30,13 +30,6 @@
   </p>
 </div>
 
-<div id="messagepopup">
-  <span id="qualitycontrols"><label>Quality:</label><span><button class="minus">-</button><input class="readout" value="1"></input><button class="plus">+</button><span></span>
-  <button class="closepreview">Close Preview</button>
-  <p>Right Click and Select "Save As File" or "Save Image As" to save this image</p>
-  <div id="previewcontainer"><img id="preview"></img></div>
-</div>
-
 <div id="mainsection">
   <div id="draftcanvas" class="draftcanvas" height="300" width="600">
   </div>
@@ -53,8 +46,10 @@
   <div>
     <span id="draftname"><input class="readout" value=""></input></span>
   </div>
-  <h3>Controls</h3>
-  <div>
+</div>
+<div class="controlpanel" id="controls">
+  <button class="accordion active">Controls</button>
+  <div class="panel">
     <span id="mainrowcontrols"><label>Picks:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
     <span id="lowrowcontrols"><label>Number of Holes:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
     <span id="colcontrols"><label>Number of Tablets:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
@@ -64,9 +59,9 @@
     <!-- <span id="repeats"><label>Pattern repeats:</label><span><button class="minus">-</button><input class="readout" value="3"></input><button class="plus">+</button></span></span> -->
   </div>
 </div>
-<div class="controlpanel">
-  <h3>Display</h3>
-  <div>
+<div class="controlpanel" id="display">
+  <button class="accordion">Display</button>
+  <div class="panel">
     <span id="showcontrols"><label for="showovals">Show Threads</label><span><input type="checkbox" id="showovals" checked=true></span></span>
     <span id="showcontrols"><label for="showlower">Show Threading Diagram</label><span><input type="checkbox" id="showlower" checked=true></span></span>
     <span id="showcontrols"><label for="showreversal">Show Reversal Points</label><span><input type="checkbox" id="showreversal" checked=true></span></span>
@@ -74,20 +69,20 @@
     <!-- <span id="showcontrols"><label for="showvruler">Show Vertical Ruler</label><span><input type="checkbox" id="showvruler" checked=true></span></span> -->
     <!-- <span id="showcontrols"><label for="showrepeat">Show Pattern Repeat</label><span><input type="checkbox" id="showrepeat" checked=true></span></span> -->
     <span id="saturationcontrols"><label>Backwards Turn Saturation:</label><input type="range" min="0" max="255" id="GREYSLIDER" value="144"></input></span>
-    <span id="scalecontrols"><label>Visual Scale:</label><span><button class="minus">-</button><input class="readout" value="1"></input><button class="plus">+</button><span></span>
+    <span id="scalecontrols"><label>Visual Scale:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button><span></span>
   </div>
 </div>
 
 <div id="resets">
-  <h3>Resets</h3>
-  <div>
+  <button class="accordion">Resets</button>
+  <div class="panel">
     <span><button id="reset">Reset All</button><button id="clear">Clear Pattern</button></span>
   </div>
 </div>
 
 <div id="palete">
-  <h3>Palette</h3>
-  <div id="fg">
+  <button class="accordion active">Palette</button>
+  <div id="fg" class="panel">
     <label>Forground Colour:</label>
     <table>
       <tr>
@@ -138,9 +133,16 @@
 </div>
 
 <div id="export">
-  <h3>Export</h3>
+  <button class="accordion">Export</button>
+  <div class="panel">
+    <div class="controlpanel">
+      <div>
+        <span><label for="export_width">Export Width (px):</label><span><input class="readout" id="export_width" value=1920></input></span></span>
+      </div>
+    </div>
     <div id="draftexport">
-      <h4>Draft</h4>
+      <!-- <h4>Draft</h4> -->
+      <span><button id="svg">SVG</button></span>
       <span><button id="jpeg">JPEG</button></span>
       <span><button id="png">PNG</button></span>
     </div>
@@ -150,15 +152,16 @@
       <span><button id="png">PNG</button></span>
     </div> -->
   </div>
+</div>
 
-  <div id="fileio">
-  <h3>Files</h3>
-  <div>
+<div id="fileio">
+  <button class="accordion">Files</button>
+  <div class="panel">
     <span><button id="save">Save</button>
     <label>Load:</label><input type="file" accept="application/json,.tdd"
       id="load"></input></span>
   </div>
-  </div>
+</div>
 
 
 <div id="copyright">Tablet Weaving Draft Designer Copyright &copy; 2015-2019
