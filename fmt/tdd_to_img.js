@@ -15,7 +15,9 @@ function tdd_to_svg_blob(
     show_threading=true,
     show_ovals=true,
     show_reversals=true,
-    grey_saturation=0x99
+    grey_saturation=0x99,
+    hruler_position=undefined,
+    vruler_position=undefined
 ) {
     return svg_to_blob(
         tdd_to_svg(
@@ -23,7 +25,9 @@ function tdd_to_svg_blob(
             show_threading,
             show_ovals,
             show_reversals,
-            grey_saturation));
+            grey_saturation,
+            hruler_position,
+            vruler_position));
 }
 
 function draw_tdd_to_canvas(
@@ -34,8 +38,10 @@ function draw_tdd_to_canvas(
     show_ovals=true,
     show_reversals=true,
     grey_saturation=0x99,
+    hruler_position=undefined,
+    vruler_position=undefined
 ) {
-    var svg = tdd_to_svg(draft, show_threading, show_ovals, show_reversals, grey_saturation);
+    var svg = tdd_to_svg(draft, show_threading, show_ovals, show_reversals, grey_saturation, hruler_position, vruler_position);
 
     var ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -59,13 +65,15 @@ function tdd_to_img(
     show_ovals=true,
     show_reversals=true,
     grey_saturation=0x99,
+    hruler_position=undefined,
+    vruler_position=undefined
 ) {
     var canvas = document.createElement("canvas");
     canvas.width = width;
     draw_tdd_to_canvas(draft, canvas, function () {
         var url = canvas.toDataURL(mimetype, 1.0);
         onload(url);
-    }, show_threading, show_ovals, show_reversals, grey_saturation);
+    }, show_threading, show_ovals, show_reversals, grey_saturation, hruler_position, vruler_position);
 }
 
 function tdd_to_img_blob(
@@ -77,10 +85,12 @@ function tdd_to_img_blob(
     show_ovals=true,
     show_reversals=true,
     grey_saturation=0x99,
+    hruler_position=undefined,
+    vruler_position=undefined
 ) {
     var canvas = document.createElement("canvas");
     canvas.width = width;
     draw_tdd_to_canvas(draft, canvas, function () {
         canvas.toBlob(onload, mimetype, 1.0);
-    }, show_threading, show_ovals, show_reversals, grey_saturation);
+    }, show_threading, show_ovals, show_reversals, grey_saturation, hruler_position, vruler_position);
 }

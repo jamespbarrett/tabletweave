@@ -13,7 +13,9 @@ function tdd_to_svg(
     show_ovals=true,
     show_reversals=true,
     grey_saturation=0x99,
-  ) {
+    hruler_position=undefined,
+    vruler_position=undefined
+) {
   var parent = document.createElement("div");
   $(parent).svg();
   var svg = $(parent).svg('get');
@@ -255,6 +257,38 @@ function tdd_to_svg(
         threading_start_y + (cellborder + cellheight)*draft.holes() + 15,
         draft.threading[x],
         {stroke: "#000000", style: "font: 15px Arial; text-anchor: middle;"}
+      );
+    }
+  }
+
+  // Draw the horizontal ruler
+  if (hruler_position != undefined) {
+    svg.line(
+      labelwidth - cellborder,
+      (cellborder + cellheight)*(draft.picks() - hruler_position + 1),
+      labelwidth + cellborder + (cellborder + cellwidth)*draft.tablets(),
+      (cellborder + cellheight)*(draft.picks() - hruler_position + 1),
+      {stroke: "#000000", strokeWidth: cellborder*4}
+    );
+  }
+
+  // Draw the vertical ruler
+  if (vruler_position != undefined) {
+    svg.line(
+      labelwidth + (cellwidth + cellborder)*(vruler_position - 1),
+      0,
+      labelwidth + (cellwidth + cellborder)*(vruler_position - 1),
+      (cellheight + cellborder)*draft.picks() + cellborder,
+      {stroke: "#000000", strokeWidth: cellborder*4}
+    );
+
+    if (show_threading) {
+      svg.line(
+        labelwidth + (cellwidth + cellborder)*(vruler_position - 1),
+        threading_start_y,
+        labelwidth + (cellwidth + cellborder)*(vruler_position - 1),
+        threading_start_y + (cellheight + cellborder)*draft.holes() + cellborder,
+        {stroke: "#000000", strokeWidth: cellborder*4}
       );
     }
   }

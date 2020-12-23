@@ -34,7 +34,7 @@ class TDDDraft {
   }
 
   toString() {
-    var r = "# tdd v0.1\n";
+    var r = "# tdd v1.0\n";
     r += "# " + this.name + "\n";
     r += "\n";
 
@@ -191,9 +191,13 @@ function TDDDraftFromString(raw) {
   var lines = raw.split(/\r?\n/);
 
   // Read the header
-  var match = lines.shift().match(/^#\s*tdd\s+v0\.1\s*$/);
+  var match = lines.shift().match(/^#\s*tdd\s+v(\d+)\.(\d+)\s*$/);
   if (!match)
     throw "Not a valid tdd file";
+
+  if (match[1] > 1 || (match[1] == 1 && match[2] > 0)) {
+    alert("WARNING: Processing tdd file from future version of tdd. This may not work.")
+  }
 
   match = lines.shift().match(/^#\s*(.+)\s*$/);
   if (match) {

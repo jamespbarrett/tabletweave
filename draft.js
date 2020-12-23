@@ -18,6 +18,11 @@ function control_vals() {
         showlower: $("#showlower").prop("checked"),
         showreversal: $("#showreversal").prop("checked"),
         grey_saturation: $("#GREYSLIDER").val(),
+        showhruler: $("#showhruler").prop("checked"),
+        showvruler: $("#showvruler").prop("checked"),
+        hruler: $("#hruler .readout").val(),
+        vruler: $("#vruler .readout").val(),
+        export_width: $('#export_width').val(),
         accordion: accordion,
     };
 }
@@ -40,6 +45,11 @@ function loadFromLocal() {
         $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
         $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
         $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
+        $("#showhruler").prop("checked", ((controls.showhruler != undefined)?controls.showhruler:true));
+        $("#showvruler").prop("checked", ((controls.showvruler != undefined)?controls.showvruler:true));
+        $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
+        $("#vruler .readout").val((controls.vruler != undefined)?controls.vruler:0);
+        $("#export_width").val((controls.export_width != undefined)?controls.export_width:1920);
 
         if (controls.accordion) {
             for (const [key, value] of Object.entries(controls.accordion)) {
@@ -81,6 +91,16 @@ function updateDraft() {
         draft.addTablets(tablets - draft.tablets());
     }
 
+    if ($("#hruler .readout").val() > draft.picks() + 1) {
+        $("#hruler .readout").val(draft.picks() + 1);
+    } else if ($("#hruler .readout").val() < -draft.holes()) {
+        $("#hruler .readout").val(-draft.holes());
+    }
+
+    if ($("#vruler .readout").val() > draft.tablets() + 1) {
+        $("#vruler .readout").val(draft.tablets() + 1);
+    }
+
     saveToLocal();
 }
 
@@ -90,6 +110,8 @@ function redraw() {
     var showlower = $("#showlower").prop("checked");
     var showreversal = $("#showreversal").prop("checked");
     var grey_saturation = 0x100 - $("#GREYSLIDER").val();
+    var hruler_position = ($("#showhruler").prop("checked"))?$("#hruler .readout").val():undefined;
+    var vruler_position = ($("#showvruler").prop("checked"))?$("#vruler .readout").val():undefined;
 
     $('#draftcanvas').text("");
     $('#draftcanvas').append(tdd_to_svg(
@@ -97,7 +119,9 @@ function redraw() {
         showlower,
         showovals,
         showreversal,
-        grey_saturation
+        grey_saturation,
+        hruler_position,
+        vruler_position
     ));
     var bbox = $('#draftcanvas svg')[0].getBBox();
     $('#draftcanvas svg').width(bbox.width * scale);
@@ -180,6 +204,12 @@ function draftClick(e) {
 
 function setupNumberInput(id, min_val, max_val, callback, increment=1) {
     var validate = function(new_val, min_val, max_val) {
+        if (typeof(min_val) == "function") {
+            min_val = min_val();
+        }
+        if (typeof(max_val) == "function") {
+            max_val = max_val();
+        }
         if (min_val != undefined && new_val < min_val) {
             new_val = min_val;
         } else if (max_val != undefined && new_val > max_val) {
@@ -229,6 +259,16 @@ function setControlsFromDraft() {
     $("#lowrowcontrols .readout").val(draft.holes());
     $("#colcontrols .readout").val(draft.tablets());
     $("#draftname .readout").val(draft.name);
+
+    if ($("#hruler .readout").val() > draft.picks() + 1) {
+        $("#hruler .readout").val(draft.picks() + 1);
+    } else if ($("#hruler .readout").val() < -draft.holes()) {
+        $("#hruler .readout").val(-draft.holes());
+    }
+
+    if ($("#vruler .readout").val() > draft.tablets() + 1) {
+        $("#vruler .readout").val(draft.tablets() + 1);
+    }
 }
 
 function loadFile() {
@@ -286,6 +326,14 @@ function reset() {
     $("#showreversal").prop("checked", true);
     $("#GREYSLIDER").val(144);
 
+    $("#showhruler").prop("checked", false);
+    $("#showvruler").prop("checked", false);
+
+    $("#hruler .readout").val(0);
+    $("#vruler .readout").val(0);
+
+    $("#export_width").val(1920);
+
     saveToLocal();
     setControlsFromDraft();
     redraw();
@@ -298,6 +346,8 @@ function exportDraft(mimetype) {
     var showlower = $("#showlower").prop("checked");
     var showreversal = $("#showreversal").prop("checked");
     var grey_saturation = 0x100 - $("#GREYSLIDER").val();
+    var hruler_position = ($("#showhruler").prop("checked"))?$("#hruler .readout").val():undefined;
+    var vruler_position = ($("#showvruler").prop("checked"))?$("#vruler .readout").val():undefined;
 
     var process_blob = function(blob) {
         var extension;
@@ -325,7 +375,9 @@ function exportDraft(mimetype) {
                 showlower,
                 showovals,
                 showreversal,
-                grey_saturation));
+                grey_saturation,
+                hruler_position,
+                vruler_position));
     } else {
         tdd_to_img_blob(
             draft,
@@ -335,7 +387,9 @@ function exportDraft(mimetype) {
             showlower,
             showovals,
             showreversal,
-            grey_saturation);
+            grey_saturation,
+            hruler_position,
+            vruler_position);
     }
 }
 
@@ -358,6 +412,11 @@ $(function() {
     setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
     setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
     setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
+
+    setupNumberInput("hruler", function() { return -draft.holes(); }, function() { return draft.picks() + 1; }, function() { saveToLocal(); redraw(); });
+    setupNumberInput("vruler", 1, function() { return draft.tablets() + 1; }, function() { saveToLocal(); redraw(); });
+    $("#showhruler").change(function() {saveToLocal(); redraw(); })
+    $("#showvruler").change(function() {saveToLocal(); redraw(); })
 
     $("#showovals").change(function() { saveToLocal(); redraw(); });
     $("#showlower").change(function() { saveToLocal(); redraw(); });
@@ -389,6 +448,8 @@ $(function() {
     $('#draftexport #svg').click(function() { exportDraft('image/svg+xml'); });
     $('#draftexport #jpeg').click(function() { exportDraft('image/jpeg'); });
     $('#draftexport #png').click(function() { exportDraft('image/png'); });
+
+    $('#export_width').change(function() { saveToLocal(); });
 
     $('.accordion').click(function() { $(this).toggleClass("active"); applyAccordian(); saveToLocal(); });
 
