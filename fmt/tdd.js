@@ -184,6 +184,18 @@ class TDDDraft {
 
     this.reverse(tablet, 0);
   }
+
+  threadCount(c) {
+    if (0 <= c && c < 10) {
+      return this.threadingColours.reduce((count, colours) => (count + colours.filter(x => x == '' + c).length), 0);
+    } else if (c == 10) {
+      return this.threadingColours.reduce((count, colours) => (count + colours.filter(x => x == 'a').length), 0);
+    } else if (c == 11) {
+      return this.threadingColours.reduce((count, colours) => (count + colours.filter(x => x == 'b').length), 0);
+    } else {
+      return this.threadingColours.reduce((count, colours) => (count + colours.filter(x => x == ' ').length), 0);
+    }
+  }
 }
 
 function TDDDraftFromString(raw) {

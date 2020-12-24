@@ -159,6 +159,11 @@ function redraw() {
         $('#repeatcanvas svg').height(bbox.height * scale);
         $('#repeatsection').css('left', left);
     }
+
+    var i;
+    for (i=0; i <= 12; i++) {
+        $("#NUM" + (i)).text(draft.threadCount(i-1));
+    }
 }
 
 function redrawControls() {
