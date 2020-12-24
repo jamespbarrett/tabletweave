@@ -196,6 +196,18 @@ class TDDDraft {
       return this.threadingColours.reduce((count, colours) => (count + colours.filter(x => x == ' ').length), 0);
     }
   }
+
+  clearTurning() {
+    for (var i = 0; i < this.tablets(); i++) {
+      var val = '\\';
+      if (this.threading[i] == 'S') {
+        val = '/';
+      }
+      for (var j = 0; j < this.picks(); j++) {
+        this.turning[j][i] = val;
+      }
+    }
+  }
 }
 
 function TDDDraftFromString(raw) {

@@ -488,7 +488,7 @@ $(function() {
     $("#fileio #load").change(function() { loadFile(); saveToLocal(); });
     $("#fileio #save").click(function() { saveFile(); });
 
-    $("#clear").click(function() { draft = new TDDDraft(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
+    $("#clear").click(function() { draft.clearTurning(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
     $("#reset").click(function() { reset(); });
 
     $('#draftexport #svg').click(function() { exportDraft('image/svg+xml'); });
