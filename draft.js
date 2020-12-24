@@ -159,6 +159,7 @@ function redrawControls() {
         $('#REDSLIDE').prop( "disabled", false );
         $('#GREENSLIDE').prop( "disabled", false );
         $('#BLUESLIDE').prop( "disabled", false );
+        $('#colourname').text(ntc.name(draft.colour(fgcol).getCSSHexadecimalRGB())[1]);
     } else {
         $('#REDVAL').val(0);
         $('#REDSLIDE').val(0);
@@ -173,6 +174,8 @@ function redrawControls() {
         $('#REDSLIDE').prop( "disabled", true );
         $('#GREENSLIDE').prop( "disabled", true );
         $('#BLUESLIDE').prop( "disabled", true );
+
+        $('#colourname').text("");
     }
 }
 
