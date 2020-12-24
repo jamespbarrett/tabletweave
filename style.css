@@ -30,6 +30,21 @@ h4 {
     top: 170px;
 }
 
+#textinstructions {
+    display: inline-block;
+    position: absolute;
+    left: 400px;
+    top: 170px;
+}
+
+.instructions {
+    display: table;
+}
+
+.instruction {
+    display: table-row;
+}
+
 #repeatsection {
     display: inline-block;
     position: absolute;

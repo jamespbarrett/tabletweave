@@ -125,6 +125,14 @@ function redraw() {
     for (i=0; i <= 12; i++) {
         $("#NUM" + (i)).text(draft.threadCount(i-1));
     }
+
+    $('#textinstructions').css('top', bot);
+    $('#textinstructions').text("");
+    $('#textinstructions').append("<div class=\"instructions\">")
+    for (i=0; i < draft.picks(); i++) {
+        $('#textinstructions').append("<span class=\"instruction\">" + (i+1) + ". " + draft.describePick(i) + "</span>");
+    }
+    $('#textinstructions').append("</div>")
 }
 
 function redrawControls() {

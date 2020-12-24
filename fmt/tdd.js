@@ -213,6 +213,37 @@ class TDDDraft {
       }
     }
   }
+
+  describePick(num) {
+    var desc = "";
+    var dir = "F";
+    var n = 0;
+
+    for (var i = 0; i < this.tablets(); i++) {
+      var new_dir;
+      if ((this.turning[this.picks() - 1 - num][i] == "\\") == (this.threading[i] == "Z")) {
+        new_dir = "F";
+      } else {
+        new_dir = "B";
+      }
+
+      if (new_dir == dir) {
+        n += 1;
+      } else {
+        if (n >= 1) {
+          desc += '' + n + dir + " "
+        }
+        dir = new_dir;
+        n = 1;
+      }
+    }
+
+    if (n >= 1) {
+       desc += '' + n + dir;
+    }
+
+    return desc;
+  }
 }
 
 function TDDDraftFromString(raw) {
