@@ -1,6 +1,7 @@
 // The main script for the draft designer
 
 var draft = new TDDDraft();
+var view = new TDDSVGView();
 var fgcol = -1;
 
 function control_vals() {
@@ -126,21 +127,12 @@ function redraw() {
     var repeatto = parseInt($('#repeatto .readout').val());
     var repeats = parseInt($('#repeats .readout').val());
 
-    $('#draftcanvas').text("");
-    $('#draftcanvas').append(tdd_to_svg(
-        draft,
-        showlower,
-        showovals,
-        showreversal,
-        grey_saturation,
-        hruler_position,
-        vruler_position
-    ));
+
+    view.conform(draft);
+
     var bbox = $('#draftcanvas svg')[0].getBBox();
     $('#draftcanvas svg').width(bbox.width * scale);
     $('#draftcanvas svg').height(bbox.height * scale);
-
-    $('#draftcanvas svg').click(draftClick);
 
     $('#repeatcanvas').text("");
     if (showrepeat) {
@@ -464,9 +456,9 @@ $(function() {
     $("#showhruler").change(function() {saveToLocal(); redraw(); })
     $("#showvruler").change(function() {saveToLocal(); redraw(); })
 
-    $("#showovals").change(function() { saveToLocal(); redraw(); });
-    $("#showlower").change(function() { saveToLocal(); redraw(); });
-    $("#showreversal").change(function() { saveToLocal(); redraw(); });
+    $("#showovals").change(function() { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
+    $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
+    $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
 
     $('#EMPTYBOX').click(function() { fgcol = -1; saveToLocal(); redrawControls(); });
     var i;
@@ -483,7 +475,7 @@ $(function() {
     $('#BLUEVAL').change(function() { updateBlue($('#BLUEVAL').val()); redraw(); redrawControls(); });
     $('#BLUESLIDE').change(function() { updateBlue($('#BLUESLIDE').val()); redraw(); redrawControls(); });
 
-    $('#GREYSLIDER').change(function() { saveToLocal(); redraw(); });
+    $('#GREYSLIDER').change(function() { view.greySaturation(0x100 - $('#GREYSLIDER').val()); saveToLocal(); redraw(); });
 
     $("#fileio #load").change(function() { loadFile(); saveToLocal(); });
     $("#fileio #save").click(function() { saveFile(); });
@@ -501,9 +493,18 @@ $(function() {
 
     loadFromLocal();
 
+    view.showOvals($("#showovals").prop('checked'));
+    view.showThreading($("#showlower").prop('checked'));
+    view.showReversals($("#showreversal").prop('checked'));
+    view.greySaturation(0x100 - $('#GREYSLIDER').val()) ;
+
     applyAccordian();
 
     setControlsFromDraft();
+
+    $('#draftcanvas').append(view.root());
+    $('#draftcanvas svg').click(draftClick);
+
     redraw();
     redrawControls();
 })

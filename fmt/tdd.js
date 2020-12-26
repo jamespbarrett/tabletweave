@@ -175,6 +175,14 @@ class TDDDraft {
     }
   }
 
+  threadColour(tablet, hole) {
+    var c = this.threadingColours[hole][tablet];
+    if (c != ' ')
+      return this.palette[c];
+    else
+      return undefined;
+  }
+
   flip(tablet) {
     if (this.threading[tablet] == "S") {
       this.threading[tablet] = "Z";

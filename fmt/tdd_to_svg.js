@@ -1,11 +1,11 @@
 /* This script contains a function that can draw a tdd structure as an svg image */
 
-const cellwidth = 20;
-const cellheight = 20;
-const labelwidth = 20;
-const cellborder = 2;
-const rulerwidth = 3;
-const intertablegap = 25;
+// const cellwidth = 20;
+// const cellheight = 20;
+// const labelwidth = 20;
+// const cellborder = 2;
+// const rulerwidth = 3;
+// const intertablegap = 25;
 
 function tdd_to_svg(
     draft,
