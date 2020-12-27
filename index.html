@@ -11,8 +11,7 @@
 <script src="fmt/Colour.js"></script>
 <script src="fmt/tdd.js"></script>
 <script src="fmt/TDDSVGView.js"></script>
-<script src="fmt/tdd_to_svg.js"></script>
-<script src="fmt/tdd_to_img.js"></script>
+<script src="fmt/svg_to_img.js"></script>
 <script src="fmt/json_to_tdd.js"></script>
 <script src="draft.js"></script>
 </head>
@@ -32,11 +31,6 @@
 
 <div id="mainsection">
   <div id="draftcanvas" class="draftcanvas">
-  </div>
-</div>
-
-<div id="repeatsection">
-  <div id="repeatcanvas" class="repeatcanvas">
   </div>
 </div>
 
@@ -62,14 +56,6 @@
     <span id="showcontrols"><label for="showvruler">Show Vertical Ruler</label><span><input type="checkbox" id="showvruler" checked=true></span></span>
     <span id="hruler"><label>Horizontal Ruler Position:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
     <span id="vruler"><label>Vertical Ruler Position:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
-  </div>
-</div>
-<div class="controlpanel" id="patternrepeat">
-  <button class="accordion">Pattern Repeats</button>
-  <div class="panel">
-    <span id="showcontrols"><label for="showrepeat">Show Pattern Repeat</label><span><input type="checkbox" id="showrepeat" checked=false></span></span>
-    <span id="repeatpicks"><label>Pattern repeat from:</label><span id="repeatfrom"><button class="minus">-</button><input class="readout" value="1"></input><button class="plus">+</button></span> to <span id="repeatto"><button class="minus">-</button><input class="readout" value="1"></input><button class="plus">+</button></span></span>
-    <span id="repeats"><label>Pattern repeats:</label><span><button class="minus">-</button><input class="readout" value="3"></input><button class="plus">+</button></span></span>
   </div>
 </div>
 <div class="controlpanel" id="display">

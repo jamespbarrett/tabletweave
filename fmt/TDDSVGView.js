@@ -532,3 +532,39 @@ class TDDSVGView {
         }
     }
 }
+
+function svg_coord_to_tablet(x) {
+    if (x < labelwidth + cellborder/2) {
+      return -1;
+    } else {
+      return parseInt((x - labelwidth)/(cellborder + cellwidth));
+    }
+  }
+
+  function svg_coord_to_pick(y, draft) {
+    if (y >= (cellborder + cellheight)*draft.picks()) {
+      return -1;
+    } else {
+      return draft.picks() - parseInt(y/(cellborder + cellheight)) - 1;
+    }
+  }
+
+  function svg_coord_to_hole(y, draft) {
+    const threading_start_y = (
+      (cellborder + cellheight)*draft.picks() +
+      intertablegap
+    );
+
+    const threading_end_y = (
+      threading_start_y +
+      (cellborder + cellheight)*draft.holes()
+    );
+
+    if (y < threading_start_y) {
+      return -1;
+    } else if (y < threading_end_y) {
+      return parseInt((y - threading_start_y)/(cellborder + cellheight));
+    } else {
+      return -1;
+    }
+  }
