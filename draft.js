@@ -451,10 +451,18 @@ $(function() {
     setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
     setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
 
-    setupNumberInput("hruler", function() { return -draft.holes(); }, function() { return draft.picks() + 1; }, function() { saveToLocal(); redraw(); });
-    setupNumberInput("vruler", 1, function() { return draft.tablets() + 1; }, function() { saveToLocal(); redraw(); });
-    $("#showhruler").change(function() {saveToLocal(); redraw(); })
-    $("#showvruler").change(function() {saveToLocal(); redraw(); })
+    setupNumberInput("hruler", function() { return -draft.holes(); }, function() { return draft.picks() + 1; }, function() {
+        view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
+    });
+    setupNumberInput("vruler", 1, function() { return draft.tablets() + 1; }, function() {
+        view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
+    });
+    $("#showhruler").change(function() {
+        view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
+    });
+    $("#showvruler").change(function() {
+        view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
+    });
 
     $("#showovals").change(function() { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
     $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
@@ -497,6 +505,8 @@ $(function() {
     view.showThreading($("#showlower").prop('checked'));
     view.showReversals($("#showreversal").prop('checked'));
     view.greySaturation(0x100 - $('#GREYSLIDER').val()) ;
+    view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
+    view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
 
     applyAccordian();
 

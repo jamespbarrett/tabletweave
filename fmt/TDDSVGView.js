@@ -78,6 +78,36 @@ class TDDSVGView {
         this.main_group = this.svg.group();
         this.threading_group = this.svg.group();
         this.overlay = this.svg.group();
+
+        this.hruler = this.svg.line(
+            labelwidth - cellborder,
+            0,
+            labelwidth + cellborder + (cellborder + cellwidth),
+            0,
+            {stroke: "#000000", strokeWidth: cellborder*4}
+        );
+
+        const threading_start_y = (
+            (cellborder + cellheight) +
+            intertablegap
+        );
+
+        this.vruler = {
+            turning: this.svg.line(
+                labelwidth,
+                0,
+                labelwidth,
+                (cellheight + cellborder) + cellborder,
+                {stroke: "#000000", strokeWidth: cellborder*4}
+            ),
+            threading: this.svg.line(
+                labelwidth,
+                threading_start_y,
+                labelwidth,
+                threading_start_y + (cellheight + cellborder)*4 + cellborder,
+                {stroke: "#000000", strokeWidth: cellborder*4}
+            )
+        }
     }
 
     showThreading(val) {
@@ -100,6 +130,14 @@ class TDDSVGView {
         );
     }
 
+    hRuler(y) {
+        this.hruler_position = y;
+    }
+
+    vRuler(x) {
+        this.vruler_position = x;
+    }
+
     root () {
         return this.svg.root();
     }
@@ -116,6 +154,7 @@ class TDDSVGView {
 
         this.conform_threading(draft);
         this.conform_turning(draft);
+        this.conform_rulers(draft);
     }
 
     conform_size(draft) {
@@ -282,7 +321,10 @@ class TDDSVGView {
                     else
                         this.set_cell_direction(this.threading[x].holes[y], "\\");
 
-                    this.set_cell_colour(this.threading[x].holes[y], draft.threadColour(x, y));
+                    if (this.show_ovals)
+                        this.set_cell_colour(this.threading[x].holes[y], draft.threadColour(x, y));
+                    else
+                        this.set_cell_colour(this.threading[x].holes[y], undefined);
                 }
             }
             this.showing_threading = true;
@@ -312,12 +354,68 @@ class TDDSVGView {
                     this.turning[y][x].b = true;
                     tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
                 }
-                this.set_cell_colour(this.turning[y][x], fg);
+                if (this.show_ovals) {
+                    this.set_cell_colour(this.turning[y][x], fg);
+                } else {
+                    this.set_cell_colour(this.turning[y][x], undefined);
+                }
                 this.set_cell_reverse_marker(this.turning[y][x], (
                     (y != draft.picks() - 1) &&
                     (this.turning[y][x].b != this.turning[y+1][x].b) &&
                     this.show_reversals
                 ));
+            }
+        }
+    }
+
+    conform_rulers (draft) {
+        const threading_start_y = (
+            (cellborder + cellheight)*draft.picks() +
+            intertablegap
+        );
+
+        if (this.hruler_position == undefined) {
+            $(this.hruler).attr('visibility', 'hidden');
+        } else {
+            $(this.hruler).attr('x1', labelwidth - cellborder);
+            $(this.hruler).attr('x2', labelwidth + cellborder + (cellborder + cellwidth)*draft.tablets());
+
+            if (this.hruler_position > 0) {
+                $(this.hruler).attr('y1', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
+                $(this.hruler).attr('y2', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
+
+                $(this.hruler).attr('visibility', 'visible');
+            } else {
+                $(this.hruler).attr('y1', threading_start_y - (cellborder + cellheight)*this.hruler_position);
+                $(this.hruler).attr('y2', threading_start_y - (cellborder + cellheight)*this.hruler_position);
+
+                if (this.show_threading) {
+                    $(this.hruler).attr('visibility', 'visible');
+                } else {
+                    $(this.hruler).attr('visibility', 'hidden');
+                }
+            }
+        }
+
+        if (this.vruler_position == undefined) {
+            $(this.vruler.turning).attr('visibility', 'hidden');
+            $(this.vruler.threading).attr('visibility', 'hidden');
+        } else {
+            $(this.vruler.turning).attr('visibility', 'visible');
+            $(this.vruler.turning).attr('x1', labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
+            $(this.vruler.turning).attr('y1', 0);
+            $(this.vruler.turning).attr('x2', labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
+            $(this.vruler.turning).attr('y2', (cellheight + cellborder)*draft.picks() + cellborder);
+
+            if (this.show_threading) {
+                $(this.vruler.threading).attr('visibility', 'visible');
+
+                $(this.vruler.threading).attr('x1', labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
+                $(this.vruler.threading).attr('y1', threading_start_y);
+                $(this.vruler.threading).attr('x2', labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
+                $(this.vruler.threading).attr('y2', threading_start_y + (cellheight + cellborder)*draft.holes() + cellborder);
+            } else {
+                $(this.vruler.threading).attr('visibility', 'hidden');
             }
         }
     }
