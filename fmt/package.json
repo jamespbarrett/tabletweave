@@ -1,0 +1,16 @@
+{
+  "name": "tdd",
+  "version": "0.1.0",
+  "description": "Some tools for tablet weaving drafts",
+  "main": "json2tdd.js",
+  "dependencies": {
+    "jsdom": "^15.1.1",
+    "raphael": "^2.2.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

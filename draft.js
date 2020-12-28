@@ -1,979 +1,465 @@
 // The main script for the draft designer
 
-var max_cols = 20;
-var main_cells  = [];
-var lower_cells = [];
-var labels = [ "A", "B", "C", "D", "E", "F", "G", "H" ];
-var palette = [ ];
-var default_palette = [ 'rgb(255, 255, 255)',
-                        'rgb(0, 0, 0)',
-                        'rgb(255, 0, 0)',
-                        'rgb(0, 153, 0)',
-                        'rgb(0, 0, 255)',
-                        'rgb(221, 221, 221)',
-                        'rgb(153, 153, 153)',
-                        'rgb(255, 255, 0)',
-                        'rgb(0, 255, 255)',
-                        'rgb(153, 0, 153)',
-                        'rgb(255, 136, 0)',
-                        'rgb(255, 136, 136)' ];
+var draft = new TDDDraft();
+var view = new TDDSVGView();
+var fgcol = -1;
 
-var fgcol = "none";
-var fgid = 0;
-var reverse = "false";
+function control_vals() {
+    var accordion = {};
+    $('.accordion').each(function () {
+        var id = $(this).parent().attr('id');
+        var active = $(this).hasClass('active');
+        accordion[id] = active;
+    });
 
-var exportMimetype = "image/png";
-
-var defaultcell = {
-    "colorid" : 1,
-    "color": "rgb(0, 0, 0)",
-    "direction":"left",
-};
-
-function drawOval(ctx, x, y, length, bredth, angle) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(angle);
-    ctx.scale(bredth/length,1);
-    ctx.arc(0, 0, length/2, 2*Math.PI, false);
-    ctx.restore();
+    return {
+        fgcol: fgcol,
+        scale: $('#scalecontrols .readout').val(),
+        showovals: $("#showovals").prop("checked"),
+        showlower: $("#showlower").prop("checked"),
+        showreversal: $("#showreversal").prop("checked"),
+        grey_saturation: $("#GREYSLIDER").val(),
+        showhruler: $("#showhruler").prop("checked"),
+        showvruler: $("#showvruler").prop("checked"),
+        hruler: $("#hruler .readout").val(),
+        vruler: $("#vruler .readout").val(),
+        export_width: $('#export_width').val(),
+        accordion: accordion,
+    };
 }
 
-function max(a,b) { return (a > b)?a:b; }
+function saveToLocal() {
+    localStorage.setItem("tdd-controls", JSON.stringify(control_vals()));
+    localStorage.setItem("tdd-draft", draft.toString());
+}
 
-function redrawCanvas(scale) {
-    save();
+function loadFromLocal() {
+    var local_controls = localStorage.getItem("tdd-controls");
+    var local_draft = localStorage.getItem("tdd-draft");
 
-    var c = $("#draftcanvas");
-    var ctx = c[0].getContext("2d");
+    if (local_controls != undefined) {
+        var controls = JSON.parse(local_controls);
 
-    scale = ( typeof scale === 'undefined') ? $("#scalecontrols .readout").val() : scale;
+        fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
 
-    var nRowsMain = main_cells.length;
-    var nRowsLow  = lower_cells.length;
-    var nCols     = main_cells[0].length;
+        $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
+        $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
+        $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
+        $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
+        $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
+        $("#showhruler").prop("checked", ((controls.showhruler != undefined)?controls.showhruler:true));
+        $("#showvruler").prop("checked", ((controls.showvruler != undefined)?controls.showvruler:true));
+        $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
+        $("#vruler .readout").val((controls.vruler != undefined)?controls.vruler:0);
+        $("#export_width").val((controls.export_width != undefined)?controls.export_width:1920);
 
-    var cellwidth = 20*scale;
-    var cellheight = 20*scale;
-    ctx.font = "" + 15*scale + "px Arial";
-    var labelwidth = 20*scale;
-    if (nRowsMain > 99)
-        labelwidth = 30*scale;
-    var cellborder = 2*scale;
-    var rulerwidth = 3*cellborder;
-    var intertablegap = 25*scale;
-    var copyrightheight = 20*scale;
-    var copyrightwidth = 416*scale;
+        if (controls.accordion) {
+            for (const [key, value] of Object.entries(controls.accordion)) {
+                var but = $("#" + key + " .accordion");
+                if (value) {
+                    but.addClass('active');
+                } else {
+                    but.removeClass('active');
+                }
+            }
+        }
+    }
 
-    var satn = $("#GREYSLIDER").val();
-    var sat = ("0" + (255 - Number(satn)).toString(16)).slice(-2);
-    var greycolour = "#" + sat + sat + sat;
+    if (local_draft != undefined) {
+        draft = TDDDraftFromString(local_draft);
+    }
+}
 
+function updateDraft() {
+    var picks   = parseInt($("#mainrowcontrols .readout").val());
+    var holes   = parseInt($("#lowrowcontrols .readout").val());
+    var tablets = parseInt($("#colcontrols .readout").val());
+
+    if (picks < draft.picks()) {
+        draft.removePicks(draft.picks() - picks);
+    } else if (picks > draft.picks()) {
+        draft.addPicks(picks - draft.picks());
+    }
+
+    if (holes < draft.holes()) {
+        draft.removeHoles(draft.holes() - holes);
+    } else if (holes > draft.holes()) {
+        draft.addHoles(holes - draft.holes());
+    }
+
+    if (tablets < draft.tablets()) {
+        draft.removeTablets(draft.tablets() - tablets);
+    } else if (tablets > draft.tablets()) {
+        draft.addTablets(tablets - draft.tablets());
+    }
+
+    if ($("#hruler .readout").val() > draft.picks() + 1) {
+        $("#hruler .readout").val(draft.picks() + 1);
+    } else if ($("#hruler .readout").val() < -draft.holes()) {
+        $("#hruler .readout").val(-draft.holes());
+    }
+
+    if ($("#vruler .readout").val() > draft.tablets() + 1) {
+        $("#vruler .readout").val(draft.tablets() + 1);
+    }
+
+    saveToLocal();
+}
+
+function redraw() {
+    var scale = Math.pow(2, parseInt($('#scalecontrols .readout').val()) / 10);
     var showovals = $("#showovals").prop("checked");
     var showlower = $("#showlower").prop("checked");
     var showreversal = $("#showreversal").prop("checked");
-    var showhruler = $("#showhruler").prop("checked");
-    var showvruler = $("#showvruler").prop("checked");
-    var showrepeat = $("#showrepeat").prop("checked");
+    var grey_saturation = 0x100 - $("#GREYSLIDER").val();
+    var hruler_position = ($("#showhruler").prop("checked"))?$("#hruler .readout").val():undefined;
+    var vruler_position = ($("#showvruler").prop("checked"))?$("#vruler .readout").val():undefined;
 
-    var r = $("#repeatcanvas");
-    var rtx = r[0].getContext("2d");
+    view.conform(draft);
 
-    var repeats = parseInt($("#repeats .readout").val());
-    var repeatfrom = nRowsMain - parseInt($("#repeatpicks #repeatfrom .readout").val());
-    var repeatto = nRowsMain - parseInt($("#repeatpicks #repeatto .readout").val());
+    var bbox = $('#draftcanvas svg')[0].getBBox();
+    $('#draftcanvas svg').width(bbox.width * scale);
+    $('#draftcanvas svg').height(bbox.height * scale);
 
-    var hruler = parseInt($("#hruler .readout").val());
-    var vruler = parseInt($("#vruler .readout").val());
-
-    var fullheight = cellborder + (cellborder + cellheight)*nRowsMain +
-        cellborder + cellheight
-        + copyrightheight;
-
-    var tableheight = (cellborder + cellheight)*nRowsMain;
-    var eachrepeatheight = (cellborder + cellheight)*(repeatfrom + 1 - repeatto);
-    var fullheightrepeats = eachrepeatheight*repeats+20;
-
-    if (showlower) {
-        fullheight += intertablegap + cellborder + (cellborder + cellheight)*(nRowsLow);
+    var i;
+    for (i=0; i <= 12; i++) {
+        $("#NUM" + (i)).text(draft.threadCount(i-1));
     }
-    var fullwidth = max(labelwidth + cellborder + (cellborder + cellwidth)*nCols, copyrightwidth);
-    var fullwidthrepeats = labelwidth + cellborder + (cellborder + cellwidth)*nCols + 20;
+}
 
-    c.attr("width",  fullwidth);
-    c.attr("height", fullheight);
-
-    r.attr("width",  fullwidthrepeats);
-    r.attr("height", fullheightrepeats);
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0,0, fullwidth, fullheight);
-
-    rtx.fillStyle = "#ffffff";
-    rtx.fillRect(0,0, fullwidthrepeats, fullheightrepeats);
-
-    ctx.strokeStyle = "#000000";
-    ctx.fillStyle = "#000000";
-
-    ctx.beginPath();
-    for (y = 0; y < nRowsMain + 1; y++) {
-        ctx.moveTo(labelwidth, y*(cellborder + cellheight));
-        ctx.lineTo(labelwidth + (cellborder + cellwidth)*nCols, y*(cellborder + cellheight))
-    }
-    for (x = 0; x < nCols + 1; x++) {
-        ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, 0);
-        ctx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*nRowsMain);
-    }
-
-    rtx.beginPath();
-    for (y = 0; y < (repeatfrom + 1 - repeatto)*repeats + 1; y++) {
-        rtx.moveTo(labelwidth, y*(cellborder + cellheight));
-        rtx.lineTo(labelwidth + (cellborder + cellwidth)*nCols, y*(cellborder + cellheight))
-    }
-    for (x = 0; x < nCols + 1; x++) {
-        rtx.moveTo(labelwidth + (cellborder + cellwidth)*x, 0);
-        rtx.lineTo(labelwidth + (cellborder + cellwidth)*x, (cellborder + cellheight)*(repeatfrom + 1 - repeatto)*repeats);
-    }
-
-    if (showlower) {
-        for (y = 0; y < nRowsLow + 1; y++) {
-            ctx.moveTo(labelwidth,
-                       (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight));
-            ctx.lineTo(labelwidth + (cellborder + cellwidth)*nCols,
-                       (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight))
-        }
-        for (x = 0; x < nCols + 1; x++) {
-            ctx.moveTo(labelwidth + (cellborder + cellwidth)*x,
-                       (cellborder + cellheight)*nRowsMain + intertablegap);
-            ctx.lineTo(labelwidth + (cellborder + cellwidth)*x,
-                       (cellborder + cellheight)*nRowsMain + intertablegap + (cellborder + cellheight)*nRowsLow);
-        }
-    }
-    ctx.lineWidth = cellborder;
-    ctx.stroke();
-
-    rtx.lineWidth = cellborder;
-    rtx.stroke();
-
-    for (x = 0; x < nCols; x++) {
-        n = nRowsLow - 1;
-        reverse = 0;
-        dir = "left";
-        for (y = nRowsMain - 1; y >= 0; y--) {
-            reversed = false;
-            if (!reverse && !main_cells[y][x]) {
-                bg = "#ffffff";
-                fg = lower_cells[n][x]["colorid"];
-                dir = lower_cells[n][x]["direction"];
-                reverse = false;
-                n = (nRowsLow + n - 1) % nRowsLow;
-            } else if (reverse && !main_cells[y][x]) {
-                bg = greycolour;
-                fg = lower_cells[n][x]["colorid"];
-                dir = lower_cells[n][x]["direction"];
-                reverse = true;
-                n = (n + 1) % nRowsLow;
-            } else if (!reverse && main_cells[y][x]) {
-                bg = greycolour;
-                reverse = true;
-                reversed = true;
-                n = (n + 1) % nRowsLow;
-                fg = lower_cells[n][x]["colorid"];
-                dir = lower_cells[n][x]["direction"];
-                n = (n + 1) % nRowsLow;
-            } else {
-                bg = "#ffffff";
-                n = (nRowsLow + n - 1) % nRowsLow;
-                reverse = false;
-                reversed = true;
-                fg = lower_cells[n][x]["colorid"];
-                dir = lower_cells[n][x]["direction"];
-                n = (nRowsLow + n - 1) % nRowsLow;
-            }
-            if (fg != -1)
-                lower_cells[n][x]["color"] = palette[fg];
-
-            ctx.fillStyle = bg;
-            ctx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale, (cellborder + cellheight)*y + 1*scale,
-                         cellwidth + cellborder - 2*scale, cellheight + cellborder - 2*scale);
-            if (showovals && fg != -1) {
-                ctx.fillStyle = palette[fg];
-                ctx.strokeStyle = "0x000000";
-                ctx.beginPath();
-                if (((dir == "left") != (reverse))) {
-                    drawOval(ctx,
-                             labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                             cellborder + (cellborder + cellheight)*y + cellheight/2,
-                             cellwidth, cellwidth/2, -Math.PI/4);
-                } else {
-                    drawOval(ctx,
-                             labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                             cellborder + (cellborder + cellheight)*y + cellheight/2,
-                             cellwidth, cellwidth/2, Math.PI/4);
-                }
-                ctx.lineWidth = scale;
-                ctx.fill();
-                ctx.stroke();
-            }
-
-            if (y <= repeatfrom && y >= repeatto) {
-                for (z=0; z<repeats; z++){
-                    rtx.fillStyle = "#ffffff";
-                    rtx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale,
-                                 (cellborder + cellheight)*(y - repeatfrom - 1) + 1*scale + (z + 1)*eachrepeatheight,
-                                  cellwidth + cellborder - 2*scale,
-                                  cellheight + cellborder - 2*scale);
-
-                    if (showovals && fg != -1) {
-                        rtx.fillStyle = palette[fg];
-                        rtx.strokeStyle = "0x000000";
-                        rtx.beginPath();
-
-                        if (((dir == "left") != (reverse))) {
-                            drawOval(rtx,
-                                labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                                cellborder + (cellborder + cellheight)*(y - repeatfrom - 1) + (z + 1)*eachrepeatheight + cellheight/2,
-                                cellwidth, cellwidth/2, -Math.PI/4);
-                        } else {
-                            drawOval(rtx,
-                                labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                                cellborder + (cellborder + cellheight)*(y - repeatfrom - 1) + (z + 1)*eachrepeatheight + cellheight/2,
-                                cellwidth, cellwidth/2, Math.PI/4);
-                        }
-                        rtx.lineWidth = scale;
-                        rtx.fill();
-                        rtx.stroke();
-                    }
-                }
-            }
-
-            if (showhruler && y == nRowsMain - hruler) {
-                ctx.strokeStyle = "#000000";
-                ctx.beginPath();
-                ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, (y+1)*(cellborder + cellheight));
-                ctx.lineTo(labelwidth + (cellborder + cellwidth)*(x+1), (y+1)*(cellborder + cellheight));
-                ctx.lineWidth = rulerwidth;
-                ctx.stroke();
-                ctx.strokeStyle = "#000000";
-                ctx.lineWidth = scale;
-            }
-            if (showreversal && reversed && y != nRowsMain - 1) {
-                ctx.strokeStyle = "#FF0000";
-                ctx.beginPath();
-                ctx.moveTo(labelwidth + (cellborder + cellwidth)*x, (y+1)*(cellborder + cellheight));
-                ctx.lineTo(labelwidth + (cellborder + cellwidth)*(x+1), (y+1)*(cellborder + cellheight));
-                if (showhruler && y == nRowsMain - hruler)
-                    ctx.lineWidth = rulerwidth;
-                else
-                    ctx.lineWidth = cellborder;
-                ctx.stroke();
-                ctx.strokeStyle = "#000000";
-                ctx.lineWidth = scale;
-            }
-        }
-    }
-    if (showlower) {
-        for (y = 0; y < nRowsLow; y++) {
-            for (x = 0; x < nCols; x++) {
-                ctx.fillStyle = "#ffffff";//lower_cells[y][x]["background_color"];
-                ctx.fillRect(labelwidth + (cellborder + cellwidth)*x + 1*scale,
-                             (cellborder + cellheight)*nRowsMain +
-                             intertablegap + (cellborder + cellheight)*y + 1*scale,
-                             cellwidth + cellborder - 2*scale,
-                             cellheight + cellborder - 2*scale);
-                if (lower_cells[y][x]["colorid"] != -1) {
-                    ctx.fillStyle = palette[lower_cells[y][x]["colorid"]];
-                    ctx.strokeStyle = "0x000000";
-                    ctx.beginPath();
-                    if (lower_cells[y][x]["direction"] == "left") {
-                        drawOval(ctx,
-                                 labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                                 (cellborder + cellheight)*nRowsMain +
-                                 intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
-                                 cellwidth, cellwidth/2, -Math.PI/4);
-                    } else {
-                        drawOval(ctx,
-                                 labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
-                                 (cellborder + cellheight)*nRowsMain +
-                                 intertablegap + cellborder + (cellborder + cellheight)*y + cellheight/2,
-                                 cellwidth, cellwidth/2, Math.PI/4);
-                    }
-                    ctx.lineWidth = scale;
-                    ctx.fill();
-                }
-                ctx.stroke();
-            }
-        }
-    }
-
-    if (showhruler || showvruler) {
-        ctx.strokeStyle = "#000000";
-        ctx.fillStyle = "#000000";
-        ctx.beginPath();
-        if (showhruler && hruler <= 0) {
-            var y = -hruler;
-            ctx.moveTo(labelwidth,
-                       (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight));
-            ctx.lineTo(labelwidth + (cellborder + cellwidth)*nCols,
-                       (cellborder + cellheight)*nRowsMain + intertablegap + y*(cellborder + cellheight))
-        }
-        if (showvruler) {
-            var x = vruler - 1;
-            ctx.moveTo(labelwidth + (cellborder + cellwidth)*x,
-                       0);
-            ctx.lineTo(labelwidth + (cellborder + cellwidth)*x,
-                       (cellborder + cellheight)*nRowsMain + intertablegap + nRowsLow*(cellborder + cellheight));
-        }
-        ctx.lineWidth = rulerwidth;
-        ctx.stroke();
-    }
-
-    ctx.fillStyle = "#000000";
-    ctx.strokeStyle = "#000000";
-
-    ctx.font = "" + 15*scale + "px Arial";
-    for (y = 0; y < nRowsMain; y++) {
-        ctx.fillText("" + (nRowsMain - y), 1*scale, (cellborder + cellheight)*y + (cellheight + 15*scale)/2);
-    }
-    var h = (cellborder + cellheight)*(nRowsMain + 1) - 3*scale;
-    if (showlower)
-        h += intertablegap - cellheight - cellborder;
-    for (x = 0; x < nCols; x++) {
-        var w = ctx.measureText(x + 1).width;
-        ctx.fillText(x + 1,  labelwidth + (cellborder + cellwidth)*x +  (cellwidth)/2 - w/2, h);
-    }
-    if (showlower) {
-        for (y = 0; y < nRowsLow; y++) {
-            ctx.fillText(labels[y], 1*scale,
-                         (cellborder + cellheight)*nRowsMain +
-                         intertablegap + (cellborder + cellheight)*y + (cellheight + 15*scale)/2);
-        }
-        for (x = 0; x < nCols; x++) {
-            if (lower_cells[0][x]["direction"] == "left") {
-                ctx.fillText("Z", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8*scale)/2,
-                             (cellborder + cellheight)*nRowsMain +
-                             intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15*scale)/2);
-            } else {
-                ctx.fillText("S", labelwidth + (cellborder + cellwidth)*x +  (cellwidth - 8*scale)/2,
-                             (cellborder + cellheight)*nRowsMain +
-                             intertablegap + (cellborder + cellheight)*nRowsLow + (cellheight + 15*scale)/2);
-            }
-        }
-    }
-
-    ctx.font = "" + 10*scale + "px Arial";
-    ctx.fillText("Made using Tablet Weaving Draft Designer v0.2 http://www.bazzalisk.org/tabletweave/",
-                 1*scale,
-                 fullheight - 5*scale);
-
-    if (showlower) {
-        for (clr = -1; clr < palette.length; clr++) {
-            n = 0;
-            for (row = 0; row < lower_cells.length; row++) {
-                for (col = 0; col < lower_cells[row].length; col++) {
-                    if (lower_cells[row][col]['colorid'] == clr)
-                        n++;
-                }
-            }
-            $("#NUM" + (clr + 1)).text(n);
-        }
-    }
-
-    // drop #repeatsection below #mainsection if more than 20 tablets or window too small
-    repeatDiv = document.getElementById('repeatsection');
-    if (nCols > max_cols || window.innerWidth < $("#controlbar").width() + $("#mainsection").width()*2) {
-      repeatDiv.style.top = $("#mainsection").height()+190+"px";
-      repeatDiv.style.left = "400px";
+function redrawControls() {
+    if (fgcol == -1) {
+        $('#EMPTYBOX').addClass('selected');
     } else {
-      repeatDiv.style.top = "";
-      repeatDiv.style.left = "";
+        $('#EMPTYBOX').removeClass('selected');
     }
 
-    if (showrepeat) {
-        $("#repeatsection").show();
-        $("#repeatexport").show();
-        $("#repeatpicks").show();
-        $("#repeats").show();
-    } else {
-        $("#repeatexport").hide();
-        $("#repeatsection").hide();
-        $("#repeatpicks").hide();
-        $("#repeats").hide();
-    }
-}
-
-function updateScale(s) {
-    if (s < 1)
-        s = 1;
-
-    $("#scalecontrols .readout").val(s);
-
-    redrawCanvas();
-}
-
-function updateRulers(h, v) {
-    if (h === undefined)
-        h = parseInt($("#hruler .readout").val());
-    if (v === undefined)
-        v = parseInt($("#vruler .readout").val());
-
-    if (h < -parseInt($("#lowrowcontrols .readout").val()))
-        h = -parseInt($("#lowrowcontrols .readout").val());
-    if (v < 1)
-        v = 1;
-
-    cols = parseInt($("#colcontrols .readout").val()) + 1;
-    rows = parseInt($("#mainrowcontrols .readout").val()) + 1;
-
-    if (h > rows)
-        h = rows;
-    if (v > cols)
-        v = cols;
-
-    $("#hruler .readout").val(h);
-    $("#vruler .readout").val(v);
-
-    if ($("#showhruler").prop("checked")) {
-        $("#hruler").show();
-    } else {
-        $("#hruler").hide();
-    }
-
-    if ($("#showvruler").prop("checked")) {
-        $("#vruler").show();
-    } else {
-        $("#vruler").hide();
-    }
-
-    redrawCanvas();
-}
-
-function updateQuality(s) {
-    if (s < 1)
-        s = 1;
-
-    $("#qualitycontrols .readout").val(s);
-
-    redrawCanvas(s);
-    redrawPreview();
-    redrawCanvas();
-}
-
-function updateRepeats(f, t, r) {
-    if (f < 1)
-        f = 1;
-    if (t < 1)
-        t = 1;
-    if (r < 1)
-        r = 1;
-
-    if (f > t)
-        f = t;
-    if (t > main_cells.length)
-        t = main_cells.length;
-
-    $("#repeatpicks #repeatfrom .readout").val(f);
-    $("#repeatpicks #repeatto .readout").val(t);
-    $("#repeats .readout").val(r);
-
-    redrawCanvas();
-}
-
-function updateSizes(m,l,c) {
-    if (m < 1)
-        m = 1;
-    if (l < 1)
-        l = 1;
-    if (l > 8)
-        l = 8;
-    if (c < 1)
-        c = 1;
-
-    $("#mainrowcontrols .readout").val(m);
-    $("#lowrowcontrols .readout").val(l);
-    $("#colcontrols .readout").val(c);
-
-    if (main_cells.length > m) {
-        main_cells = main_cells.slice(main_cells.length - m, main_cells.length);
-    } else if (main_cells.length < m) {
-        for (y = main_cells.length; y < m; y++) {
-            var row = [];
-            for (x = 0; x < c; x++) {
-                row[x] = 0;
-            }
-            main_cells.unshift(row);
-        }
-    }
-
-    if (lower_cells.length > l) {
-        lower_cells = lower_cells.slice(0,l);
-    } else if (lower_cells.length < l) {
-        for (y = lower_cells.length; y < l; y++) {
-            var row = [];
-            for (x = 0; x < c; x++) {
-                row[x] = JSON.parse(JSON.stringify(defaultcell));
-            }
-            lower_cells[y] = row;
-        }
-    }
-
-    for (y = 0; y < main_cells.length; y++) {
-        if (main_cells[y].length > c) {
-            main_cells[y] = main_cells[y].slice(0,c);
-        } else if (main_cells[y].length < c) {
-            for (x = main_cells[y].length; x < c; x++) {
-                main_cells[y][x] = 0;
-            }
-        }
-    }
-
-    for (y = 0; y < lower_cells.length; y++) {
-        if (lower_cells[y].length > c) {
-            lower_cells[y] = lower_cells[y].slice(0,c);
-        } else if (lower_cells[y].length < c) {
-            for (x = lower_cells[y].length; x < c; x++) {
-                lower_cells[y][x] = JSON.parse(JSON.stringify(defaultcell));
-            }
-        }
-    }
-
-    for (y = 1; y < lower_cells.length; y++) {
-        for (x = 0; x < lower_cells[y].length; x++) {
-            lower_cells[y][x]["direction"] = lower_cells[0][x]["direction"];
-        }
-    }
-
-    updateRulers();
-}
-
-function cellClick(g,x,y) {
-    var cell;
-    if (g == 0) {
-        main_cells[y][x] = !main_cells[y][x];
-    } else {
-        if (y < lower_cells.length) {
-            cell = lower_cells[y][x];
-            cell["color"] = fgcol;
-            cell["colorid"] = fgid;
+    var i;
+    for (i = 0; i < 12; i++) {
+        $('#BOX' + (i+1)).css("background-color", draft.colour(i).getCSSHexadecimalRGB());
+        if (fgcol != i) {
+            $('#BOX' + (i+1)).removeClass("selected");
         } else {
-            for (y = 0; y < lower_cells.length; y++) {
-                cell = lower_cells[y][x];
-                if (cell["direction"] == "left")
-                    cell["direction"] = "right";
-                else
-                    cell["direction"] = "left";
-            }
+            $('#BOX' + (i+1)).addClass("selected");
         }
     }
 
-    redrawCanvas();
-}
+    if (fgcol != -1) {
+        var c = draft.colour(fgcol).getIntegerRGB();
+        $('#REDVAL').val(c.r);
+        $('#REDSLIDE').val(c.r);
+        $('#GREENVAL').val(c.g);
+        $('#GREENSLIDE').val(c.g);
+        $('#BLUEVAL').val(c.b);
+        $('#BLUESLIDE').val(c.b);
 
-function canvasClick(e) {
-    var scale = $("#scalecontrols .readout").val();
-
-    var cellwidth = 20*scale;
-    var cellheight = 20*scale;
-    var labelwidth = 20*scale;
-    var cellborder = 2*scale;
-    var intertablegap = 25*scale;
-
-    var offs = $(this).offset();
-    var x = e.pageX - offs.left;
-    var y = e.pageY - offs.top;
-
-    var nRowsMain = main_cells.length;
-    var nRowsLow  = lower_cells.length;
-    var nCols     = main_cells[0].length;
-
-    if (x > labelwidth && y < (cellborder + cellheight)*nRowsMain) {
-        var col = Math.floor((x - labelwidth - cellborder)/(cellwidth + cellborder));
-        var row = Math.floor((y - cellborder)/(cellheight + cellborder));
-        cellClick(0,col,row);
-    }
-
-    if (x > labelwidth && y > (cellborder + cellheight)*nRowsMain + intertablegap) {
-        var col = Math.floor((x - labelwidth - cellborder)/(cellwidth + cellborder));
-        var row = Math.floor((y - (cellborder + cellheight)*nRowsMain -
-                              intertablegap - cellborder)/(cellheight + cellborder));
-        cellClick(1,col,row);
-    }
-}
-
-function setForegroundColor(id) {
-    if (id == "EMPTYBOX") {
-        fgcol = "none";
-        fgid = -1;
+        $('#REDVAL').prop( "disabled", false );
+        $('#GREENVAL').prop( "disabled", false );
+        $('#BLUEVAL').prop( "disabled", false );
+        $('#REDSLIDE').prop( "disabled", false );
+        $('#GREENSLIDE').prop( "disabled", false );
+        $('#BLUESLIDE').prop( "disabled", false );
     } else {
-        fgcol = $("#palete #fg #" + id).css('backgroundColor');
-        fgid = parseInt(id.slice(3)) - 1;
-    }
+        $('#REDVAL').val(0);
+        $('#REDSLIDE').val(0);
+        $('#GREENVAL').val(0);
+        $('#GREENSLIDE').val(0);
+        $('#BLUEVAL').val(0);
+        $('#BLUESLIDE').val(0);
 
-    $("#palete #fg .colorbox").each(function() {
-        $(this).removeClass("selected");
+        $('#REDVAL').prop( "disabled", true );
+        $('#GREENVAL').prop( "disabled", true );
+        $('#BLUEVAL').prop( "disabled", true );
+        $('#REDSLIDE').prop( "disabled", true );
+        $('#GREENSLIDE').prop( "disabled", true );
+        $('#BLUESLIDE').prop( "disabled", true );
+    }
+}
+
+function draftClick(e) {
+    const pt = this.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const svgP = pt.matrixTransform( this.getScreenCTM().inverse() );
+    var tablet = svg_coord_to_tablet(svgP.x);
+    var pick = svg_coord_to_pick(svgP.y, draft);
+    var hole = svg_coord_to_hole(svgP.y, draft);
+
+    if (tablet >= 0) {
+        if (pick >= 0) {
+            draft.reverse(tablet, pick);
+        } else if (hole >= 0) {
+            draft.setThreadColour(tablet, hole, fgcol);
+        } else {
+            draft.flip(tablet);
+        }
+
+        saveToLocal();
+        redraw();
+    }
+}
+
+function setupNumberInput(id, min_val, max_val, callback, increment=1) {
+    var validate = function(new_val, min_val, max_val) {
+        if (typeof(min_val) == "function") {
+            min_val = min_val();
+        }
+        if (typeof(max_val) == "function") {
+            max_val = max_val();
+        }
+        if (min_val != undefined && new_val < min_val) {
+            new_val = min_val;
+        } else if (max_val != undefined && new_val > max_val) {
+            new_val = max_val;
+        }
+        return new_val;
+    };
+    $("#" + id + " .readout").change(function() {
+        var new_val = validate(Math.round(parseFloat($("#" + id + " .readout").val())/increment)*increment, min_val, max_val);
+        $("#" + id + " .readout").val(new_val);
+        callback();
     });
-    $("#palete #fg #" + id).addClass("selected");
+    $("#" + id + " .minus").click(function() {
+        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val())/increment) - 1)*increment, min_val, max_val);
+        $("#" + id + " .readout").val(new_val);
+        callback();
+    });
+    $("#" + id + " .plus").click(function() {
+        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val())/increment) + 1)*increment, min_val, max_val);
+        $("#" + id + " .readout").val(new_val);
+        callback();
+    });
 
-    var rgb = /rgb\((\d+), (\d+), (\d+)\)/.exec(fgcol);
-
-    $("#REDSLIDE").val(rgb[1]);
-    $("#REDVAL").val(rgb[1]);
-
-    $("#GREENSLIDE").val(rgb[2]);
-    $("#GREENVAL").val(rgb[2]);
-
-    $("#BLUESLIDE").val(rgb[3]);
-    $("#BLUEVAL").val(rgb[3]);
+    $("#" + id + " .readout").val(validate(Math.round(parseFloat($("#" + id + " .readout").val())/increment)*increment, min_val, max_val));
 }
 
-function save() {
-    try {
-        localStorage.setItem("tablet-draft-main", JSON.stringify(main_cells));
-        localStorage.setItem("tablet-draft-lower", JSON.stringify(lower_cells));
-        localStorage.setItem("tablet-draft-palette", JSON.stringify(palette));
-        localStorage.setItem("tablet-draft-greyslider", JSON.stringify($('#GREYSLIDER').val()));
-        localStorage.setItem("tablet-draft-hruler", JSON.stringify(parseInt($("#hruler .readout").val())));
-        localStorage.setItem("tablet-draft-vruler", JSON.stringify(parseInt($("#vruler .readout").val())));
-        localStorage.setItem("tablet-draft-showhruler", JSON.stringify($("#showhruler").prop("checked")));
-        localStorage.setItem("tablet-draft-showvruler", JSON.stringify($("#showvruler").prop("checked")));
-    } catch (err) {
+function updateRed(r) {
+    var c = draft.colour(fgcol).getIntegerRGB();
+    draft.setColour(fgcol, new RGBColour(r, c.g, c.b));
+    saveToLocal();
+}
+
+function updateGreen(g) {
+    var c = draft.colour(fgcol).getIntegerRGB();
+    draft.setColour(fgcol, new RGBColour(c.r, g, c.b));
+    saveToLocal();
+}
+
+function updateBlue(b) {
+    var c = draft.colour(fgcol).getIntegerRGB();
+    draft.setColour(fgcol, new RGBColour(c.r, c.g, b));
+    saveToLocal();
+}
+
+function setControlsFromDraft() {
+    $("#mainrowcontrols .readout").val(draft.picks());
+    $("#lowrowcontrols .readout").val(draft.holes());
+    $("#colcontrols .readout").val(draft.tablets());
+    $("#draftname .readout").val(draft.name);
+
+    if ($("#hruler .readout").val() > draft.picks() + 1) {
+        $("#hruler .readout").val(draft.picks() + 1);
+    } else if ($("#hruler .readout").val() < -draft.holes()) {
+        $("#hruler .readout").val(-draft.holes());
+    }
+
+    if ($("#vruler .readout").val() > draft.tablets() + 1) {
+        $("#vruler .readout").val(draft.tablets() + 1);
     }
 }
 
-function save_file() {
-    try {
-        var tmp = { 'main_cells'  : main_cells,
-                    'lower_cells' : lower_cells,
-                    'palette'     : palette };
-        var link = document.createElement('a');
-        link.download = "draft.json";
-        link.href = 'data:application/json;charset=utf-8,' + escape(JSON.stringify(tmp));
-        link.click();
-    } catch (err) {
-    }
-}
-
-function load_file() {
-    var x = document.getElementById("load");
-
-    if (x.files.length > 0) {
+function loadFile() {
+    var files = $('#fileio #load')[0].files;
+    if (files.length > 0) {
         var reader = new FileReader();
-        reader.onload = (function(f) {
+
+        reader.onload = (function(is_tdd) {
             return function (e) {
                 try {
-                    tmp = JSON.parse(e.target.result);
-                    main_cells = tmp['main_cells'];
-                    lower_cells = tmp['lower_cells'];
-                    if (tmp['palette'] != undefined) {
-                        palette = tmp['palette'];
+                    var data = e.target.result;
+
+                    if (is_tdd) {
+                        draft = TDDDraftFromString(data);
                     } else {
-                        palette = JSON.parse(JSON.stringify(default_palette));
+                        draft = json_to_tdd(JSON.parse(data));
                     }
-                    for (r = 0; r < lower_cells.length; r++) {
-                        for (c = 0; c < lower_cells[r].length; c++) {
-                            if (lower_cells[r][c]['colorid'] == undefined) {
-                                for (i = 0; i < palette.length; i++) {
-                                    if (lower_cells[r][c]['color'] == palette[i]) {
-                                        lower_cells[r][c]['colorid'] = i;
-                                    }
-                                }
-                                if (lower_cells[r][c]['colorid'] == undefined) {
-                                    lower_cells[r][c]['colorid'] = 0;
-                                }
-                            }
-                        }
-                    }
-                } catch (err) {
+                } catch(err) {
                     alert("File is corrupted and could not be loaded.");
                     return;
                 }
-                updateSizes(main_cells.length, lower_cells.length, main_cells[0].length);
-                save();
-                redrawCanvas();
+
+                saveToLocal();
+                setControlsFromDraft();
+                redrawControls();
+                redraw();
             };
-        })(x.files[0]);
+        })(/^.*\.tdd$/.test(files[0].name));
 
-        reader.readAsText(x.files[0]);
+        reader.readAsText(files[0]);
     }
 }
 
-function load() {
+function saveFile() {
     try {
-        if (localStorage.getItem("tablet-draft-main") == undefined) {
-
-            // Setup the initial cells
-            main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
-
-            lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
+        if (draft.name != "") {
+            filename = draft.name + ".tdd";
         } else {
-            main_cells  = JSON.parse(localStorage.getItem("tablet-draft-main"));
-            lower_cells = JSON.parse(localStorage.getItem("tablet-draft-lower"));
+            filename = "draft.tdd";
         }
-
-        if (localStorage.getItem("tablet-draft-palette") == undefined) {
-            palette = JSON.parse(JSON.stringify(default_palette));
-        } else {
-            palette = JSON.parse(localStorage.getItem("tablet-draft-palette"));
-        }
-        for (r = 0; r < lower_cells.length; r++) {
-            for (c = 0; c < lower_cells[r].length; c++) {
-                if (lower_cells[r][c]['colorid'] == undefined) {
-                    for (i = 0; i < palette.length; i++) {
-                        if (lower_cells[r][c]['color'] == palette[i]) {
-                            lower_cells[r][c]['colorid'] = i;
-                        }
-                    }
-                    if (lower_cells[r][c]['colorid'] == undefined) {
-                        lower_cells[r][c]['colorid'] = 0;
-                    }
-                }
-            }
-        }
-
-        if (localStorage.getItem("tablet-draft-greyslider") == null) {
-            $("#GREYSLIDER").val(144);
-        } else {
-            $("#GREYSLIDER").val(JSON.parse(localStorage.getItem("tablet-draft-greyslider")));
-        }
-
-        if (localStorage.getItem("tablet-draft-hruler") == null) {
-            $("#hruler .readout").val(0);
-        } else {
-            $("#hruler .readout").val(localStorage.getItem("tablet-draft-hruler"));
-        }
-
-        if (localStorage.getItem("tablet-draft-vruler") == null) {
-            $("#vruler .readout").val(0);
-        } else {
-            $("#vruler .readout").val(localStorage.getItem("tablet-draft-vruler"));
-        }
-
-        if (localStorage.getItem("tablet-draft-showhruler") == null) {
-            $("#showhruler").prop(checked, false);
-        } else {
-            $("#showhruler").prop("checked", JSON.parse(localStorage.getItem("tablet-draft-showhruler")));
-        }
-
-        if (localStorage.getItem("tablet-draft-showvruler") == null) {
-            $("#showvruler").prop(checked, false);
-        } else {
-            $("#showvruler").prop("checked", JSON.parse(localStorage.getItem("tablet-draft-showvruler")));
-        }
+        var blob = new Blob([draft.toString()], { type: "text/plain;charset=utf-8"});
+        saveAs(blob, filename);
     } catch (err) {
-        main_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
-        lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
-        palette = JSON.parse(JSON.stringify(default_palette));
-        $("#GREYSLIDER").val(144);
+        alert("Could not save file, something went wrong");
+        return;
     }
-
-    save();
 }
 
-function redrawPreview(repeatsection) {
-    if (repeatsection) {
-        var c = $("#repeatcanvas")[0];
+function reset() {
+    draft = new TDDDraft();
+
+    $('#scalecontrols .readout').val(0);
+    $("#showovals").prop("checked", true);
+    $("#showlower").prop("checked", true);
+    $("#showreversal").prop("checked", true);
+    $("#GREYSLIDER").val(144);
+
+    $("#showhruler").prop("checked", false);
+    $("#showvruler").prop("checked", false);
+
+    $("#hruler .readout").val(0);
+    $("#vruler .readout").val(0);
+
+    $("#export_width").val(1920);
+
+    saveToLocal();
+    setControlsFromDraft();
+    redraw();
+    redrawControls();
+}
+
+function exportDraft(mimetype) {
+    var width = parseInt($("#export_width").val());
+    var showovals = $("#showovals").prop("checked");
+    var showlower = $("#showlower").prop("checked");
+    var showreversal = $("#showreversal").prop("checked");
+    var grey_saturation = 0x100 - $("#GREYSLIDER").val();
+    var hruler_position = ($("#showhruler").prop("checked"))?$("#hruler .readout").val():undefined;
+    var vruler_position = ($("#showvruler").prop("checked"))?$("#vruler .readout").val():undefined;
+
+    var process_blob = function(blob) {
+        var extension;
+        var filename;
+
+        if (mimetype == "image/jpeg") {
+            extension = ".jpg";
+        } else if (mimetype == "image/png") {
+            extension = ".png";
+        } else {
+            extension = "";
+        }
+        if (draft.name != "") {
+            filename = draft.name + extension;
+        } else {
+            filename = "draft" + extension;
+        }
+        saveAs(blob, filename);
+    };
+
+    if (mimetype == "image/svg+xml") {
+        process_blob(svg_to_blob(view.root()));
     } else {
-        var c = $("#draftcanvas")[0];
+        svg_to_img_blob(
+            view.root(),
+            mimetype,
+            width,
+            process_blob);
     }
-    var image = c.toDataURL(exportMimetype, 1.0);
-    $("#preview").attr("src", image);
 }
 
-function exportImage(mimetype, repeatsection) {
-    save();
-    exportMimetype = mimetype;
-    updateQuality($("#scalecontrols .readout").val());
-    if (repeatsection) {
-        redrawPreview(repeatsection);
-    }
-    $("#messagepopup").show();
-    $(".closepreview").focus();
-}
-
-function updatePalette(r,g,b) {
-    palette[fgid] = "rgb(" + r + ", " + g + " ," + b + ")";
-    $("#REDSLIDE").val(r);
-    $("#REDVAL").val(r);
-    $("#GREENSLIDE").val(g);
-    $("#GREENVAL").val(g);
-    $("#BLUESLIDE").val(b);
-    $("#BLUEVAL").val(b);
-    $("#BOX" + (fgid + 1)).css("background-color", palette[fgid]);
-    redrawCanvas();
+function applyAccordian() {
+    $(".accordion").each(function () {
+        if ($(this).hasClass("active")) {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
 }
 
 $(function() {
     Cookies.json = true;
-    palette = JSON.parse(JSON.stringify(default_palette));
-    load();
 
-    $("#reset").click(function() {
-        updateSizes(1,1,1);
+    $("#draftname .readout").change(function () { draft.name = $("#draftname .readout").val(); saveToLocal(); });
 
-        main_cells[0] = [ false ];
+    setupNumberInput("scalecontrols", -100, 100, function() { saveToLocal(); redraw(); });
+    setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
+    setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
+    setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
 
-        lower_cells[0] = [ JSON.parse(JSON.stringify(defaultcell)) ];
-
-        palette = JSON.parse(JSON.stringify(default_palette));
-
-        redrawCanvas();
+    setupNumberInput("hruler", function() { return -draft.holes(); }, function() { return draft.picks() + 1; }, function() {
+        view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
+    });
+    setupNumberInput("vruler", 1, function() { return draft.tablets() + 1; }, function() {
+        view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
+    });
+    $("#showhruler").change(function() {
+        view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
+    });
+    $("#showvruler").change(function() {
+        view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
     });
 
-    $("#clear").click(function() {
-        for (y = 0; y < main_cells.length; y++) {
-            for (x = 0; x < main_cells[y].length; x++) {
-                main_cells[y][x] = false;
-            }
-        }
+    $("#showovals").change(function() { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
+    $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
+    $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
 
-        redrawCanvas();
-    });
+    $('#EMPTYBOX').click(function() { fgcol = -1; saveToLocal(); redrawControls(); });
+    var i;
+    for (i=0; i<12; i++) {
+        (function (i) {
+            $('#BOX' + (i+1)).click(function() { fgcol = i; saveToLocal(); redrawControls(); });
+        })(i);
+    }
 
-    $("#showovals").change(function() { redrawCanvas(); });
-    $("#showlower").change(function() { redrawCanvas(); });
-    $("#showreversal").change(function() { redrawCanvas(); });
-    $("#showhruler").change(function() { updateRulers(); });
-    $("#showvruler").change(function() { updateRulers(); });
-    $("#showrepeat").change(function() { redrawCanvas(); });
-    $("#GREYSLIDER").change(function() { redrawCanvas(); });
+    $('#REDVAL').change(function() { updateRed($('#REDVAL').val()); redraw(); redrawControls(); });
+    $('#REDSLIDE').change(function() { updateRed($('#REDSLIDE').val()); redraw(); redrawControls(); });
+    $('#GREENVAL').change(function() { updateGreen($('#GREENVAL').val()); redraw(); redrawControls(); });
+    $('#GREENSLIDE').change(function() { updateGreen($('#GREENSLIDE').val()); redraw(); redrawControls(); });
+    $('#BLUEVAL').change(function() { updateBlue($('#BLUEVAL').val()); redraw(); redrawControls(); });
+    $('#BLUESLIDE').change(function() { updateBlue($('#BLUESLIDE').val()); redraw(); redrawControls(); });
 
-    $("#mainrowcontrols .readout").val(main_cells.length);
-    $("#lowrowcontrols .readout").val(lower_cells.length);
-    $("#colcontrols .readout").val(main_cells[0].length);
+    $('#GREYSLIDER').change(function() { view.greySaturation(0x100 - $('#GREYSLIDER').val()); saveToLocal(); redraw(); });
 
-    $("#REDSLIDE").change(function() { updatePalette($("#REDSLIDE").val(),
-                                                     $("#GREENSLIDE").val(),
-                                                     $("#BLUESLIDE").val()); });
-    $("#REDVAL").change(function() { updatePalette($("#REDVAL").val(),
-                                                   $("#GREENSLIDE").val(),
-                                                   $("#BLUESLIDE").val()); });
-    $("#GREENSLIDE").change(function() { updatePalette($("#REDSLIDE").val(),
-                                                       $("#GREENSLIDE").val(),
-                                                       $("#BLUESLIDE").val()); });
-    $("#GREENVAL").change(function() { updatePalette($("#REDSLIDE").val(),
-                                                     $("#GREENVAL").val(),
-                                                     $("#BLUESLIDE").val()); });
-    $("#BLUESLIDE").change(function() { updatePalette($("#REDSLIDE").val(),
-                                                      $("#GREENSLIDE").val(),
-                                                      $("#BLUESLIDE").val()); });
-    $("#BLUEVAL").change(function() { updatePalette($("#REDSLIDE").val(),
-                                                    $("#GREENSLIDE").val(),
-                                                    $("#BLUEVAL").val()); });
+    $("#fileio #load").change(function() { loadFile(); saveToLocal(); });
+    $("#fileio #save").click(function() { saveFile(); });
 
-    $("#mainrowcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
-                                                                   parseInt($("#lowrowcontrols .readout").val()),
-                                                                   parseInt($("#colcontrols .readout").val())) });
-    $("#mainrowcontrols .minus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()) - 1,
-                                                                parseInt($("#lowrowcontrols .readout").val()),
-                                                                parseInt($("#colcontrols .readout").val())) });
-    $("#mainrowcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()) + 1,
-                                                               parseInt($("#lowrowcontrols .readout").val()),
-                                                               parseInt($("#colcontrols .readout").val())) });
+    $("#clear").click(function() { draft.clearTurning(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
+    $("#reset").click(function() { reset(); });
 
-    $("#lowrowcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
-                                                                  parseInt($("#lowrowcontrols .readout").val()),
-                                                                  parseInt($("#colcontrols .readout").val())) });
-    $("#lowrowcontrols .minus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
-                                                               parseInt($("#lowrowcontrols .readout").val()) - 1,
-                                                               parseInt($("#colcontrols .readout").val())) });
-    $("#lowrowcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
-                                                              parseInt($("#lowrowcontrols .readout").val()) + 1,
-                                                              parseInt($("#colcontrols .readout").val())) });
+    $('#draftexport #svg').click(function() { exportDraft('image/svg+xml'); });
+    $('#draftexport #jpeg').click(function() { exportDraft('image/jpeg'); });
+    $('#draftexport #png').click(function() { exportDraft('image/png'); });
 
-    $("#colcontrols .readout").change(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
-                                                               parseInt($("#lowrowcontrols .readout").val()),
-                                                               parseInt($("#colcontrols .readout").val())) });
-    $("#colcontrols .minus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
-                                                            parseInt($("#lowrowcontrols .readout").val()),
-                                                            parseInt($("#colcontrols .readout").val()) - 1) });
-    $("#colcontrols .plus").click(function() { updateSizes(parseInt($("#mainrowcontrols .readout").val()),
-                                                           parseInt($("#lowrowcontrols .readout").val()),
-                                                           parseInt($("#colcontrols .readout").val()) + 1) });
+    $('#export_width').change(function() { saveToLocal(); });
 
-    $("#hruler .readout").change(function() { updateRulers(parseInt($('#hruler .readout').val()),
-                                                           parseInt($('#vruler .readout').val()));
-                                              redrawPreview();});
-    $("#hruler .minus").click(function() { updateRulers(parseInt($('#hruler .readout').val()) - 1,
-                                                        parseInt($('#vruler .readout').val()));
-                                           redrawPreview();});
-    $("#hruler .plus").click(function() { updateRulers(parseInt($('#hruler .readout').val()) + 1,
-                                                       parseInt($('#vruler .readout').val()));
-                                          redrawPreview();});
+    $('.accordion').click(function() { $(this).toggleClass("active"); applyAccordian(); saveToLocal(); });
 
-    $("#vruler .readout").change(function() { updateRulers(parseInt($('#hruler .readout').val()),
-                                                           parseInt($('#vruler .readout').val()));
-                                              redrawPreview();});
-    $("#vruler .minus").click(function() { updateRulers(parseInt($('#hruler .readout').val()),
-                                                        parseInt($('#vruler .readout').val()) - 1);
-                                           redrawPreview();});
-    $("#vruler .plus").click(function() { updateRulers(parseInt($('#hruler .readout').val()),
-                                                       parseInt($('#vruler .readout').val()) + 1);
-                                          redrawPreview();});
+    loadFromLocal();
 
-    $("#scalecontrols .readout").change(function() { updateScale(parseInt($("#scalecontrols .readout").val()));
-                                                     redrawPreview();});
-    $("#scalecontrols .minus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) - 1);
-                                                  redrawPreview();});
-    $("#scalecontrols .plus").click(function() { updateScale(parseInt($("#scalecontrols .readout").val()) + 1);
-                                                 redrawPreview();});
+    view.showOvals($("#showovals").prop('checked'));
+    view.showThreading($("#showlower").prop('checked'));
+    view.showReversals($("#showreversal").prop('checked'));
+    view.greySaturation(0x100 - $('#GREYSLIDER').val()) ;
+    view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
+    view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
 
-    $("#repeatpicks #repeatfrom .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
-                                                               redrawPreview();});
-    $("#repeatpicks #repeatfrom .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()) - 1, parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
-                                                            redrawPreview();});
-    $("#repeatpicks #repeatfrom .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()) + 1, parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
-                                                           redrawPreview();});
+    applyAccordian();
 
-    $("#repeatpicks #repeatto .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
-                                                               redrawPreview();});
-    $("#repeatpicks #repeatto .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()) - 1, parseInt($("#repeats .readout").val()));
-                                                            redrawPreview();});
-    $("#repeatpicks #repeatto .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()) + 1, parseInt($("#repeats .readout").val()));
-                                                           redrawPreview();});
+    setControlsFromDraft();
 
-    $("#repeats .readout").change(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()));
-                                                                redrawPreview();});
-    $("#repeats .minus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()) - 1);
-                                                                redrawPreview();});
-    $("#repeats .plus").click(function() { updateRepeats(parseInt($("#repeatpicks #repeatfrom .readout").val()), parseInt($("#repeatpicks #repeatto .readout").val()), parseInt($("#repeats .readout").val()) + 1);
-                                                            redrawPreview();});
+    $('#draftcanvas').append(view.root());
+    $('#draftcanvas svg').click(draftClick);
 
-    $("#qualitycontrols .readout").change(function() {
-        updateQuality(parseInt($("#qualitycontrols .readout").val()));
-    });
-    $("#qualitycontrols .minus").click(function() {
-        updateQuality(parseInt($("#qualitycontrols .readout").val()) - 1);
-    });
-    $("#qualitycontrols .plus").click(function() {
-        updateQuality(parseInt($("#qualitycontrols .readout").val()) + 1);
-    });
-
-
-    $("#messagepopup .closepreview").click(function() { $("#messagepopup").hide(); });
-
-    $("#palete #fg .colorbox").each(function() {
-        for (i = 0; i < palette.length; i++)
-            if ($(this).attr("id") == "BOX" + (i + 1))
-                $(this).css("background-color", palette[i]);
-    });
-
-    $("#palete #fg .colorbox").click(function() {
-        setForegroundColor($(this).attr("id"));
-    });
-
-    $("#export #draftexport #jpeg").click(function() { exportImage("image/jpeg"); });
-    $("#export #draftexport #png").click(function() { exportImage("image/png"); });
-
-    $("#export #repeatexport #jpeg").click(function() { exportImage("image/jpeg", true); });
-    $("#export #repeatexport #png").click(function() { exportImage("image/png", true); });
-
-    $("#fileio #save").click(function() { save_file(); });
-
-    $("#fileio #load").change(function() { load_file(); });
-
-    $("#draftcanvas").mousedown(canvasClick);
-
-    setForegroundColor("BOX1");
-
-    updateRulers();
+    redraw();
+    redrawControls();
 })
