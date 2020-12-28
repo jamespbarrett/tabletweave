@@ -76,8 +76,8 @@ class TDDSVGView {
         );
 
         this.main_group = this.svg.group();
-        this.threading_group = this.svg.group();
         this.overlay = this.svg.group();
+        this.threading_group = this.svg.group();
 
         this.hruler = this.svg.line(
             labelwidth - cellborder,
@@ -290,7 +290,7 @@ class TDDSVGView {
             for (y = 0; y < draft.holes(); y++) {
                 if (y >= this.threading[x].holes.length) {
                     this.threading[x].holes.push(
-                        this.create_cell(x, y, threading_start_y, this.threading_group)
+                        this.create_cell(x, y, threading_start_y, this.threading_group, false)
                     );
                 }
                 this.move_cell(this.threading[x].holes[y], x, y, threading_start_y);
@@ -311,6 +311,7 @@ class TDDSVGView {
 
     conform_threading (draft) {
         if (this.show_threading) {
+            $(this.root()).append(this.threading_group);
             $(this.threading_group).attr('visibility', 'visible');
             for (var x = 0; x < draft.tablets(); x++) {
                 $(this.threading[x].direction).text(draft.threading[x]);
@@ -329,7 +330,7 @@ class TDDSVGView {
             }
             this.showing_threading = true;
         } else {
-            $(this.threading_group).attr('visibility', 'hidden');
+            $(this.threading_group).detach();
             this.showing_threading = false;
         }
     }
@@ -420,7 +421,7 @@ class TDDSVGView {
         }
     }
 
-    create_cell (x, y, offset=0, group=this.main_group) {
+    create_cell (x, y, offset=0, group=this.main_group, overlay=this.overlay) {
         var rect = this.svg.rect(
             group,
             labelwidth + (cellborder + cellwidth)*x,
@@ -434,19 +435,22 @@ class TDDSVGView {
             }
         );
 
-        var revline = this.svg.line(
-            this.overlay,
-            labelwidth + (cellborder + cellwidth)*x,
-            offset + (cellborder + cellheight)*y + cellheight + cellborder,
-            labelwidth + (cellborder + cellwidth)*x + cellwidth + cellborder,
-            offset + (cellborder + cellheight)*y + cellheight + cellborder,
-            {
-                strokeWidth: cellborder,
-                stroke: "#FF0000",
-                visibility: 'hidden',
-                strokeWidth: cellborder
-            }
-        );
+        var revline = undefined;
+        if (overlay) {
+            revline = this.svg.line(
+                overlay,
+                labelwidth + (cellborder + cellwidth)*x,
+                offset + (cellborder + cellheight)*y + cellheight + cellborder,
+                labelwidth + (cellborder + cellwidth)*x + cellwidth + cellborder,
+                offset + (cellborder + cellheight)*y + cellheight + cellborder,
+                {
+                    strokeWidth: cellborder,
+                    stroke: "#FF0000",
+                    visibility: 'hidden',
+                    strokeWidth: cellborder
+                }
+            );
+        }
 
         const X_coord = labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2;
         const Y_coord = offset + cellborder + (cellborder + cellheight)*y + cellheight/2;

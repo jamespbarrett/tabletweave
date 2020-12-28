@@ -75,12 +75,12 @@ class TDDDraft {
     var i;
     for (i=0; i < num; i++) {
       var arr = this.turning[this.picks() - 1].slice();
-      this.turning.push(arr);
+      this.turning.unshift(arr);
     }
   }
 
   removePicks(num) {
-    this.turning = this.turning.slice(0, this.picks() - num);
+    this.turning = this.turning.slice(num, this.picks());
   }
 
   addHoles(num) {
@@ -99,14 +99,11 @@ class TDDDraft {
   addTablets(num) {
     var i;
     var j;
-    var arr = [];
-
-    for (i=0; i < num; i++) {
-      arr.push('\\');
-    }
 
     for (i=0; i < this.picks(); i++) {
-      this.turning[i] = this.turning[i].concat(arr);
+      for (var j=0; j < num; j++) {
+        this.turning[i].push(this.turning[i][this.turning[i].length - 1]);
+      }
     }
 
     for (j=0; j < num; j++) {
