@@ -368,7 +368,7 @@ function exportDraft(mimetype) {
     if (mimetype == "image/svg+xml") {
         process_blob(svg_to_blob(view.root()));
     } else {
-        svg_to_img_blob(
+        svg_to_img(
             view.root(),
             mimetype,
             width,
