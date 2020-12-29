@@ -244,6 +244,20 @@ class TDDDraft {
 
     return desc;
   }
+
+  describeTablet (x) {
+    return this.threading[x] + " threaded tablet";
+  }
+
+  describeHole(x, y) {
+    var c = this.threadColour(x, y);
+    if (c == undefined) {
+      return "Empty";
+    } else {
+      var n = ntc.name(c.getCSSHexadecimalRGB());
+      return n[1] + " (" + c.getCSSHexadecimalRGB() + ")";
+    }
+  }
 }
 
 function TDDDraftFromString(raw) {
