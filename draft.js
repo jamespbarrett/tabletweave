@@ -15,6 +15,7 @@ function control_vals() {
     return {
         fgcol: fgcol,
         scale: $('#scalecontrols .readout').val(),
+        showtext: $("#showtext").prop("checked"),
         showovals: $("#showovals").prop("checked"),
         showlower: $("#showlower").prop("checked"),
         showreversal: $("#showreversal").prop("checked"),
@@ -44,6 +45,7 @@ function loadFromLocal() {
 
         $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
         $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
+        $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
         $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
         $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
         $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
@@ -108,12 +110,6 @@ function updateDraft() {
 
 function redraw() {
     var scale = Math.pow(2, parseInt($('#scalecontrols .readout').val()) / 10);
-    var showovals = $("#showovals").prop("checked");
-    var showlower = $("#showlower").prop("checked");
-    var showreversal = $("#showreversal").prop("checked");
-    var grey_saturation = 0x100 - $("#GREYSLIDER").val();
-    var hruler_position = ($("#showhruler").prop("checked"))?$("#hruler .readout").val():undefined;
-    var vruler_position = ($("#showvruler").prop("checked"))?$("#vruler .readout").val():undefined;
 
     view.conform(draft);
 
@@ -121,10 +117,41 @@ function redraw() {
     $('#draftcanvas svg').width(bbox.width * scale);
     $('#draftcanvas svg').height(bbox.height * scale);
 
+    var bot = $('#mainsection').position().top + bbox.height * scale;
+
     var i;
     for (i=0; i <= 12; i++) {
         $("#NUM" + (i)).text(draft.threadCount(i-1));
     }
+
+    $('#threadinginstructions').text("");
+    for (i=0; i < draft.tablets(); i++) {
+        $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i) + "</li>");
+        $('#threadinginstructions li').last().append('<ol type="A"></ol>');
+        var ol = $('#threadinginstructions li').last().children().last();
+        for (var j = 0; j < draft.holes(); j++) {
+            ol.append('<li>' + draft.describeHole(i, j) + '</li>');
+        }
+    }
+
+    $('#turninginstructions').text("");
+    for (i=0; i < draft.picks(); i++) {
+        $('#turninginstructions').append("<li class=\"instruction\">" + draft.describePick(i) + "</li>");
+    }
+
+    if ($('#showtext').prop('checked')) {
+        $('#textinstructions').show();
+        $('#textinstructions').css('top', bot + 10);
+        $('#textinstructions').css('min-width', bbox.width - 10);
+
+        bot = $('#textinstructions').position().top + $('#textinstructions').height() + 10;
+    } else {
+        $('#textinstructions').hide();
+    }
+
+    $('#copyright').css('position', 'absolute');
+    $('#copyright').css('top', bot + 10);
+    $('#copyright').css('botton', undefined);
 }
 
 function redrawControls() {
@@ -159,6 +186,7 @@ function redrawControls() {
         $('#REDSLIDE').prop( "disabled", false );
         $('#GREENSLIDE').prop( "disabled", false );
         $('#BLUESLIDE').prop( "disabled", false );
+        $('#colourname').text(ntc.name(draft.colour(fgcol).getCSSHexadecimalRGB())[1]);
     } else {
         $('#REDVAL').val(0);
         $('#REDSLIDE').val(0);
@@ -173,6 +201,8 @@ function redrawControls() {
         $('#REDSLIDE').prop( "disabled", true );
         $('#GREENSLIDE').prop( "disabled", true );
         $('#BLUESLIDE').prop( "disabled", true );
+
+        $('#colourname').text("");
     }
 }
 
@@ -321,6 +351,7 @@ function reset() {
     $("#showovals").prop("checked", true);
     $("#showlower").prop("checked", true);
     $("#showreversal").prop("checked", true);
+    $("#showtext").prop("checked", false);
     $("#GREYSLIDER").val(144);
 
     $("#showhruler").prop("checked", false);
@@ -339,12 +370,6 @@ function reset() {
 
 function exportDraft(mimetype) {
     var width = parseInt($("#export_width").val());
-    var showovals = $("#showovals").prop("checked");
-    var showlower = $("#showlower").prop("checked");
-    var showreversal = $("#showreversal").prop("checked");
-    var grey_saturation = 0x100 - $("#GREYSLIDER").val();
-    var hruler_position = ($("#showhruler").prop("checked"))?$("#hruler .readout").val():undefined;
-    var vruler_position = ($("#showvruler").prop("checked"))?$("#vruler .readout").val():undefined;
 
     var process_blob = function(blob) {
         var extension;
@@ -412,6 +437,7 @@ $(function() {
     $("#showovals").change(function() { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
     $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
     $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
+    $("#showtext").change(function() {saveToLocal(); redraw(); });
 
     $('#EMPTYBOX').click(function() { fgcol = -1; saveToLocal(); redrawControls(); });
     var i;

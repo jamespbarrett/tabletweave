@@ -1,6 +1,6 @@
 body {
     background-color:#CCCCFF;
-    color: darkblue;
+    color: black;
 }
 
 h1,h3 {
@@ -28,6 +28,16 @@ h4 {
     position: absolute;
     left: 400px;
     top: 170px;
+}
+
+#textinstructions {
+    display: inline-block;
+    position: absolute;
+    left: 400px;
+    top: 170px;
+    background-color: #FFFFFF;
+    border: 1px solid black;
+    padding: 5px 5px 5px;
 }
 
 #repeatsection {
@@ -207,7 +217,7 @@ div.controlpanel > div > span > span {
     font-size: larger;
     /* background-color: #eee; */
     background-color:#EEEEFF;
-    color: darkblue;
+    color: black;
     /* color: #444; */
     cursor: pointer;
     padding: 18px;

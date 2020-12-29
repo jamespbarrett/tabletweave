@@ -213,6 +213,51 @@ class TDDDraft {
       }
     }
   }
+
+  describePick(num) {
+    var desc = "";
+    var dir = "F";
+    var n = 0;
+
+    for (var i = 0; i < this.tablets(); i++) {
+      var new_dir;
+      if ((this.turning[this.picks() - 1 - num][i] == "\\") == (this.threading[i] == "Z")) {
+        new_dir = "F";
+      } else {
+        new_dir = "B";
+      }
+
+      if (new_dir == dir) {
+        n += 1;
+      } else {
+        if (n >= 1) {
+          desc += '' + n + dir + " "
+        }
+        dir = new_dir;
+        n = 1;
+      }
+    }
+
+    if (n >= 1) {
+       desc += '' + n + dir;
+    }
+
+    return desc;
+  }
+
+  describeTablet (x) {
+    return this.threading[x] + " threaded tablet";
+  }
+
+  describeHole(x, y) {
+    var c = this.threadColour(x, y);
+    if (c == undefined) {
+      return "Empty";
+    } else {
+      var n = ntc.name(c.getCSSHexadecimalRGB());
+      return n[1] + " (" + c.getCSSHexadecimalRGB() + ")";
+    }
+  }
 }
 
 function TDDDraftFromString(raw) {
