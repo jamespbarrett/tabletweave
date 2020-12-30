@@ -37,6 +37,8 @@ class TDDSVGView {
 
         $(this.svg.root()).width(fullwidth);
         $(this.svg.root()).height(fullheight);
+        $(this.svg.root()).attr('width', fullwidth);
+        $(this.svg.root()).attr('height', fullheight);
 
         this.svg.root().setAttribute('viewBox', '0 0 ' + fullwidth + ' ' + fullheight);
 
@@ -78,6 +80,9 @@ class TDDSVGView {
         this.main_group = this.svg.group();
         this.overlay = this.svg.group();
         this.threading_group = this.svg.group();
+        this.ruler_group = this.svg.group();
+        this.threading_main_group = this.svg.group(this.threading_group);
+        this.threading_ruler_group = this.svg.group(this.threading_group);
 
         this.hruler = this.svg.line(
             labelwidth - cellborder,
@@ -94,6 +99,7 @@ class TDDSVGView {
 
         this.vruler = {
             turning: this.svg.line(
+                this.ruler_group,
                 labelwidth,
                 0,
                 labelwidth,
@@ -101,6 +107,7 @@ class TDDSVGView {
                 {stroke: "#000000", strokeWidth: cellborder*4}
             ),
             threading: this.svg.line(
+                this.threading_ruler_group,
                 labelwidth,
                 threading_start_y,
                 labelwidth,
@@ -222,7 +229,7 @@ class TDDSVGView {
         while (this.labels.holes.length < draft.holes()) {
             y = this.labels.holes.length;
             this.labels.holes.push(this.svg.text(
-                this.threading_group,
+                this.threading_main_group,
                 labelwidth - 3,
                 threading_start_y + (cellborder + cellheight)*(y + 1) - 5,
                 hole_labels[y],
@@ -277,7 +284,7 @@ class TDDSVGView {
             if (x >= this.threading.length) {
                 this.threading.push({
                     direction: this.svg.text(
-                        this.threading_group,
+                        this.threading_main_group,
                         labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
                         threading_start_y + (cellborder + cellheight)*draft.holes() + 15,
                         "S",
@@ -290,7 +297,7 @@ class TDDSVGView {
             for (y = 0; y < draft.holes(); y++) {
                 if (y >= this.threading[x].holes.length) {
                     this.threading[x].holes.push(
-                        this.create_cell(x, y, threading_start_y, this.threading_group, false)
+                        this.create_cell(x, y, threading_start_y, this.threading_main_group, false)
                     );
                 }
                 this.move_cell(this.threading[x].holes[y], x, y, threading_start_y);

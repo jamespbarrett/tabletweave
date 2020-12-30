@@ -125,21 +125,22 @@ function redraw() {
     }
 
     $('#threadinginstructions').text("");
-    for (i=0; i < draft.tablets(); i++) {
-        $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i) + "</li>");
-        $('#threadinginstructions li').last().append('<ol type="A"></ol>');
-        var ol = $('#threadinginstructions li').last().children().last();
-        for (var j = 0; j < draft.holes(); j++) {
-            ol.append('<li>' + draft.describeHole(i, j) + '</li>');
-        }
-    }
-
-    $('#turninginstructions').text("");
-    for (i=0; i < draft.picks(); i++) {
-        $('#turninginstructions').append("<li class=\"instruction\">" + draft.describePick(i) + "</li>");
-    }
 
     if ($('#showtext').prop('checked')) {
+        for (i=0; i < draft.tablets(); i++) {
+            $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i) + "</li>");
+            $('#threadinginstructions li').last().append('<ol type="A"></ol>');
+            var ol = $('#threadinginstructions li').last().children().last();
+            for (var j = 0; j < draft.holes(); j++) {
+                ol.append('<li>' + draft.describeHole(i, j) + '</li>');
+            }
+        }
+
+        $('#turninginstructions').text("");
+        for (i=0; i < draft.picks(); i++) {
+            $('#turninginstructions').append("<li class=\"instruction\">" + draft.describePick(i) + "</li>");
+        }
+
         $('#textinstructions').show();
         $('#textinstructions').css('top', bot + 10);
         $('#textinstructions').css('min-width', bbox.width - 10);
