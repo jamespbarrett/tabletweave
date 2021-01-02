@@ -380,6 +380,8 @@ function exportDraft(mimetype) {
             extension = ".jpg";
         } else if (mimetype == "image/png") {
             extension = ".png";
+        } else if (mimetype == "image/svg+xml") {
+            extension = ".svg";
         } else {
             extension = "";
         }

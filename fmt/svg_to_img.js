@@ -2,7 +2,11 @@
 
 function svg_to_blob(svg) {
     var data = (new XMLSerializer()).serializeToString(svg);
-    return new Blob([data], {type: "image/svg+xml;charset=utf-8"});
+    if(navigator. userAgent. indexOf('AppleWebKit') != -1){
+        return new Blob([data], {type: "image/svg+xml"});
+    } else {
+        return new Blob([data], {type: "image/svg+xml;charset=utf-8"});
+    }
 }
 
 function svg_to_url(svg) {
