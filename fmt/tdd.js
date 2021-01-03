@@ -74,7 +74,7 @@ class TDDDraft {
   addPicks(num) {
     var i;
     for (i=0; i < num; i++) {
-      var arr = this.turning[this.picks() - 1].slice();
+      var arr = this.turning[0].slice();
       this.turning.unshift(arr);
     }
   }
