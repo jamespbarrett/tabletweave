@@ -20,12 +20,13 @@ function draw_svg_to_canvas(
     onload=function() {}
 ) {
     var ctx = canvas.getContext("2d");
-    canvas.height = svg.clientHeight * (canvas.width / svg.clientWidth);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     var img = new Image();
     img.onload = function () {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        height = svg.clientHeight * (canvas.width / svg.clientWidth);
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, canvas.width, height);
         onload();
     };
     img.src = svg_to_url(svg);

@@ -35,10 +35,11 @@ class TDDSVGView {
             (cellborder + cellwidth)*1
         );
 
-        $(this.svg.root()).width(fullwidth);
-        $(this.svg.root()).height(fullheight);
-        $(this.svg.root()).attr('width', fullwidth);
-        $(this.svg.root()).attr('height', fullheight);
+        if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+            // This is needed in Firefox to make image export work, but breaks image export in other browsers
+            $(this.svg.root()).attr('width', fullwidth);
+            $(this.svg.root()).attr('height', fullheight);
+        }
 
         this.svg.root().setAttribute('viewBox', '0 0 ' + fullwidth + ' ' + fullheight);
 
