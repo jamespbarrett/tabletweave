@@ -19,7 +19,7 @@
 </head>
 
 <body>
-<h1>Tablet Weaving Draft Designer v1.0.5</h1>
+<h1>Tablet Weaving Draft Designer v1.0.6</h1>
 
 <div id="instructions"><p class="instructionlink"><a href="howto.html" target="_blank">Click
   Here for Instructions</a></p>
@@ -33,6 +33,11 @@
 
 <div id="mainsection">
   <div id="draftcanvas" class="draftcanvas">
+  </div>
+</div>
+
+<div id="repeatsection">
+  <div id="repeatcanvas" class="draftcanvas">
   </div>
 </div>
 
@@ -77,7 +82,17 @@
       <span id="showcontrols"><label for="showreversal">Show Reversal Points</label><span><input type="checkbox" id="showreversal" checked=true></span></span>
       <span id="showcontrols"><label for="showtext">Show Text Description</label><span><input type="checkbox" id="showtext" checked=false></span></span>
       <span id="saturationcontrols"><label>Backwards Turn Saturation:</label><input type="range" min="0" max="255" id="GREYSLIDER" value="144"></input></span>
-      <span id="scalecontrols"><label>Visual Scale:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button><span></span>
+      <span id="scalecontrols"><label>Visual Scale:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+    </div>
+  </div>
+
+  <div class="controlpanel" id="repeats">
+    <button class="accordion">Repeats</button>
+    <div class="panel">
+      <span id="showrepeat"><label for="showrepeats">Show Repeats</label><span><input type="checkbox" id="showrepeats" checked=false></span></span>
+      <span id="repeatstart"><label>Repeat Starting at Pick:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="repeatend"><label>Repeat Ending at Pick:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="numrepeats"><label>Number of Repeats:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
     </div>
   </div>
 

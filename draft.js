@@ -2,6 +2,7 @@
 
 var draft = new TDDDraft();
 var view = new TDDSVGView();
+var repeat = new TDDSVGView();
 var fgcol = -1;
 
 function control_vals() {
@@ -25,6 +26,10 @@ function control_vals() {
         hruler: $("#hruler .readout").val(),
         vruler: $("#vruler .readout").val(),
         export_width: $('#export_width').val(),
+        showrepeats: $("#showrepeats").prop("checked"),
+        repeatstart: $("#repeatstart .readout").val(),
+        repeatend: $("#repeatend .readout").val(),
+        numrepeats: $("#numrepeats .readout").val(),
         accordion: accordion,
     };
 }
@@ -54,6 +59,10 @@ function loadFromLocal() {
         $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
         $("#vruler .readout").val((controls.vruler != undefined)?controls.vruler:0);
         $("#export_width").val((controls.export_width != undefined)?controls.export_width:1920);
+        $("#showrepeats").prop("checked", ((controls.showrepeats != undefined)?controls.showrepeats:false));
+        $("#repeatstart .readout").val((controls.repeatstart != undefined)?controls.repeatstart:1);
+        $("#repeatend .readout").val((controls.repeatend != undefined)?controls.repeatend:1);
+        $("#numrepeats .readout").val((controls.numrepeats != undefined)?controls.numrepeats:1);
 
         if (controls.accordion) {
             for (const [key, value] of Object.entries(controls.accordion)) {
@@ -105,6 +114,14 @@ function updateDraft() {
         $("#vruler .readout").val(draft.tablets() + 1);
     }
 
+    if ($("#repeatstart .readout").val() > draft.picks()) {
+        $("#repeatstart .readout").val(draft.picks());
+    }
+
+    if ($("#repeatend .readout").val() > draft.picks()) {
+        $("#repeatend .readout").val(draft.picks());
+    }
+
     saveToLocal();
 }
 
@@ -112,16 +129,27 @@ function redraw() {
     var scale = Math.pow(2, parseInt($('#scalecontrols .readout').val()) / 10);
 
     view.conform(draft);
+    if ($('#showrepeats').prop('checked')) {
+        repeat.conform(draft);
+    }
 
     var bbox = $('#draftcanvas svg')[0].getBBox();
     $('#draftcanvas svg').width(bbox.width * scale);
     $('#draftcanvas svg').height(bbox.height * scale);
 
     var bot = $('#mainsection').position().top + bbox.height * scale;
+    var right = $('#mainsection').position().left + bbox.width * scale;
 
     var i;
     for (i=0; i <= 12; i++) {
         $("#NUM" + (i)).text(draft.threadCount(i-1));
+    }
+
+    if ($('#showrepeats').prop('checked')) {
+        $('#repeatsection').show();
+        $('#repeatsection').css('left', right + 10);
+    } else {
+        $('#repeatsection').hide();
     }
 
     $('#threadinginstructions').text("");
@@ -148,6 +176,14 @@ function redraw() {
         bot = $('#textinstructions').position().top + $('#textinstructions').height() + 10;
     } else {
         $('#textinstructions').hide();
+    }
+
+    if ($('#showrepeats').prop('checked')) {
+        bbox = $('#repeatcanvas svg')[0].getBBox();
+
+        if ($('#repeatsection').position().top + bbox.height * scale > bot) {
+            bot = $('#repeatsection').position().top + bbox.height * scale;
+        }
     }
 
     $('#copyright').css('position', 'absolute');
@@ -297,6 +333,14 @@ function setControlsFromDraft() {
     if ($("#vruler .readout").val() > draft.tablets() + 1) {
         $("#vruler .readout").val(draft.tablets() + 1);
     }
+
+    if ($("#repeatstart .readout").val() > draft.picks()) {
+        $("#repeatstart .readout").val(draft.picks());
+    }
+
+    if ($("#repeatend .readout").val() > draft.picks()) {
+        $("#repeatend .readout").val(draft.picks());
+    }
 }
 
 function loadFile() {
@@ -362,6 +406,11 @@ function reset() {
     $("#vruler .readout").val(0);
 
     $("#export_width").val(1920);
+
+    $("#showrepeats").prop("checked", false);
+    $("#repeatstart .readout").val(1);
+    $("#repeatend .readout").val(1);
+    $("#numrepeats .readout").val(1);
 
     saveToLocal();
     setControlsFromDraft();
@@ -450,6 +499,11 @@ $(function() {
         })(i);
     }
 
+    $("#showrepeats").change(function() { saveToLocal(); redraw(); });
+    setupNumberInput("repeatstart", 1, function() { return $("#repeatend .readout").val(); }, function() { repeat.startPick(parseInt($("#repeatstart .readout").val())); saveToLocal(); redraw(); });
+    setupNumberInput("repeatend", function() { return $("#repeatstart .readout").val(); }, function() { return draft.picks(); }, function() { repeat.endPick(parseInt($("#repeatend .readout").val())); saveToLocal(); redraw(); });
+    setupNumberInput("numrepeats", 1, undefined, function() { repeat.setRepeats(parseInt($("#numrepeats .readout").val())); saveToLocal(); redraw(); });
+
     $('#REDVAL').change(function() { updateRed($('#REDVAL').val()); redraw(); redrawControls(); });
     $('#REDSLIDE').change(function() { updateRed($('#REDSLIDE').val()); redraw(); redrawControls(); });
     $('#GREENVAL').change(function() { updateGreen($('#GREENVAL').val()); redraw(); redrawControls(); });
@@ -482,12 +536,26 @@ $(function() {
     view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
     view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
 
+    repeat.showOvals(true);
+    repeat.showThreading(false);
+    repeat.showReversals(false);
+    repeat.greySaturation(0xFF);
+    repeat.hRuler(undefined);
+    repeat.vRuler(undefined);
+
+    repeat.startPick(parseInt($('#repeatstart .readout').val()));
+    repeat.endPick(parseInt($('#repeatend .readout').val()));
+    repeat.setRepeats(parseInt($('#numrepeats .readout').val()));
+
     applyAccordian();
 
     setControlsFromDraft();
 
     $('#draftcanvas').append(view.root());
     $('#draftcanvas svg').click(draftClick);
+
+    $('#repeatcanvas').append(repeat.root());
+
 
     redraw();
     redrawControls();

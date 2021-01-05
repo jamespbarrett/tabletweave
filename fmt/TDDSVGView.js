@@ -77,6 +77,11 @@ class TDDSVGView {
             grey_saturation
         );
 
+        this.start_pick=undefined;
+        this.end_pick=undefined;
+        this.repeats=undefined;
+
+        // Stuctural elements for arranging the svg
         this.main_group = this.svg.group();
         this.overlay = this.svg.group();
         this.threading_group = this.svg.group();
@@ -145,13 +150,34 @@ class TDDSVGView {
         this.vruler_position = x;
     }
 
+    startPick(y) {
+        this.start_pick = y;
+    }
+
+    endPick(y) {
+        this.end_pick = y;
+    }
+
+    setRepeats(n) {
+        this.repeats = n;
+    }
+
     root () {
         return this.svg.root();
     }
 
     conform (draft) {
         if (
-            this.turning.length != draft.picks() ||
+            (
+                this.repeats != undefined &&
+                (
+                    this.turning.length != (this.end_pick - this.start_pick + 1)*this.repeats
+                )
+            ) ||
+            (
+                this.repeats == undefined &&
+                this.turning.length != draft.picks()
+            ) ||
             this.threading.length != draft.tablets() ||
             (this.threading.length > 0 && this.threading[0].holes.length != draft.holes()) ||
             (this.show_threading != this.showing_threading)
@@ -165,15 +191,17 @@ class TDDSVGView {
     }
 
     conform_size(draft) {
+        const num_picks = (this.repeats == undefined)?draft.picks():(this.end_pick - this.start_pick + 1)*this.repeats;
+
         // First calculate the sizes
         const threading_start_y = (
-            (cellborder + cellheight)*draft.picks() +
+            (cellborder + cellheight)*num_picks +
             intertablegap
         );
 
         const fullheight = (
             cellborder +
-            (cellborder + cellheight)*draft.picks() +
+            (cellborder + cellheight)*num_picks +
             cellborder +
             cellheight +
             (
@@ -202,19 +230,26 @@ class TDDSVGView {
         $(this.bg).attr('height', fullheight);
 
         // Conform the labels -- picks first
-        while (this.labels.picks.length > draft.picks()) {
+        while (this.labels.picks.length > num_picks) {
             $(this.labels.picks.pop()).remove();
         }
         for (var y = 0; y < this.labels.picks.length; y++) {
-            $(this.labels.picks[y]).attr('y', (cellborder + cellheight)*(draft.picks() - y) - 5);
+            $(this.labels.picks[y]).attr('y', (cellborder + cellheight)*(num_picks - y) - 5);
+            if (this.repeats != undefined) {
+                $(this.labels.picks[y]).text("" + ((y%(this.end_pick - this.start_pick + 1)) + this.start_pick));
+            }
         }
-        while (this.labels.picks.length < draft.picks()) {
+        while (this.labels.picks.length < num_picks) {
             y = this.labels.picks.length;
+            var label = "" + (y + 1);
+            if (this.repeats != undefined) {
+                label = "" + ((y%(this.end_pick - this.start_pick + 1)) + this.start_pick);
+            }
             this.labels.picks.push(this.svg.text(
                 this.main_group,
                 labelwidth - 3,
-                (cellborder + cellheight)*(draft.picks() - y) - 5,
-                "" + (y + 1),
+                (cellborder + cellheight)*(num_picks - y) - 5,
+                label,
                 {stroke: "#000000", style: "font: 15px Arial; text-anchor: end;"}
             ));
         }
@@ -256,7 +291,7 @@ class TDDSVGView {
         }
 
         // Now we conform the cells of the turning diagram
-        for (y = 0; y < draft.picks(); y++) {
+        for (y = 0; y < num_picks; y++) {
             if (y >= this.turning.length) {
                 this.turning.push([]);
             }
@@ -272,7 +307,7 @@ class TDDSVGView {
                 this.remove_cell(this.turning[y].pop());
             }
         }
-        while (draft.picks() < this.turning.length) {
+        while (num_picks < this.turning.length) {
             var row = this.turning.pop();
             while (row.length > 0) {
                 this.remove_cell(row.pop());
@@ -347,31 +382,95 @@ class TDDSVGView {
         for (var x = 0; x < draft.tablets(); x++) {
             tablet_position[x] = draft.holes() - 1;
         }
-        for (var y = draft.picks() - 1; y >= 0; y--) {
-            for (var x = 0; x < draft.tablets(); x++) {
-                var fg;
-                this.set_cell_direction(this.turning[y][x], draft.turning[y][x]);
+
+        if (this.repeats != undefined) {
+            var y;
+            for (y = draft.picks() - 1; y > draft.picks() - this.start_pick; y--) {
                 if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
-                    this.set_cell_background(this.turning[y][x], this.forwardcolour);
-                    fg = draft.threadColour(x, tablet_position[x]);
-                    this.turning[y][x].b = false;
                     tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
                 } else {
-                    this.set_cell_background(this.turning[y][x], this.backwardcolour);
-                    fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
-                    this.turning[y][x].b = true;
                     tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
                 }
-                if (this.show_ovals) {
-                    this.set_cell_colour(this.turning[y][x], fg);
-                } else {
-                    this.set_cell_colour(this.turning[y][x], undefined);
+            }
+            const ppr = this.end_pick - this.start_pick + 1;
+            var cell = this.turning.length - 1;
+
+            while (cell >= 0) {
+                for (y = draft.picks() - this.start_pick; y >= draft.picks() - this.end_pick; y--) {
+                    //alert("y: " + y + " cell: " + cell);
+
+                    for (var x = 0; x < draft.tablets(); x++) {
+                        var fg;
+
+                        this.set_cell_direction(this.turning[cell][x], draft.turning[y][x]);
+                        this.set_cell_background(this.turning[cell][x], this.forwardcolour);
+                        if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
+                            fg = draft.threadColour(x, tablet_position[x]);
+                            this.turning[cell][x].b = false;
+                            tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+                        } else {
+                            fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
+                            this.turning[cell][x].b = true;
+                            tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+                        }
+                        this.set_cell_colour(this.turning[cell][x], fg);
+                        this.set_cell_reverse_marker(this.turning[cell][x], false);
+                    }
+
+                    cell--;
                 }
-                this.set_cell_reverse_marker(this.turning[y][x], (
-                    (y != draft.picks() - 1) &&
-                    (this.turning[y][x].b != this.turning[y+1][x].b) &&
-                    this.show_reversals
-                ));
+            }
+
+            // for (var n = this.repeats - 1; n >= 0; n--) {
+            //     for (y = draft.picks() - this.start_pick; y >= draft.picks() - this.end_pick; y++) {
+            //         for (var x = 0; x < draft.tablets(); x++) {
+            //             // var fg;
+            //             const cell = ppr*n + y - draft.picks() + this.end_pick;
+
+            //             // this.set_cell_direction(this.turning[cell][x], draft.turning[y][x]);
+            //             // if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
+            //             //     this.set_cell_background(this.turning[cell][x], this.forwardcolour);
+            //             //     fg = draft.threadColour(x, tablet_position[x]);
+            //             //     this.turning[cell][x].b = false;
+            //             //     tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+            //             // } else {
+            //             //     this.set_cell_background(this.turning[cell][x], this.backwardcolour);
+            //             //     fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
+            //             //     this.turning[cell][x].b = true;
+            //             //     tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+            //             // }
+            //             // this.set_cell_colour(this.turning[cell][x], fg);
+            //             // this.set_cell_reverse_marker(this.turning[cell][x], false);
+            //         }
+            //     }
+            // }
+        } else {
+            for (var y = draft.picks() - 1; y >= 0; y--) {
+                for (var x = 0; x < draft.tablets(); x++) {
+                    var fg;
+                    this.set_cell_direction(this.turning[y][x], draft.turning[y][x]);
+                    if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
+                        this.set_cell_background(this.turning[y][x], this.forwardcolour);
+                        fg = draft.threadColour(x, tablet_position[x]);
+                        this.turning[y][x].b = false;
+                        tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+                    } else {
+                        this.set_cell_background(this.turning[y][x], this.backwardcolour);
+                        fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
+                        this.turning[y][x].b = true;
+                        tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+                    }
+                    if (this.show_ovals) {
+                        this.set_cell_colour(this.turning[y][x], fg);
+                    } else {
+                        this.set_cell_colour(this.turning[y][x], undefined);
+                    }
+                    this.set_cell_reverse_marker(this.turning[y][x], (
+                        (y != draft.picks() - 1) &&
+                        (this.turning[y][x].b != this.turning[y+1][x].b) &&
+                        this.show_reversals
+                    ));
+                }
             }
         }
     }
