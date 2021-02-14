@@ -418,7 +418,7 @@ function reset() {
     redrawControls();
 }
 
-function exportDraft(mimetype) {
+function exportDraft(mimetype, root) {
     var width = parseInt($("#export_width").val());
 
     var process_blob = function(blob) {
@@ -443,10 +443,10 @@ function exportDraft(mimetype) {
     };
 
     if (mimetype == "image/svg+xml") {
-        process_blob(svg_to_blob(view.root()));
+        process_blob(svg_to_blob(root));
     } else {
         svg_to_img(
-            view.root(),
+            root,
             mimetype,
             width,
             process_blob);
@@ -519,9 +519,13 @@ $(function() {
     $("#clear").click(function() { draft.clearTurning(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
     $("#reset").click(function() { reset(); });
 
-    $('#draftexport #svg').click(function() { exportDraft('image/svg+xml'); });
-    $('#draftexport #jpeg').click(function() { exportDraft('image/jpeg'); });
-    $('#draftexport #png').click(function() { exportDraft('image/png'); });
+    $('#draftexport #svg').click(function() { exportDraft('image/svg+xml', view.root()); });
+    $('#draftexport #jpeg').click(function() { exportDraft('image/jpeg', view.root()); });
+    $('#draftexport #png').click(function() { exportDraft('image/png', view.root()); });
+
+    $('#repeatexport #svg').click(function() { exportDraft('image/svg+xml', repeat.root()); });
+    $('#repeatexport #jpeg').click(function() { exportDraft('image/jpeg', repeat.root()); });
+    $('#repeatexport #png').click(function() { exportDraft('image/png', repeat.root()); });
 
     $('#export_width').change(function() { saveToLocal(); });
 
