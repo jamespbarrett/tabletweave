@@ -421,30 +421,6 @@ class TDDSVGView {
                     cell--;
                 }
             }
-
-            // for (var n = this.repeats - 1; n >= 0; n--) {
-            //     for (y = draft.picks() - this.start_pick; y >= draft.picks() - this.end_pick; y++) {
-            //         for (var x = 0; x < draft.tablets(); x++) {
-            //             // var fg;
-            //             const cell = ppr*n + y - draft.picks() + this.end_pick;
-
-            //             // this.set_cell_direction(this.turning[cell][x], draft.turning[y][x]);
-            //             // if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
-            //             //     this.set_cell_background(this.turning[cell][x], this.forwardcolour);
-            //             //     fg = draft.threadColour(x, tablet_position[x]);
-            //             //     this.turning[cell][x].b = false;
-            //             //     tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
-            //             // } else {
-            //             //     this.set_cell_background(this.turning[cell][x], this.backwardcolour);
-            //             //     fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
-            //             //     this.turning[cell][x].b = true;
-            //             //     tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
-            //             // }
-            //             // this.set_cell_colour(this.turning[cell][x], fg);
-            //             // this.set_cell_reverse_marker(this.turning[cell][x], false);
-            //         }
-            //     }
-            // }
         } else {
             for (var y = draft.picks() - 1; y >= 0; y--) {
                 for (var x = 0; x < draft.tablets(); x++) {
