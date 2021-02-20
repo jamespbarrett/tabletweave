@@ -91,6 +91,7 @@ class TDDSVGView {
         this.threading_ruler_group = this.svg.group(this.threading_group);
 
         this.hruler = this.svg.line(
+            this.ruler_group,
             labelwidth - cellborder,
             0,
             labelwidth + cellborder + (cellborder + cellwidth),
@@ -469,6 +470,7 @@ class TDDSVGView {
                 $(this.hruler).attr('y2', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
 
                 $(this.hruler).attr('visibility', 'visible');
+                this.ruler_group.append(this.hruler);
             } else {
                 $(this.hruler).attr('y1', threading_start_y - (cellborder + cellheight)*this.hruler_position);
                 $(this.hruler).attr('y2', threading_start_y - (cellborder + cellheight)*this.hruler_position);
@@ -478,6 +480,7 @@ class TDDSVGView {
                 } else {
                     $(this.hruler).attr('visibility', 'hidden');
                 }
+                this.threading_ruler_group.append(this.hruler);
             }
         }
 
