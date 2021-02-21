@@ -329,10 +329,12 @@ function setControlsFromDraft() {
     } else if ($("#hruler .readout").val() < -draft.holes()) {
         $("#hruler .readout").val(-draft.holes());
     }
+    view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
 
     if ($("#vruler .readout").val() > draft.tablets() + 1) {
         $("#vruler .readout").val(draft.tablets() + 1);
     }
+    view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
 
     if ($("#repeatstart .readout").val() > draft.picks()) {
         $("#repeatstart .readout").val(draft.picks());
@@ -401,9 +403,6 @@ function reset() {
 
     $("#showhruler").prop("checked", false);
     $("#showvruler").prop("checked", false);
-
-    $("#hruler .readout").val(0);
-    $("#vruler .readout").val(0);
 
     $("#export_width").val(1920);
 

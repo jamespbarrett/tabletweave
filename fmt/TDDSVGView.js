@@ -461,6 +461,10 @@ class TDDSVGView {
 
         if (this.hruler_position == undefined) {
             $(this.hruler).attr('visibility', 'hidden');
+            $(this.hruler).attr('x1', labelwidth - cellborder);
+            $(this.hruler).attr('x2', labelwidth + cellborder + (cellborder + cellwidth)*draft.tablets());
+            $(this.hruler).attr('y1', threading_start_y);
+            $(this.hruler).attr('y2', threading_start_y);
         } else {
             $(this.hruler).attr('x1', labelwidth - cellborder);
             $(this.hruler).attr('x2', labelwidth + cellborder + (cellborder + cellwidth)*draft.tablets());
@@ -486,7 +490,16 @@ class TDDSVGView {
 
         if (this.vruler_position == undefined) {
             $(this.vruler.turning).attr('visibility', 'hidden');
+            $(this.vruler.turning).attr('x1', labelwidth);
+            $(this.vruler.turning).attr('y1', 0);
+            $(this.vruler.turning).attr('x2', labelwidth);
+            $(this.vruler.turning).attr('y2', (cellheight + cellborder)*draft.picks() + cellborder);
+
             $(this.vruler.threading).attr('visibility', 'hidden');
+            $(this.vruler.threading).attr('x1', labelwidth);
+            $(this.vruler.threading).attr('y1', threading_start_y);
+            $(this.vruler.threading).attr('x2', labelwidth);
+            $(this.vruler.threading).attr('y2', threading_start_y + (cellheight + cellborder)*draft.holes() + cellborder);
         } else {
             $(this.vruler.turning).attr('visibility', 'visible');
             $(this.vruler.turning).attr('x1', labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
