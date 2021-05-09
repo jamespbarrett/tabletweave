@@ -248,7 +248,7 @@ function draftClick(e) {
     pt.x = e.clientX;
     pt.y = e.clientY;
     const svgP = pt.matrixTransform( this.getScreenCTM().inverse() );
-    var tablet = svg_coord_to_tablet(svgP.x);
+    var tablet = svg_coord_to_tablet(svgP.x, view, draft);
     var pick = svg_coord_to_pick(svgP.y, draft);
     var hole = svg_coord_to_hole(svgP.y, draft);
 
