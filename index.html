@@ -1,10 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<html lang="en">
+<html>
 <head>
 <title>Tablet Weaving Draft Designer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <link rel="stylesheet" href="style.css">
-<script src="https://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="lib/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="lib/jquery-i18next/jquery-i18next.min.js"></script>
+<script type="text/javascript" src="lib/i18next-xhr-backend/i18nextXHRBackend.min.js"></script>
 <script src="js.cookie.js"></script>
 <script src="FileSaver.js"></script>
 <script src="fmt/jquery.svg.js"></script>
@@ -15,20 +18,20 @@
 <script src="fmt/TDDSVGView.js"></script>
 <script src="fmt/svg_to_img.js"></script>
 <script src="fmt/json_to_tdd.js"></script>
+<script src="i18n.js"></script>
 <script src="draft.js"></script>
 </head>
 
 <body>
 <h1>Tablet Weaving Draft Designer v1.0.11</h1>
 
-<div id="instructions"><p class="instructionlink"><a href="http://www.tabletweavingintheoryandpractice.co.uk/2021/02/getting-most-from-tablet-weaving-draft.html" target="_blank">Click
-  Here for Instructions</a></p>
-  <p class="instructionlink"><a href="http://www.tabletweavingintheoryandpractice.co.uk/2021/01/using-new-pattern-repeat-tool-on-tdd.html" target="_blank">Tips on using the new Pattern Repeat tool</a></p>
+<div id="instructions"><p class="instructionlink"><a href="http://www.tabletweavingintheoryandpractice.co.uk/2021/02/getting-most-from-tablet-weaving-draft.html" target="_blank" data-i18n="instructions"></a></p>
+  <p class="instructionlink"><a href="http://www.tabletweavingintheoryandpractice.co.uk/2021/01/using-new-pattern-repeat-tool-on-tdd.html" target="_blank" data-i18n="instructionlink"></a></p>
 </div>
 
 <div id="blogvert">
-  <p class="blogvert">For more tablet weaving drafts, information and help with tablet weaving, please <a
-  href="http://www.tabletweavingintheoryandpractice.co.uk">read my blog</a>.
+  <p class="blogvert"><span data-i18n="blogvert"></span><a
+  href="http://www.tabletweavingintheoryandpractice.co.uk" data-i18n="blogvertlink"></a><span data-i18n="blogvert2"></span>
   </p>
 </div>
 
@@ -44,70 +47,70 @@
 
 <div id="textinstructions">
   <ul>
-    <li>Threading:</li>
+    <li data-i18n="textinstructions.threading"></li>
     <ol id="threadinginstructions"></ol>
-    <li>Turning:</li>
+    <li data-i18n="textinstructions.turning"></li>
     <ol id="turninginstructions"></ol>
   </ul>
 </div>
 
 <div id="controlbar">
   <div class="controlpanel">
-    <h3>Draft Name</h3>
+    <h3 data-i18n="controlbar.draftname"></h3>
     <div>
       <span id="draftname"><input class="readout" value=""></input></span>
     </div>
   </div>
   <div class="controlpanel" id="controls">
-    <button class="accordion active">Controls</button>
+    <button class="accordion active" data-i18n="controlbar.controls.name"></button>
     <div class="panel">
-      <span id="mainrowcontrols"><label>Picks:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
-      <span id="lowrowcontrols"><label>Number of Holes:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
-      <span id="colcontrols"><label>Number of Tablets:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="mainrowcontrols"><label data-i18n="controlbar.controls.picks"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="lowrowcontrols"><label data-i18n="controlbar.controls.holes"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="colcontrols"><label data-i18n="controlbar.controls.tablets"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
     </div>
   </div>
   <div class="controlpanel" id="rulers">
-    <button class="accordion">Rulers</button>
+    <button class="accordion" data-i18n="controlbar.rulers.name"></button>
     <div class="panel">
-      <span id="showcontrols"><label for="showhruler">Show Horizontal Ruler</label><span><input type="checkbox" id="showhruler" checked=true></span></span>
-      <span id="showcontrols"><label for="showvruler">Show Vertical Ruler</label><span><input type="checkbox" id="showvruler" checked=true></span></span>
-      <span id="hruler"><label>Horizontal Ruler Position:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
-      <span id="vruler"><label>Vertical Ruler Position:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="showcontrols"><label for="showhruler" data-i18n="controlbar.rulers.showhruler"></label><span><input type="checkbox" id="showhruler" checked=true></span></span>
+      <span id="showcontrols"><label for="showvruler" data-i18n="controlbar.rulers.showvruler"></label><span><input type="checkbox" id="showvruler" checked=true></span></span>
+      <span id="hruler"><label data-i18n="controlbar.rulers.hruler"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="vruler"><label data-i18n="controlbar.rulers.vruler"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
     </div>
   </div>
   <div class="controlpanel" id="display">
-    <button class="accordion">Display</button>
+    <button class="accordion" data-i18n="controlbar.display.name"></button>
     <div class="panel">
-      <span id="showcontrols"><label for="showovals">Show Threads</label><span><input type="checkbox" id="showovals" checked=true></span></span>
-      <span id="showcontrols"><label for="showlower">Show Threading Diagram</label><span><input type="checkbox" id="showlower" checked=true></span></span>
-      <span id="showcontrols"><label for="showreversal">Show Reversal Points</label><span><input type="checkbox" id="showreversal" checked=true></span></span>
-      <span id="showcontrols"><label for="showtext">Show Text Description</label><span><input type="checkbox" id="showtext" checked=false></span></span>
-      <span id="saturationcontrols"><label>Backwards Turn Saturation:</label><input type="range" min="0" max="255" id="GREYSLIDER" value="144"></input></span>
-      <span id="scalecontrols"><label>Visual Scale:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="showcontrols"><label for="showovals" data-i18n="controlbar.display.showovals"></label><span><input type="checkbox" id="showovals" checked=true></span></span>
+      <span id="showcontrols"><label for="showlower" data-i18n="controlbar.display.showlower"></label><span><input type="checkbox" id="showlower" checked=true></span></span>
+      <span id="showcontrols"><label for="showreversal" data-i18n="controlbar.display.showreversal"></label><span><input type="checkbox" id="showreversal" checked=true></span></span>
+      <span id="showcontrols"><label for="showtext" data-i18n="controlbar.display.showtext"></label><span><input type="checkbox" id="showtext" checked=false></span></span>
+      <span id="saturationcontrols"><label data-i18n="controlbar.display.saturationcontrols"></label><input type="range" min="0" max="255" id="GREYSLIDER" value="144"></input></span>
+      <span id="scalecontrols"><label data-i18n="controlbar.display.scalecontrols"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
     </div>
   </div>
 
   <div class="controlpanel" id="repeats">
-    <button class="accordion">Repeats</button>
+    <button class="accordion" data-i18n="controlbar.repeats.name"></button>
     <div class="panel">
-      <span id="showrepeat"><label for="showrepeats">Show Repeats</label><span><input type="checkbox" id="showrepeats" checked=false></span></span>
-      <span id="repeatstart"><label>Repeat Starting at Pick:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
-      <span id="repeatend"><label>Repeat Ending at Pick:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
-      <span id="numrepeats"><label>Number of Repeats:</label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="showrepeat"><label for="showrepeats" data-i18n="controlbar.repeats.showrepeat"></label><span><input type="checkbox" id="showrepeats" checked=false></span></span>
+      <span id="repeatstart"><label data-i18n="controlbar.repeats.repeatstart"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="repeatend"><label data-i18n="controlbar.repeats.repeatend"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
+      <span id="numrepeats"><label data-i18n="controlbar.repeats.numrepeats"></label><span><button class="minus">-</button><input class="readout" value="0"></input><button class="plus">+</button></span></span>
     </div>
   </div>
 
   <div id="resets">
-    <button class="accordion">Resets</button>
+    <button class="accordion" data-i18n="controlbar.resets.name"></button>
     <div class="panel">
-      <span><button id="reset">Reset All</button><button id="clear">Clear Pattern</button></span>
+      <span><button id="reset" data-i18n="controlbar.resets.reset"></button><button id="clear" data-i18n="controlbar.resets.clear"></button></span>
     </div>
   </div>
 
   <div id="palete">
-    <button class="accordion active">Palette</button>
+    <button class="accordion active" data-i18n="controlbar.palete.name"></button>
     <div id="fg" class="panel">
-      <label>Foreground Colour:</label>
+      <label data-i18n="controlbar.palete.fg"></label>
       <table>
         <tr>
           <td class="colorbox selected" id="EMPTYBOX">None</td>
@@ -140,7 +143,7 @@
           <td class="colornum" id="NUM12"></td>
         </tr>
       </table>
-      <label>Colour Name:</label> </label><label id="colourname"></label>
+      <label data-i18n="controlbar.palete.colourname"></label> <label id="colourname"></label>
       <div id="coloursliders">
         <span><label>Red:</label><input type="range" min="0" max="255"
         id="REDSLIDE" value="0"></input>
@@ -158,21 +161,21 @@
   </div>
 
   <div id="export">
-    <button class="accordion">Export</button>
+    <button class="accordion" data-i18n="controlbar.export.name"></button>
     <div class="panel">
       <div class="controlpanel">
         <div>
-          <span><label for="export_width">Export Width (px):</label><span><input class="readout" id="export_width" value=1920></input></span></span>
+          <span><label for="export_width" data-i18n="controlbar.export.export_width"></label><span><input class="readout" id="export_width" value=1920></input></span></span>
         </div>
       </div>
       <div id="draftexport">
-        <h4>Draft</h4>
+        <h4 data-i18n="controlbar.export.draftexport"></h4>
         <span><button id="svg">SVG</button></span>
         <span><button id="jpeg">JPEG</button></span>
         <span><button id="png">PNG</button></span>
       </div>
       <div id="repeatexport">
-        <h4>Repeat</h4>
+        <h4 data-i18n="controlbar.export.repeatexport"></h4>
         <span><button id="svg">SVG</button></span>
         <span><button id="jpeg">JPEG</button></span>
         <span><button id="png">PNG</button></span>
@@ -181,10 +184,10 @@
   </div>
 
   <div id="fileio">
-    <button class="accordion">Files</button>
+    <button class="accordion" data-i18n="controlbar.fileio.name"></button>
     <div class="panel">
-      <span><button id="save">Save</button></span>
-      <span><label>Load:</label><input type="file" accept="application/json,.tdd"
+      <span><button id="save" data-i18n="controlbar.fileio.save"></button></span>
+      <span><label data-i18n="controlbar.fileio.load"></label><input type="file" accept="application/json,.tdd"
         id="load"></input></span>
     </div>
   </div>
@@ -193,9 +196,7 @@
 
 
 <div id="copyright">Tablet Weaving Draft Designer Copyright &copy; 2015-2021
-  James P. Weaver and Catherine Weaver. The copyright of drafts designed with this
-  software rests with the designer of the draft, not of the
-  software.
+  James P. Weaver and Catherine Weaver. <span data-i18n="copyright"></span>
 </div>
 
 </body> </html>

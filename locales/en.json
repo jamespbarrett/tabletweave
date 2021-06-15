@@ -1,0 +1,78 @@
+{
+  "instructions": "Click Here for Instructions",
+  "instructionlink": "Tips on using the new Pattern Repeat tool",
+  "blogvert": "For more tablet weaving drafts, information and help with tablet weaving, please ",
+  "blogvertlink": "read my blog",
+  "blogvert2": ".",
+  "textinstructions": {
+    "threading": "Threading:",
+    "turning": "Turning:"
+  },
+  "controlbar": {
+    "draftname": "Draft Name",
+    "controls": {
+      "name": "Controls",
+      "picks": "Picks:",
+      "holes": "Number of Holes:",
+      "tablets": "Number of Tablets:"
+    },
+    "rulers": {
+      "name": "Rulers",
+      "showhruler": "Show Horizontal Ruler",
+      "showvruler": "Show Vertical Ruler",
+      "hruler": "Horizontal Ruler Position:",
+      "vruler": "Vertical Ruler Position:"
+    },
+    "display": {
+      "name": "Display",
+      "showovals": "Show Threads",
+      "showlower": "Show Threading Diagram",
+      "showreversal": "Show Reversal Points",
+      "showtext": "Show Text Description",
+      "saturationcontrols": "Backwards Turn Saturation:",
+      "scalecontrols": "Visual Scale:"
+    },
+    "repeats": {
+      "name": "Repeats",
+      "showrepeat": "Show Repeats",
+      "repeatstart": "Repeat Starting at Pick:",
+      "repeatend": "Repeat Ending at Pick:",
+      "numrepeats": "Number of Repeats:"
+    },
+    "resets": {
+      "name": "Resets",
+      "reset": "Reset All",
+      "clear": "Clear Pattern"
+    },
+    "palete": {
+      "name": "Palette",
+      "fg": "Foreground Colour:",
+      "colourname": "Colour Name:"
+    },
+    "export": {
+      "name": "Export",
+      "export_width": "Export Width (px):",
+      "draftexport": "Draft",
+      "repeatexport": "Repeat"
+    },
+    "fileio": {
+      "name": "Files",
+      "save": "Save",
+      "load": "Load:"
+    }
+  },
+  "copyright": "The copyright of drafts designed with this software rests with the designer of the draft, not of the software.",
+  "howto": {
+    "title": "Tablet Weaving Draft Designer Instructions",
+    "explanation": "TDD is designed to produce tablet weaving patterns with two sections; the threading diagram and the turning diagram. The threading diagram (at the bottom) shows how the tablets should be set up and the turning diagram (at the top) shows how forwards and backwards turns of the tablets will make the pattern. Each column of the turning diagram represents one tablet and each row represents a single pick (or row) of weaving. Each oval in both the threading and turning diagrams represent a single warp thread.",
+    "no1": "Use the controls to select the number of tablets you want, how many holes they should have, and how many picks you want the turning diagram to have.",
+    "no2": "Select the threading of each tablet by clicking on the S or Z below the threading diagram. The letters correspond to the way that the threads pass through the tablet, as described by Peter Collingwood in \"The Techniques of Tablet Weaving\". The oval shapes in the threading diagram correspond to the alignment of the tablets on the warp when viewed from above.",
+    "no3": "Click on a colour from the palette to select it, adjusting it using the RGB sliders if needed, and click on an oval in the threading diagram to change its colour. Select the \"none\" square in the palette, then click on an oval in the threading diagram to leave that hole empty. The number you see under each colour in the palette shows how many threads of each colour have been used in the threading diagram.",
+    "no4": "TDD will automatically update the turning diagram if you change the threading direction or the thread colours in the threading diagram.",
+    "no5": "The squares in the turning diagram with white backgrounds show that the tablet should be turned forwards; click on the square to change the background to grey to show that the tablet should turn backwards. Every pick above the point where you changed the turning direction will also change turning direction automatically. During weaving, the warp threads will twine (twist) in the direction shown by the ovals of the turning diagram.",
+    "no6": "You can save your work as a tdd file or turn the pattern into an svg, jpeg, or png image file.",
+    "no7": "More advanced features are included, such as repeating pattern sections, and configurable rulers which you can position on the draft to make things easier for you. These advanced features are turned off by default, but you can find them in the control panel.",
+    "blog": "More help on how to use TDD, as well as tutorials, patterns and a gallery of woven bands, can be found on Catherine's blog at",
+    "mail": "If you have any bugs, comments, or suggestions please contact us at "
+  }
+}
