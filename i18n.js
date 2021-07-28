@@ -1,12 +1,23 @@
 $(function() {
-	var lang = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
-	lang = lang.split("-")[0];
+	var lang = "en";
+
+	if (navigator.languages) {
+		for (const full_lang of navigator.languages) {
+			lang = full_lang.split("-")[0];
+			if (lang == "en" || lang == "ja") {
+				break;
+			}
+		}
+	} else {
+		lang = (navigator.language || navigator.userLanguage).split("-")[0];
+	}
 
 	i18next.use(i18nextXHRBackend).init({
 		lng: lang,
 		debug: false,
-		fallbackLng: false,
-		defaultLng: 'en',
+		fallbackLng: 'en',
+		supportedLngs: ['en', 'ja'],
+		nonExplicitSupportedLngs: true,
 		backend: {
 			loadPath: 'locales/{{lng}}.json'
 		}
