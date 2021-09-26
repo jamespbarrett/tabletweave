@@ -27,14 +27,14 @@ h4 {
     display: inline-block;
     position: absolute;
     left: 400px;
-    top: 170px;
+    top: 200px;
 }
 
 #textinstructions {
     display: inline-block;
     position: absolute;
     left: 400px;
-    top: 170px;
+    top: 200px;
     background-color: #FFFFFF;
     border: 1px solid black;
     padding: 5px 5px 5px;
@@ -44,12 +44,12 @@ h4 {
     display: inline-block;
     position: absolute;
     left: 900px;
-    top: 170px;
+    top: 200px;
 }
 
 #controlbar {
     position: fixed;
-    top: 160px;
+    top: 190px;
     left: 0px;
     width: 350px;
     bottom: 28px;
@@ -140,6 +140,10 @@ div.controlpanel > div > span > span {
     width:100%;
 }
 
+#copyright_notice {
+    width:100%;
+}
+
 .instructionlink {
     font-size: 200%;
     text-align: center;
@@ -148,6 +152,11 @@ div.controlpanel > div > span > span {
 }
 
 .blogvert {
+    font-size: 100%;
+    text-align: center;
+}
+
+.copyright_notice {
     font-size: 100%;
     text-align: center;
 }

@@ -74,5 +74,17 @@
     "no7": "More advanced features are included, such as repeating pattern sections, and configurable rulers which you can position on the draft to make things easier for you. These advanced features are turned off by default, but you can find them in the control panel.",
     "blog": "More help on how to use TDD, as well as tutorials, patterns and a gallery of woven bands, can be found on Catherine's blog at",
     "mail": "If you have any bugs, comments, or suggestions please contact us at "
+  },
+  "copyright_notice": {
+    "explanation": "For more details on copyright and usage please click ",
+    "link": "here",
+    "explanation2": "",
+    "title": "Copyright of Drafts",
+    "no1": "Tabletweaving Draft Designer is provided free of charge for use in creating, editing, viewing, and otherwise working with tablet weaving drafts. We do not currently plan to ever charge for it.",
+    "no2": "Any draft you create using this software is YOURS, and you may use it however you wish. This applies to both the computer-readable .tdd file and any human readable output format (.txt, .png. .svg, .jpg, etc...).",
+    "no3": "You MAY use these drafts in commercial work if you wish.",
+    "no4_start": "We ASK (but do not require) that you include a statement that the drafts were designed using TDD and a link to TDD (",
+    "no4_end": ") so that others might find it more easily.",
+    "no5": "If you wish to give us money, links to Catherine's books can be found here:"
   }
 }

@@ -75,5 +75,17 @@
     "no7": "リピートパターンセクションや、ドラフトに配置して作業を簡単にする設定可能なルーラーなど、より高度な機能があります。これらの高度な機能はデフォルトでオフになっていますが、コントロールパネルで見つけることができます。",
     "blog": "TDDの使用方法の詳細、チュートリアル、パターン、織ったバンドのギャラリーは、以下のCatherineのブログにあります。",
     "mail": "バグ、コメント、提案がある場合は、以下までお問い合わせください："
+  },
+  "copyright_notice": {
+    "explanation": "英語で著作権の通知は",
+    "link": "ここ",
+    "explanation2": "です。",
+    "title": "Copyright of Drafts",
+    "no1": "Tabletweaving Draft Designer is provided free of charge for use in creating, editing, viewing, and otherwise working with tablet weaving drafts. We do not currently plan to ever charge for it.",
+    "no2": "Any draft you create using this software is YOURS, and you may use it however you wish. This applies to both the computer-readable .tdd file and any human readable output format (.txt, .png. .svg, .jpg, etc...).",
+    "no3": "You MAY use these drafts in commercial work if you wish.",
+    "no4_start": "We ASK (but do not require) that you include a statement that the drafts were designed using TDD and a link to TDD (",
+    "no4_end": ") so that others might find it more easily.",
+    "no5": "If you wish to give us money, links to Catherine's books can be found here:"
   }
 }
