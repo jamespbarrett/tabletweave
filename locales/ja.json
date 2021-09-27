@@ -82,8 +82,8 @@
     "explanation2": "です。",
     "title": "Copyright of Drafts",
     "no1": "Tabletweaving Draft Designer is provided free of charge for use in creating, editing, viewing, and otherwise working with tablet weaving drafts. We do not currently plan to ever charge for it.",
-    "no2": "Any draft you create using this software is YOURS, and you may use it however you wish. This applies to both the computer-readable .tdd file and any human readable output format (.txt, .png. .svg, .jpg, etc...).",
-    "no3": "You MAY use these drafts in commercial work if you wish.",
+    "no2": "Any draft created using this software belongs to THE PERSON WHO DESIGNED IT, and that person may use it however they wish. This applies to both the computer-readable .tdd file and any human readable output format (.txt, .png. .svg, .jpg, etc...).",
+    "no3": "You MAY use drafts you designed yourself in commercial work if you wish.",
     "no4_start": "We ASK (but do not require) that you include a statement that the drafts were designed using TDD and a link to TDD (",
     "no4_end": ") so that others might find it more easily.",
     "no5": "If you wish to give us money, links to Catherine's books can be found here:"
