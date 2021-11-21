@@ -301,7 +301,7 @@ function TDDDraftFromString(raw) {
 
   // Discard empty lines
   var line = lines.shift();
-  while(line.match(/^(#.*)?\s*$/)) {
+  while(line.match(/^(#.*)?$/)) {
     line = lines.shift();
   }
 
