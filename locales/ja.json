@@ -27,6 +27,7 @@
     "display": {
       "name": "表示",
       "showovals": "糸の向きを表示",
+      "showupper": "回し方図を表示",
       "showlower": "通し方図を表示",
       "showreversal": "反転位置を表示",
       "showtext": "テキストでの説明表示",
