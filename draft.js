@@ -14,6 +14,7 @@ function control_vals() {
     });
 
     return {
+        lockdraft: $("#lockdraft").prop("checked"),
         fgcol: fgcol,
         scale: $('#scalecontrols .readout').val(),
         showtext: $("#showtext").prop("checked"),
@@ -51,6 +52,7 @@ function loadFromLocal() {
         fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
 
         $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
+        $("#lockdraft").prop("checked", ((controls.lockdraft != undefined)?controls.lockdraft:false));
         $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
         $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
         $("#showupper").prop("checked", ((controls.showupper != undefined)?controls.showupper:true));
@@ -248,25 +250,27 @@ function redrawControls() {
 }
 
 function draftClick(e) {
-    const pt = this.createSVGPoint();
-    pt.x = e.clientX;
-    pt.y = e.clientY;
-    const svgP = pt.matrixTransform( this.getScreenCTM().inverse() );
-    var tablet = view.svg_coord_to_tablet(svgP.x, view, draft);
-    var pick = view.svg_coord_to_pick(svgP.y, draft);
-    var hole = view.svg_coord_to_hole(svgP.y, draft);
+    if (!$("#lockdraft").prop("checked")) {
+        const pt = this.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const svgP = pt.matrixTransform( this.getScreenCTM().inverse() );
+        var tablet = view.svg_coord_to_tablet(svgP.x, view, draft);
+        var pick = view.svg_coord_to_pick(svgP.y, draft);
+        var hole = view.svg_coord_to_hole(svgP.y, draft);
 
-    if (tablet >= 0) {
-        if (pick >= 0) {
-            draft.reverse(tablet, pick);
-        } else if (hole >= 0) {
-            draft.setThreadColour(tablet, hole, fgcol);
-        } else {
-            draft.flip(tablet);
+        if (tablet >= 0) {
+            if (pick >= 0) {
+                draft.reverse(tablet, pick);
+            } else if (hole >= 0) {
+                draft.setThreadColour(tablet, hole, fgcol);
+            } else {
+                draft.flip(tablet);
+            }
+
+            saveToLocal();
+            redraw();
         }
-
-        saveToLocal();
-        redraw();
     }
 }
 
@@ -399,6 +403,7 @@ function reset() {
     draft = new TDDDraft();
 
     $('#scalecontrols .readout').val(0);
+    $("#lockdraft").prop("checked", false);
     $("#showovals").prop("checked", true);
     $("#showupper").prop("checked", true);
     $("#showlower").prop("checked", true);
@@ -477,6 +482,7 @@ $(function() {
     setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
     setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
     setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
+    $("#lockdraft").change(function() { saveToLocal(); });
 
     setupNumberInput("hruler", function() { return -draft.holes(); }, function() { return draft.picks() + 1; }, function() {
         view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
