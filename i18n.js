@@ -19,7 +19,10 @@ $(function() {
 		supportedLngs: ['en', 'ja'],
 		nonExplicitSupportedLngs: true,
 		backend: {
-			loadPath: 'locales/{{lng}}.json'
+			loadPath: 'locales/{{lng}}.json',
+			customHeaders: {
+				"Cache-Control": "no-cache"
+			}
 		}
 	}, function (err, t) {
 		jqueryI18next.init(i18next, $);

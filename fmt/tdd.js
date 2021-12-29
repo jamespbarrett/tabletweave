@@ -5,6 +5,22 @@
 class TDDDraft {
   constructor() {
     this.name   = "untitled draft";
+    this.resetPalette();
+    this.threadingColours = [
+      ['1'],
+      ['1'],
+      ['1'],
+      ['1']
+    ];
+    this.threading = [
+      'Z'
+    ];
+    this.turning = [
+      ['\\']
+    ];
+  }
+
+  resetPalette() {
     this.palette = {
       '0': new RGBColour(255, 255, 255),
       '1': new RGBColour(0, 0, 0),
@@ -19,18 +35,6 @@ class TDDDraft {
       'a': new RGBColour(255, 136, 0),
       'b': new RGBColour(255, 136, 136)
     };
-    this.threadingColours = [
-      ['1'],
-      ['1'],
-      ['1'],
-      ['1']
-    ];
-    this.threading = [
-      'Z'
-    ];
-    this.turning = [
-      ['\\']
-    ];
   }
 
   toString() {

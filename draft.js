@@ -517,6 +517,7 @@ $(function() {
 
     $("#clear").click(function() { draft.clearTurning(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
     $("#reset").click(function() { reset(); });
+    $("#resetpallette").click(function() { draft.resetPalette(); setControlsFromDraft(); saveToLocal; redraw(); redrawControls(); })
 
     $('#draftexport #svg').click(function() { exportDraft('image/svg+xml', view.root()); });
     $('#draftexport #jpeg').click(function() { exportDraft('image/jpeg', view.root()); });
