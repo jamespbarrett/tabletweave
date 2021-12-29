@@ -16,7 +16,7 @@ class TDDSVGView {
         $(parent).svg();
         this.svg = $(parent).svg('get');
 
-        this.labelwidth = 200;
+        this.labelwidth = 30;
 
         // Height and width will really be set when we
         // conform to a draft, for now set some defaults
@@ -66,7 +66,9 @@ class TDDSVGView {
         }
 
         // Settings
+        this.show_turning=true;
         this.show_threading=true;
+        this.showing_turning=true;
         this.showing_threading=true;
         this.show_ovals=true;
         this.show_reversals=true;
@@ -131,6 +133,10 @@ class TDDSVGView {
         this.show_threading = val;
     }
 
+    showTurning(val) {
+        this.show_turning = val;
+    }
+
     showOvals(val) {
         this.show_ovals = val;
     }
@@ -173,8 +179,9 @@ class TDDSVGView {
 
     conform (draft) {
         const num_picks = (this.repeats == undefined)?draft.picks():(this.end_pick - this.start_pick + 1)*this.repeats;
-        if (this.labelwidth != ("" + num_picks).length * 10 + labelpadding*2) {
-            this.labelwidth = ("" + num_picks).length * 10 + labelpadding*2;
+        const labelwidth = ((this.show_turning)?(("" + num_picks).length * 10):10) + labelpadding*2;
+        if (this.labelwidth != labelwidth) {
+            this.labelwidth = labelwidth;
             while (this.labels.picks.length > 0) {
                 $(this.labels.picks.pop()).remove();
             }
@@ -212,7 +219,8 @@ class TDDSVGView {
             ) ||
             this.threading.length != draft.tablets() ||
             (this.threading.length > 0 && this.threading[0].holes.length != draft.holes()) ||
-            (this.show_threading != this.showing_threading)
+            (this.show_threading != this.showing_threading) ||
+            (this.show_turning != this.showing_turning)
         ) {
             this.conform_size(draft);
         }
@@ -226,17 +234,21 @@ class TDDSVGView {
         const num_picks = (this.repeats == undefined)?draft.picks():(this.end_pick - this.start_pick + 1)*this.repeats;
 
         // First calculate the sizes
-        const threading_start_y = (
+        const threading_start_y = (this.show_turning)?(
             (cellborder + cellheight)*num_picks +
             intertablegap
-        );
+        ):0;
 
         const fullheight = (
-            cellborder +
-            (cellborder + cellheight)*num_picks +
-            cellborder +
-            cellheight +
             (
+                (this.show_turning)?
+                (
+                    cellborder +
+                    (cellborder + cellheight)*num_picks +
+                    cellborder +
+                    cellheight
+                ):0 
+            ) + (
               (this.show_threading)?
               (
                 intertablegap +
@@ -414,84 +426,96 @@ class TDDSVGView {
     }
 
     conform_turning (draft) {
-        var tablet_position = [];
-        for (var x = 0; x < draft.tablets(); x++) {
-            tablet_position[x] = draft.holes() - 1;
-        }
-
-        if (this.repeats != undefined) {
-            var y;
-            for (y = draft.picks() - 1; y > draft.picks() - this.start_pick; y--) {
-                if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
-                    tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
-                } else {
-                    tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
-                }
+        if (this.show_turning) {
+            $(this.root()).append(this.main_group);
+            $(this.root()).append(this.overlay);
+            $(this.main_group).attr('visibility', 'visible');
+            $(this.overlay).attr('visibility', 'visible');
+            
+            var tablet_position = [];
+            for (var x = 0; x < draft.tablets(); x++) {
+                tablet_position[x] = draft.holes() - 1;
             }
-            const ppr = this.end_pick - this.start_pick + 1;
-            var cell = this.turning.length - 1;
 
-            while (cell >= 0) {
-                for (y = draft.picks() - this.start_pick; y >= draft.picks() - this.end_pick; y--) {
-                    //alert("y: " + y + " cell: " + cell);
-
-                    for (var x = 0; x < draft.tablets(); x++) {
-                        var fg;
-
-                        this.set_cell_direction(this.turning[cell][x], draft.turning[y][x]);
-                        this.set_cell_background(this.turning[cell][x], this.forwardcolour);
-                        if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
-                            fg = draft.threadColour(x, tablet_position[x]);
-                            this.turning[cell][x].b = false;
-                            tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
-                        } else {
-                            fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
-                            this.turning[cell][x].b = true;
-                            tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
-                        }
-                        this.set_cell_colour(this.turning[cell][x], fg);
-                        this.set_cell_reverse_marker(this.turning[cell][x], false);
-                    }
-
-                    cell--;
-                }
-            }
-        } else {
-            for (var y = draft.picks() - 1; y >= 0; y--) {
-                for (var x = 0; x < draft.tablets(); x++) {
-                    var fg;
-                    this.set_cell_direction(this.turning[y][x], draft.turning[y][x]);
+            if (this.repeats != undefined) {
+                var y;
+                for (y = draft.picks() - 1; y > draft.picks() - this.start_pick; y--) {
                     if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
-                        this.set_cell_background(this.turning[y][x], this.forwardcolour);
-                        fg = draft.threadColour(x, tablet_position[x]);
-                        this.turning[y][x].b = false;
                         tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
                     } else {
-                        this.set_cell_background(this.turning[y][x], this.backwardcolour);
-                        fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
-                        this.turning[y][x].b = true;
                         tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
                     }
-                    if (this.show_ovals) {
-                        this.set_cell_colour(this.turning[y][x], fg);
-                    } else {
-                        this.set_cell_colour(this.turning[y][x], undefined);
+                }
+                const ppr = this.end_pick - this.start_pick + 1;
+                var cell = this.turning.length - 1;
+
+                while (cell >= 0) {
+                    for (y = draft.picks() - this.start_pick; y >= draft.picks() - this.end_pick; y--) {
+                        //alert("y: " + y + " cell: " + cell);
+
+                        for (var x = 0; x < draft.tablets(); x++) {
+                            var fg;
+
+                            this.set_cell_direction(this.turning[cell][x], draft.turning[y][x]);
+                            this.set_cell_background(this.turning[cell][x], this.forwardcolour);
+                            if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
+                                fg = draft.threadColour(x, tablet_position[x]);
+                                this.turning[cell][x].b = false;
+                                tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+                            } else {
+                                fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
+                                this.turning[cell][x].b = true;
+                                tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+                            }
+                            this.set_cell_colour(this.turning[cell][x], fg);
+                            this.set_cell_reverse_marker(this.turning[cell][x], false);
+                        }
+
+                        cell--;
                     }
-                    this.set_cell_reverse_marker(this.turning[y][x], (
-                        (y != draft.picks() - 1) &&
-                        (this.turning[y][x].b != this.turning[y+1][x].b) &&
-                        this.show_reversals
-                    ));
+                }
+            } else {
+                for (var y = draft.picks() - 1; y >= 0; y--) {
+                    for (var x = 0; x < draft.tablets(); x++) {
+                        var fg;
+                        this.set_cell_direction(this.turning[y][x], draft.turning[y][x]);
+                        if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
+                            this.set_cell_background(this.turning[y][x], this.forwardcolour);
+                            fg = draft.threadColour(x, tablet_position[x]);
+                            this.turning[y][x].b = false;
+                            tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+                        } else {
+                            this.set_cell_background(this.turning[y][x], this.backwardcolour);
+                            fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
+                            this.turning[y][x].b = true;
+                            tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+                        }
+                        if (this.show_ovals) {
+                            this.set_cell_colour(this.turning[y][x], fg);
+                        } else {
+                            this.set_cell_colour(this.turning[y][x], undefined);
+                        }
+                        this.set_cell_reverse_marker(this.turning[y][x], (
+                            (y != draft.picks() - 1) &&
+                            (this.turning[y][x].b != this.turning[y+1][x].b) &&
+                            this.show_reversals
+                        ));
+                    }
                 }
             }
+            this.showing_turning = true;
+        } else {
+            $(this.main_group).detach();
+            $(this.overlay).detach();
+            this.showing_turning = false;
         }
     }
 
     conform_rulers (draft) {
-        const threading_start_y = (
+        const threading_start_y = (this.show_turning)?(
             (cellborder + cellheight)*draft.picks() +
             intertablegap
-        );
+        ):0;
 
         if (this.hruler_position == undefined) {
             $(this.hruler).attr('visibility', 'hidden');
@@ -507,7 +531,11 @@ class TDDSVGView {
                 $(this.hruler).attr('y1', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
                 $(this.hruler).attr('y2', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
 
-                $(this.hruler).attr('visibility', 'visible');
+                if (this.show_turning) {
+                    $(this.hruler).attr('visibility', 'visible');
+                } else {
+                    $(this.hruler).attr('visibility', 'hidden');
+                }
                 this.ruler_group.append(this.hruler);
             } else {
                 $(this.hruler).attr('y1', threading_start_y - (cellborder + cellheight)*this.hruler_position);
@@ -527,19 +555,27 @@ class TDDSVGView {
             $(this.vruler.turning).attr('x1', this.labelwidth);
             $(this.vruler.turning).attr('y1', 0);
             $(this.vruler.turning).attr('x2', this.labelwidth);
-            $(this.vruler.turning).attr('y2', (cellheight + cellborder)*draft.picks() + cellborder);
+            $(this.vruler.turning).attr('y2', 0);
 
             $(this.vruler.threading).attr('visibility', 'hidden');
             $(this.vruler.threading).attr('x1', this.labelwidth);
             $(this.vruler.threading).attr('y1', threading_start_y);
             $(this.vruler.threading).attr('x2', this.labelwidth);
-            $(this.vruler.threading).attr('y2', threading_start_y + (cellheight + cellborder)*draft.holes() + cellborder);
+            $(this.vruler.threading).attr('y2', threading_start_y);
         } else {
-            $(this.vruler.turning).attr('visibility', 'visible');
-            $(this.vruler.turning).attr('x1', this.labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
-            $(this.vruler.turning).attr('y1', 0);
-            $(this.vruler.turning).attr('x2', this.labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
-            $(this.vruler.turning).attr('y2', (cellheight + cellborder)*draft.picks() + cellborder);
+            if (this.show_turning) {
+                $(this.vruler.turning).attr('visibility', 'visible');
+                $(this.vruler.turning).attr('x1', this.labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
+                $(this.vruler.turning).attr('y1', 0);
+                $(this.vruler.turning).attr('x2', this.labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
+                $(this.vruler.turning).attr('y2', (cellheight + cellborder)*draft.picks() + cellborder);
+            } else {
+                $(this.vruler.turning).attr('visibility', 'hidden');
+                $(this.vruler.turning).attr('x1', this.labelwidth);
+                $(this.vruler.turning).attr('y1', 0);
+                $(this.vruler.turning).attr('x2', this.labelwidth);
+                $(this.vruler.turning).attr('y2', 0);
+            }
 
             if (this.show_threading) {
                 $(this.vruler.threading).attr('visibility', 'visible');
@@ -550,6 +586,10 @@ class TDDSVGView {
                 $(this.vruler.threading).attr('y2', threading_start_y + (cellheight + cellborder)*draft.holes() + cellborder);
             } else {
                 $(this.vruler.threading).attr('visibility', 'hidden');
+                $(this.vruler.threading).attr('x1', this.labelwidth);
+                $(this.vruler.threading).attr('y1', threading_start_y);
+                $(this.vruler.threading).attr('x2', this.labelwidth);
+                $(this.vruler.threading).attr('y2', threading_start_y);
             }
         }
     }
@@ -668,43 +708,44 @@ class TDDSVGView {
             $(cell.revline).attr('visibility', 'hidden');
         }
     }
+
+    svg_coord_to_tablet(x, view, draft) {
+        const num_picks = (view.repeats == undefined)?draft.picks():(view.end_pick - view.start_pick + 1)*view.repeats;
+        const labelwidth = ((this.show_turning)?(("" + num_picks).length * 10):10) + 2*labelpadding;
+    
+        if (x < labelwidth + cellborder/2) {
+          return -1;
+        } else {
+          return parseInt((x - labelwidth)/(cellborder + cellwidth));
+        }
+    }
+    
+    svg_coord_to_pick(y, draft) {
+        if (!this.show_turning || y >= (cellborder + cellheight)*draft.picks()) {
+          return -1;
+        } else {
+          return draft.picks() - parseInt(y/(cellborder + cellheight)) - 1;
+        }
+    }
+    
+    svg_coord_to_hole(y, draft) {
+        const threading_start_y = (this.show_turning)?(
+          (cellborder + cellheight)*draft.picks() +
+          intertablegap
+        ):0;
+    
+        const threading_end_y = (
+          threading_start_y +
+          (cellborder + cellheight)*draft.holes()
+        );
+    
+        if (y < threading_start_y) {
+          return -1;
+        } else if (y < threading_end_y) {
+          return parseInt((y - threading_start_y)/(cellborder + cellheight));
+        } else {
+          return -1;
+        }
+    }
 }
 
-function svg_coord_to_tablet(x, view, draft) {
-    const num_picks = (view.repeats == undefined)?draft.picks():(view.end_pick - view.start_pick + 1)*view.repeats;
-    const labelwidth = ("" + num_picks).length * 10;
-
-    if (x < labelwidth + cellborder/2) {
-      return -1;
-    } else {
-      return parseInt((x - labelwidth)/(cellborder + cellwidth));
-    }
-  }
-
-  function svg_coord_to_pick(y, draft) {
-    if (y >= (cellborder + cellheight)*draft.picks()) {
-      return -1;
-    } else {
-      return draft.picks() - parseInt(y/(cellborder + cellheight)) - 1;
-    }
-  }
-
-  function svg_coord_to_hole(y, draft) {
-    const threading_start_y = (
-      (cellborder + cellheight)*draft.picks() +
-      intertablegap
-    );
-
-    const threading_end_y = (
-      threading_start_y +
-      (cellborder + cellheight)*draft.holes()
-    );
-
-    if (y < threading_start_y) {
-      return -1;
-    } else if (y < threading_end_y) {
-      return parseInt((y - threading_start_y)/(cellborder + cellheight));
-    } else {
-      return -1;
-    }
-  }

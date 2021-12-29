@@ -26,6 +26,7 @@
     "display": {
       "name": "Display",
       "showovals": "Show Threads",
+      "showupper": "Show Turning Diagram",
       "showlower": "Show Threading Diagram",
       "showreversal": "Show Reversal Points",
       "showtext": "Show Text Description",

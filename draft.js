@@ -18,6 +18,7 @@ function control_vals() {
         scale: $('#scalecontrols .readout').val(),
         showtext: $("#showtext").prop("checked"),
         showovals: $("#showovals").prop("checked"),
+        showupper: $("#showupper").prop("checked"), 
         showlower: $("#showlower").prop("checked"),
         showreversal: $("#showreversal").prop("checked"),
         grey_saturation: $("#GREYSLIDER").val(),
@@ -51,6 +52,7 @@ function loadFromLocal() {
         $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
         $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
         $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
+        $("#showupper").prop("checked", ((controls.showupper != undefined)?controls.showupper:true));
         $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
         $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
         $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
@@ -248,9 +250,9 @@ function draftClick(e) {
     pt.x = e.clientX;
     pt.y = e.clientY;
     const svgP = pt.matrixTransform( this.getScreenCTM().inverse() );
-    var tablet = svg_coord_to_tablet(svgP.x, view, draft);
-    var pick = svg_coord_to_pick(svgP.y, draft);
-    var hole = svg_coord_to_hole(svgP.y, draft);
+    var tablet = view.svg_coord_to_tablet(svgP.x, view, draft);
+    var pick = view.svg_coord_to_pick(svgP.y, draft);
+    var hole = view.svg_coord_to_hole(svgP.y, draft);
 
     if (tablet >= 0) {
         if (pick >= 0) {
@@ -396,6 +398,7 @@ function reset() {
 
     $('#scalecontrols .readout').val(0);
     $("#showovals").prop("checked", true);
+    $("#showupper").prop("checked", true);
     $("#showlower").prop("checked", true);
     $("#showreversal").prop("checked", true);
     $("#showtext").prop("checked", false);
@@ -486,6 +489,7 @@ $(function() {
     });
 
     $("#showovals").change(function() { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
+    $("#showupper").change(function() { view.showTurning($("#showupper").prop('checked')); saveToLocal(); redraw(); });
     $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
     $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
     $("#showtext").change(function() {saveToLocal(); redraw(); });
@@ -534,6 +538,7 @@ $(function() {
     loadFromLocal();
 
     view.showOvals($("#showovals").prop('checked'));
+    view.showTurning($("#showupper").prop('checked'));
     view.showThreading($("#showlower").prop('checked'));
     view.showReversals($("#showreversal").prop('checked'));
     view.greySaturation(0x100 - $('#GREYSLIDER').val()) ;
