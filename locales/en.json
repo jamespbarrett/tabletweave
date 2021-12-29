@@ -31,7 +31,8 @@
       "showreversal": "Show Reversal Points",
       "showtext": "Show Text Description",
       "saturationcontrols": "Backwards Turn Saturation:",
-      "scalecontrols": "Visual Scale:"
+      "scalecontrols": "Visual Scale:",
+      "labelholescw": "Label holes clockwise"
     },
     "repeats": {
       "name": "Repeats",

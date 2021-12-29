@@ -21,6 +21,7 @@ function control_vals() {
         showupper: $("#showupper").prop("checked"), 
         showlower: $("#showlower").prop("checked"),
         showreversal: $("#showreversal").prop("checked"),
+        labelholescw: $("#labelholescw").prop("checked"),
         grey_saturation: $("#GREYSLIDER").val(),
         showhruler: $("#showhruler").prop("checked"),
         showvruler: $("#showvruler").prop("checked"),
@@ -56,6 +57,7 @@ function loadFromLocal() {
         $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
         $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
         $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
+        $("#labelholescw").prop("checked", ((controls.labelholescw != undefined)?controls.labelholescw:true));
         $("#showhruler").prop("checked", ((controls.showhruler != undefined)?controls.showhruler:true));
         $("#showvruler").prop("checked", ((controls.showvruler != undefined)?controls.showvruler:true));
         $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
@@ -403,6 +405,7 @@ function reset() {
     $("#showreversal").prop("checked", true);
     $("#showtext").prop("checked", false);
     $("#GREYSLIDER").val(144);
+    $("#labelholescw").prop("checked", true);
 
     $("#showhruler").prop("checked", false);
     $("#showvruler").prop("checked", false);
@@ -493,6 +496,7 @@ $(function() {
     $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
     $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
     $("#showtext").change(function() {saveToLocal(); redraw(); });
+    $("#labelholescw").change(function() { view.labelHolesCW($("#labelholescw").prop('checked')); saveToLocal(); redraw(); });
 
     $('#EMPTYBOX').click(function() { fgcol = -1; saveToLocal(); redrawControls(); });
     var i;
@@ -542,6 +546,7 @@ $(function() {
     view.showThreading($("#showlower").prop('checked'));
     view.showReversals($("#showreversal").prop('checked'));
     view.greySaturation(0x100 - $('#GREYSLIDER').val()) ;
+    view.labelHolesCW($("#labelholescw").prop('checked'));
     view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
     view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
 
