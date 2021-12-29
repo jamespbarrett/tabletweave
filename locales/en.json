@@ -42,7 +42,8 @@
     "resets": {
       "name": "Resets",
       "reset": "Reset All",
-      "clear": "Clear Pattern"
+      "clear": "Clear Pattern",
+      "pal": "Reset Palette"
     },
     "palete": {
       "name": "Palette",
