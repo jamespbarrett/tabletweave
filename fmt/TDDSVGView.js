@@ -415,8 +415,6 @@ class TDDSVGView {
             $(this.root()).append(this.threading_group);
             $(this.threading_group).attr('visibility', 'visible');
 
-
-
             for (var x = 0; x < draft.tablets(); x++) {
                 $(this.threading[x].direction).text(draft.threading[x]);
 
@@ -442,9 +440,7 @@ class TDDSVGView {
     conform_turning (draft) {
         if (this.show_turning) {
             $(this.root()).append(this.main_group);
-            $(this.root()).append(this.overlay);
             $(this.main_group).attr('visibility', 'visible');
-            $(this.overlay).attr('visibility', 'visible');
             
             var tablet_position = [];
             for (var x = 0; x < draft.tablets(); x++) {
@@ -520,7 +516,6 @@ class TDDSVGView {
             this.showing_turning = true;
         } else {
             $(this.main_group).detach();
-            $(this.overlay).detach();
             this.showing_turning = false;
         }
     }
@@ -606,6 +601,8 @@ class TDDSVGView {
                 $(this.vruler.threading).attr('y2', threading_start_y);
             }
         }
+        $(this.root()).append(this.ruler_group);
+        $(this.root()).append(this.threading_ruler_group);
     }
 
     create_cell (x, y, offset=0, group=this.main_group, overlay=this.overlay) {
