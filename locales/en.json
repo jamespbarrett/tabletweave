@@ -14,7 +14,8 @@
       "name": "Controls",
       "picks": "Picks:",
       "holes": "Number of Holes:",
-      "tablets": "Number of Tablets:"
+      "tablets": "Number of Tablets:",
+      "lockdraft": "Lock draft"
     },
     "rulers": {
       "name": "Rulers",

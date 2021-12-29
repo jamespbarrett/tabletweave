@@ -15,7 +15,8 @@
       "name": "コントロール",
       "picks": "段数:",
       "holes": "穴の数:",
-      "tablets": "カード枚数:"
+      "tablets": "カード枚数:",
+      "lockdraft": "ドラフトの鍵をかける"
     },
     "rulers": {
       "name": "ルーラー",
