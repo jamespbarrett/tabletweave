@@ -6,6 +6,8 @@ const cellborder = 2;
 const rulerwidth = 3;
 const intertablegap = 25;
 
+const labelpadding = 3;
+
 const hole_labels = [ "A", "B", "C", "D", "E", "F", "G", "H" ];
 
 class TDDSVGView {
@@ -14,7 +16,7 @@ class TDDSVGView {
         $(parent).svg();
         this.svg = $(parent).svg('get');
 
-        this.labelwidth = 30;
+        this.labelwidth = 200;
 
         // Height and width will really be set when we
         // conform to a draft, for now set some defaults
@@ -171,8 +173,8 @@ class TDDSVGView {
 
     conform (draft) {
         const num_picks = (this.repeats == undefined)?draft.picks():(this.end_pick - this.start_pick + 1)*this.repeats;
-        if (this.labelwidth != ("" + num_picks).length * 10) {
-            this.labelwidth = ("" + num_picks).length * 10;
+        if (this.labelwidth != ("" + num_picks).length * 10 + labelpadding*2) {
+            this.labelwidth = ("" + num_picks).length * 10 + labelpadding*2;
             while (this.labels.picks.length > 0) {
                 $(this.labels.picks.pop()).remove();
             }
@@ -264,7 +266,7 @@ class TDDSVGView {
             $(this.labels.picks.pop()).remove();
         }
         for (var y = 0; y < this.labels.picks.length; y++) {
-            $(this.labels.picks[y]).attr('x', this.labelwidth - 3);
+            $(this.labels.picks[y]).attr('x', this.labelwidth - labelpadding);
             $(this.labels.picks[y]).attr('y', (cellborder + cellheight)*(num_picks - y) - 5);
             if (this.repeats != undefined) {
                 $(this.labels.picks[y]).text("" + ((y%(this.end_pick - this.start_pick + 1)) + this.start_pick));
@@ -278,7 +280,7 @@ class TDDSVGView {
             }
             this.labels.picks.push(this.svg.text(
                 this.main_group,
-                this.labelwidth - 3,
+                this.labelwidth - labelpadding,
                 (cellborder + cellheight)*(num_picks - y) - 5,
                 label,
                 {stroke: "#000000", style: "font: 15px Arial; text-anchor: end;"}
@@ -290,14 +292,14 @@ class TDDSVGView {
             $(this.labels.holes.pop()).remove();
         }
         for (y = 0; y < this.labels.holes.length; y++) {
-            $(this.labels.holes[y]).attr('x', this.labelwidth - 3);
+            $(this.labels.holes[y]).attr('x', this.labelwidth - labelpadding);
             $(this.labels.holes[y]).attr('y', threading_start_y + (cellborder + cellheight)*(y + 1) - 5);
         }
         while (this.labels.holes.length < draft.holes()) {
             y = this.labels.holes.length;
             this.labels.holes.push(this.svg.text(
                 this.threading_main_group,
-                this.labelwidth - 3,
+                this.labelwidth - labelpadding,
                 threading_start_y + (cellborder + cellheight)*(y + 1) - 5,
                 hole_labels[y],
                 {stroke: "#000000", style: "font: 15px Arial; text-anchor: end;"}
