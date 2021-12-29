@@ -72,6 +72,8 @@ class TDDSVGView {
         this.showing_threading=true;
         this.show_ovals=true;
         this.show_reversals=true;
+        this.labelholescw=true;
+        this.labelingholescw=true;
         var grey_saturation=0x99;
         this.hruler_position=undefined;
         this.vruler_position=undefined;
@@ -143,6 +145,10 @@ class TDDSVGView {
 
     showReversals(val) {
         this.show_reversals = val;
+    }
+
+    labelHolesCW(val) {
+        this.labelholescw = val;
     }
 
     greySaturation(val) {
@@ -220,7 +226,8 @@ class TDDSVGView {
             this.threading.length != draft.tablets() ||
             (this.threading.length > 0 && this.threading[0].holes.length != draft.holes()) ||
             (this.show_threading != this.showing_threading) ||
-            (this.show_turning != this.showing_turning)
+            (this.show_turning != this.showing_turning) ||
+            (this.labelholescw != this.labelingholescw)
         ) {
             this.conform_size(draft);
         }
@@ -304,19 +311,23 @@ class TDDSVGView {
             $(this.labels.holes.pop()).remove();
         }
         for (y = 0; y < this.labels.holes.length; y++) {
+            const hole_label = this.labelholescw?hole_labels[y]:hole_labels[draft.holes() - y - 1];
             $(this.labels.holes[y]).attr('x', this.labelwidth - labelpadding);
             $(this.labels.holes[y]).attr('y', threading_start_y + (cellborder + cellheight)*(y + 1) - 5);
+            $(this.labels.holes[y]).text(hole_label);
         }
         while (this.labels.holes.length < draft.holes()) {
             y = this.labels.holes.length;
+            const hole_label = this.labelholescw?hole_labels[y]:hole_labels[draft.holes() - y - 1];
             this.labels.holes.push(this.svg.text(
                 this.threading_main_group,
                 this.labelwidth - labelpadding,
                 threading_start_y + (cellborder + cellheight)*(y + 1) - 5,
-                hole_labels[y],
+                hole_label,
                 {stroke: "#000000", style: "font: 15px Arial; text-anchor: end;"}
             ));
         }
+        this.labelingholescw = this.labelholescw;
 
         // Finally the tablets
         while (this.labels.tablets.length > draft.tablets()) {
@@ -403,6 +414,9 @@ class TDDSVGView {
         if (this.show_threading) {
             $(this.root()).append(this.threading_group);
             $(this.threading_group).attr('visibility', 'visible');
+
+
+
             for (var x = 0; x < draft.tablets(); x++) {
                 $(this.threading[x].direction).text(draft.threading[x]);
 
