@@ -15,7 +15,7 @@
       "picks": "Picks:",
       "holes": "Number of Holes:",
       "tablets": "Number of Tablets:",
-      "lockdraft": "Lock draft"
+      "lockdraft": "Lock Draft"
     },
     "rulers": {
       "name": "Rulers",
@@ -33,7 +33,7 @@
       "showtext": "Show Text Description",
       "saturationcontrols": "Backwards Turn Saturation:",
       "scalecontrols": "Visual Scale:",
-      "labelholescw": "Label holes clockwise"
+      "labelholescw": "Label Holes Clockwise"
     },
     "repeats": {
       "name": "Repeats",
