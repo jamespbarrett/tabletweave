@@ -162,11 +162,15 @@ function redraw() {
 
     if ($('#showtext').prop('checked')) {
         for (i=0; i < draft.tablets(); i++) {
-            $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i) + "</li>");
+            $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i) + " (" +  ($('#labelholescw').prop('checked')?'&#x21BB;': '&#x21BA;') + ")</li>");
             $('#threadinginstructions li').last().append('<ol type="A"></ol>');
             var ol = $('#threadinginstructions li').last().children().last();
             for (var j = 0; j < draft.holes(); j++) {
-                ol.append('<li>' + draft.describeHole(i, j) + '</li>');
+                if ($('#labelholescw').prop('checked')) {
+                    ol.append('<li>' + draft.describeHole(i, j) + '</li>');
+                } else {
+                    ol.append('<li>' + draft.describeHole(i, draft.holes() - j - 1) + '</li>');
+                }
             }
         }
 

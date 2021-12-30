@@ -440,6 +440,7 @@ class TDDSVGView {
     conform_turning (draft) {
         if (this.show_turning) {
             $(this.root()).append(this.main_group);
+            $(this.root()).append(this.overlay);
             $(this.main_group).attr('visibility', 'visible');
             
             var tablet_position = [];
@@ -516,6 +517,7 @@ class TDDSVGView {
             this.showing_turning = true;
         } else {
             $(this.main_group).detach();
+            $(this.overlay).detach();
             this.showing_turning = false;
         }
     }
@@ -526,7 +528,7 @@ class TDDSVGView {
             intertablegap
         ):0;
 
-        if (this.hruler_position == undefined) {
+        if (this.hruler_position == undefined || (!this.showing_turning && this.hruler_position > 0) || (!this.show_threading && this.hruler_position <= 0)) {
             $(this.hruler).attr('visibility', 'hidden');
             $(this.hruler).attr('x1', this.labelwidth - cellborder);
             $(this.hruler).attr('x2', this.labelwidth + cellborder + (cellborder + cellwidth)*draft.tablets());
@@ -537,24 +539,14 @@ class TDDSVGView {
             $(this.hruler).attr('x2', this.labelwidth + cellborder + (cellborder + cellwidth)*draft.tablets());
 
             if (this.hruler_position > 0) {
+                $(this.hruler).attr('visibility', 'visible');
                 $(this.hruler).attr('y1', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
                 $(this.hruler).attr('y2', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
-
-                if (this.show_turning) {
-                    $(this.hruler).attr('visibility', 'visible');
-                } else {
-                    $(this.hruler).attr('visibility', 'hidden');
-                }
                 this.ruler_group.append(this.hruler);
             } else {
+                $(this.hruler).attr('visibility', 'visible');
                 $(this.hruler).attr('y1', threading_start_y - (cellborder + cellheight)*this.hruler_position);
                 $(this.hruler).attr('y2', threading_start_y - (cellborder + cellheight)*this.hruler_position);
-
-                if (this.show_threading) {
-                    $(this.hruler).attr('visibility', 'visible');
-                } else {
-                    $(this.hruler).attr('visibility', 'hidden');
-                }
                 this.threading_ruler_group.append(this.hruler);
             }
         }
