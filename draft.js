@@ -46,38 +46,36 @@ function loadFromLocal() {
     var local_controls = localStorage.getItem("tdd-controls");
     var local_draft = localStorage.getItem("tdd-draft");
 
-    if (local_controls != undefined) {
-        var controls = JSON.parse(local_controls);
+    var controls = (local_controls != undefined)?JSON.parse(local_controls):{};
 
-        fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
+    fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
 
-        $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
-        $("#lockdraft").prop("checked", ((controls.lockdraft != undefined)?controls.lockdraft:false));
-        $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
-        $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
-        $("#showupper").prop("checked", ((controls.showupper != undefined)?controls.showupper:true));
-        $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
-        $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
-        $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
-        $("#labelholescw").prop("checked", ((controls.labelholescw != undefined)?controls.labelholescw:true));
-        $("#showhruler").prop("checked", ((controls.showhruler != undefined)?controls.showhruler:true));
-        $("#showvruler").prop("checked", ((controls.showvruler != undefined)?controls.showvruler:true));
-        $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
-        $("#vruler .readout").val((controls.vruler != undefined)?controls.vruler:0);
-        $("#export_width").val((controls.export_width != undefined)?controls.export_width:1920);
-        $("#showrepeats").prop("checked", ((controls.showrepeats != undefined)?controls.showrepeats:false));
-        $("#repeatstart .readout").val((controls.repeatstart != undefined)?controls.repeatstart:1);
-        $("#repeatend .readout").val((controls.repeatend != undefined)?controls.repeatend:1);
-        $("#numrepeats .readout").val((controls.numrepeats != undefined)?controls.numrepeats:1);
+    $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
+    $("#lockdraft").prop("checked", ((controls.lockdraft != undefined)?controls.lockdraft:false));
+    $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
+    $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
+    $("#showupper").prop("checked", ((controls.showupper != undefined)?controls.showupper:true));
+    $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
+    $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
+    $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
+    $("#labelholescw").prop("checked", ((controls.labelholescw != undefined)?controls.labelholescw:true));
+    $("#showhruler").prop("checked", ((controls.showhruler != undefined)?controls.showhruler:true));
+    $("#showvruler").prop("checked", ((controls.showvruler != undefined)?controls.showvruler:true));
+    $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
+    $("#vruler .readout").val((controls.vruler != undefined)?controls.vruler:0);
+    $("#export_width").val((controls.export_width != undefined)?controls.export_width:1920);
+    $("#showrepeats").prop("checked", ((controls.showrepeats != undefined)?controls.showrepeats:false));
+    $("#repeatstart .readout").val((controls.repeatstart != undefined)?controls.repeatstart:1);
+    $("#repeatend .readout").val((controls.repeatend != undefined)?controls.repeatend:1);
+    $("#numrepeats .readout").val((controls.numrepeats != undefined)?controls.numrepeats:1);
 
-        if (controls.accordion) {
-            for (const [key, value] of Object.entries(controls.accordion)) {
-                var but = $("#" + key + " .accordion");
-                if (value) {
-                    but.addClass('active');
-                } else {
-                    but.removeClass('active');
-                }
+    if (controls.accordion) {
+        for (const [key, value] of Object.entries(controls.accordion)) {
+            var but = $("#" + key + " .accordion");
+            if (value) {
+                but.addClass('active');
+            } else {
+                but.removeClass('active');
             }
         }
     }
