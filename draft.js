@@ -430,6 +430,41 @@ function reset() {
     redrawControls();
 }
 
+function textDescriptionString() {
+    var desc = " " + draft.name;
+    desc += "\n" + ("=".repeat(draft.name.length+2));
+    
+    desc += "\n\nThreading:";
+    for (var i=0; i < draft.tablets(); i++) {
+        desc += "\n * " + draft.describeTablet(i) + " (" +  String.fromCharCode($('#labelholescw').prop('checked')?0x21BB:0x21BA) + ")";
+        for (var j=0; j < draft.holes(); j++) {
+            var char = String.fromCharCode("A".charCodeAt(0) + j);
+            desc += "\n    " + char + ": ";
+            if ($('#labelholescw').prop('checked')) {
+                desc += draft.describeHole(i,j);
+            } else {
+                desc += draft.describeHole(i,draft.holes() - j - 1);
+            }
+        }
+    }
+    desc += "\n\nTurning:";
+    for (i=0; i < draft.picks(); i++) {
+        desc += "\n * " + draft.describePick(i);
+    }
+    desc += "\n";
+    return desc;
+}
+
+function exportTextDescription() {
+    var filename;
+    if (draft.name != "") {
+        filename = draft.name + ".txt";
+    } else {
+        filename = "draft.txt";
+    }
+    saveAs(new Blob([textDescriptionString()], {type: "text/plain"}), filename);
+}
+
 function exportDraft(mimetype, root) {
     var width = parseInt($("#export_width").val());
 
@@ -538,6 +573,7 @@ $(function() {
     $('#draftexport #svg').click(function() { exportDraft('image/svg+xml', view.root()); });
     $('#draftexport #jpeg').click(function() { exportDraft('image/jpeg', view.root()); });
     $('#draftexport #png').click(function() { exportDraft('image/png', view.root()); });
+    $('#draftexport #txt').click(function() { exportTextDescription(); });
 
     $('#repeatexport #svg').click(function() { exportDraft('image/svg+xml', repeat.root()); });
     $('#repeatexport #jpeg').click(function() { exportDraft('image/jpeg', repeat.root()); });
