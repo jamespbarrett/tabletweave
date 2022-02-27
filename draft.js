@@ -449,7 +449,7 @@ function textDescriptionString() {
     }
     desc += "\n\nTurning:";
     for (i=0; i < draft.picks(); i++) {
-        desc += "\n * " + draft.describePick(i);
+        desc += "\n " + (i+1) + ". " + draft.describePick(i);
     }
     desc += "\n";
     return desc;
