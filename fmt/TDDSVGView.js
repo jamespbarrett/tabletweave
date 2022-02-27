@@ -91,6 +91,7 @@ class TDDSVGView {
 
         // Stuctural elements for arranging the svg
         this.main_group = this.svg.group();
+        this.tablet_label_group = this.svg.group();
         this.overlay = this.svg.group();
         this.threading_group = this.svg.group();
         this.ruler_group = this.svg.group();
@@ -244,7 +245,7 @@ class TDDSVGView {
         const threading_start_y = (this.show_turning)?(
             (cellborder + cellheight)*num_picks +
             intertablegap
-        ):0;
+        ):intertablegap;
 
         const fullheight = (
             (
@@ -254,7 +255,7 @@ class TDDSVGView {
                     (cellborder + cellheight)*num_picks +
                     cellborder +
                     cellheight
-                ):0 
+                ):intertablegap 
             ) + (
               (this.show_threading)?
               (
@@ -340,7 +341,7 @@ class TDDSVGView {
         while (this.labels.tablets.length < draft.tablets()) {
             x = this.labels.tablets.length;
             this.labels.tablets.push(this.svg.text(
-                this.main_group,
+                this.tablet_label_group,
                 this.labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
                 threading_start_y - cellborder - 2,
                 "" + (x + 1),
@@ -526,7 +527,7 @@ class TDDSVGView {
         const threading_start_y = (this.show_turning)?(
             (cellborder + cellheight)*draft.picks() +
             intertablegap
-        ):0;
+        ):intertablegap;
 
         if (this.hruler_position == undefined || (!this.showing_turning && this.hruler_position > 0) || (!this.show_threading && this.hruler_position <= 0)) {
             $(this.hruler).attr('visibility', 'hidden');
