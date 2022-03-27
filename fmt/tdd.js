@@ -100,7 +100,7 @@ class TDDDraft {
     this.threadingColours = this.threadingColours.slice(0, Math.max(this.holes() - num), 1);
   }
 
-  addTablets(num) {
+  addTabletsRight(num) {
     var i;
     var j;
 
@@ -114,12 +114,13 @@ class TDDDraft {
       this.threading.push(this.threading[this.threading.length - 1]);
 
       for (i=0; i < this.threadingColours.length; i++) {
-        this.threadingColours[i].push(this.threadingColours[i][this.threadingColours[i].length - 1]);
+        var elem = this.threadingColours[i][this.threadingColours[i].length - 1];
+        this.threadingColours[i].push(elem);
       }
     }
   }
 
-  removeTablets(num) {
+  removeTabletsRight(num) {
     var i;
     for (i=0; i < this.picks(); i++) {
       this.turning[i] = this.turning[i].slice(0, Math.max(this.turning[i].length - num, 1));
@@ -128,6 +129,36 @@ class TDDDraft {
       this.threadingColours[i] = this.threadingColours[i].slice(0, Math.max(this.threadingColours[i].length - num, 1));
     }
     this.threading = this.threading.slice(0, Math.max(this.threading.length - num, 1));
+  }
+
+  addTabletsLeft(num) {
+    var i;
+    var j;
+
+    for (i=0; i < this.picks(); i++) {
+      for (var j=0; j < num; j++) {
+        this.turning[i].unshift(this.turning[i][0]);
+      }
+    }
+
+    for (j=0; j < num; j++) {
+      this.threading.unshift(this.threading[0]);
+
+      for (i=0; i < this.threadingColours.length; i++) {
+        this.threadingColours[i].unshift(this.threadingColours[i][0]);
+      }
+    }
+  }
+
+  removeTabletsLeft(num) {
+    var i;
+    for (i=0; i < this.picks(); i++) {
+      this.turning[i] = this.turning[i].slice(Math.min(num, this.turning[i].length - 1), this.turning[i].length);
+    }
+    for (i=0; i < this.holes(); i++) {
+      this.threadingColours[i] = this.threadingColours[i].slice(Math.min(num, this.threadingColours[i].length - 1), this.threadingColours[i].length);
+    }
+    this.threading = this.threading.slice(Math.min(num, this.threading.length - 1), this.threading.length);
   }
 
   colour(num) {
