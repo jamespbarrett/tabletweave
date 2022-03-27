@@ -14,6 +14,7 @@ function control_vals() {
     });
 
     return {
+        addright: $("#addright").prop("checked"),
         lockdraft: $("#lockdraft").prop("checked"),
         fgcol: fgcol,
         scale: $('#scalecontrols .readout').val(),
@@ -51,6 +52,7 @@ function loadFromLocal() {
     fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
 
     $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
+    $("#addright").prop("checked", ((controls.addright != undefined)?controls.addright:true));
     $("#lockdraft").prop("checked", ((controls.lockdraft != undefined)?controls.lockdraft:false));
     $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
     $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
@@ -89,6 +91,7 @@ function updateDraft() {
     var picks   = parseInt($("#mainrowcontrols .readout").val());
     var holes   = parseInt($("#lowrowcontrols .readout").val());
     var tablets = parseInt($("#colcontrols .readout").val());
+    var addright = $("#addright").prop("checked");
 
     if (picks < draft.picks()) {
         draft.removePicks(draft.picks() - picks);
@@ -102,10 +105,18 @@ function updateDraft() {
         draft.addHoles(holes - draft.holes());
     }
 
-    if (tablets < draft.tablets()) {
-        draft.removeTablets(draft.tablets() - tablets);
-    } else if (tablets > draft.tablets()) {
-        draft.addTablets(tablets - draft.tablets());
+    if (addright) {
+        if (tablets < draft.tablets()) {
+            draft.removeTabletsRight(draft.tablets() - tablets);
+        } else if (tablets > draft.tablets()) {
+            draft.addTabletsRight(tablets - draft.tablets());
+        }
+    } else {
+        if (tablets < draft.tablets()) {
+            draft.removeTabletsLeft(draft.tablets() - tablets);
+        } else if (tablets > draft.tablets()) {
+            draft.addTabletsLeft(tablets - draft.tablets());
+        }
     }
 
     if ($("#hruler .readout").val() > draft.picks() + 1) {
@@ -412,6 +423,7 @@ function reset() {
     $("#showreversal").prop("checked", true);
     $("#showtext").prop("checked", false);
     $("#GREYSLIDER").val(144);
+    $("#addright").prop("checked", true);
     $("#labelholescw").prop("checked", true);
 
     $("#showhruler").prop("checked", false);
@@ -519,6 +531,7 @@ $(function() {
     setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
     setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
     setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
+    $("#addright").change(function() { saveToLocal(); });
     $("#lockdraft").change(function() { saveToLocal(); });
 
     setupNumberInput("hruler", function() { return -draft.holes(); }, function() { return draft.picks() + 1; }, function() {
