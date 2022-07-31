@@ -20,7 +20,7 @@ function control_vals() {
         scale: $('#scalecontrols .readout').val(),
         showtext: $("#showtext").prop("checked"),
         showovals: $("#showovals").prop("checked"),
-        showupper: $("#showupper").prop("checked"), 
+        showupper: $("#showupper").prop("checked"),
         showlower: $("#showlower").prop("checked"),
         showreversal: $("#showreversal").prop("checked"),
         labelholescw: $("#labelholescw").prop("checked"),
@@ -47,35 +47,38 @@ function loadFromLocal() {
     var local_controls = localStorage.getItem("tdd-controls");
     var local_draft = localStorage.getItem("tdd-draft");
 
-    var controls = (local_controls != undefined)?JSON.parse(local_controls):{};
+    var controls = (local_controls != undefined) ? JSON.parse(local_controls) : {};
 
-    fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
+    fgcol = (controls.fgcol != undefined) ? controls.fgcol : -1;
 
-    $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
-    $("#addright").prop("checked", ((controls.addright != undefined)?controls.addright:true));
-    $("#lockdraft").prop("checked", ((controls.lockdraft != undefined)?controls.lockdraft:false));
-    $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
-    $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
-    $("#showupper").prop("checked", ((controls.showupper != undefined)?controls.showupper:true));
-    $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
-    $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
-    $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
-    $("#labelholescw").prop("checked", ((controls.labelholescw != undefined)?controls.labelholescw:true));
-    $("#showhruler").prop("checked", ((controls.showhruler != undefined)?controls.showhruler:true));
-    $("#showvruler").prop("checked", ((controls.showvruler != undefined)?controls.showvruler:true));
-    $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
-    $("#vruler .readout").val((controls.vruler != undefined)?controls.vruler:0);
-    $("#export_width").val((controls.export_width != undefined)?controls.export_width:1920);
-    $("#showrepeats").prop("checked", ((controls.showrepeats != undefined)?controls.showrepeats:false));
-    $("#repeatstart .readout").val((controls.repeatstart != undefined)?controls.repeatstart:1);
-    $("#repeatend .readout").val((controls.repeatend != undefined)?controls.repeatend:1);
-    $("#numrepeats .readout").val((controls.numrepeats != undefined)?controls.numrepeats:1);
+    $('#scalecontrols .readout').val((controls.scale != undefined) ? controls.scale : 0);
+    $("#addright").prop("checked", ((controls.addright != undefined) ? controls.addright : true));
+    $("#lockdraft").prop("checked", ((controls.lockdraft != undefined) ? controls.lockdraft : false));
+    $("#showovals").prop("checked", ((controls.showovals != undefined) ? controls.showovals : true));
+    $("#showtext").prop("checked", ((controls.showtext != undefined) ? controls.showtext : false));
+    $("#showupper").prop("checked", ((controls.showupper != undefined) ? controls.showupper : true));
+    $("#showlower").prop("checked", ((controls.showlower != undefined) ? controls.showlower : true));
+    $("#showreversal").prop("checked", ((controls.showreversal != undefined) ? controls.showreversal : true));
+    $("#GREYSLIDER").val(((controls.grey_saturation != undefined) ? controls.grey_saturation : 144));
+    $("#labelholescw").prop("checked", ((controls.labelholescw != undefined) ? controls.labelholescw : true));
+    $("#showhruler").prop("checked", ((controls.showhruler != undefined) ? controls.showhruler : true));
+    $("#showvruler").prop("checked", ((controls.showvruler != undefined) ? controls.showvruler : true));
+    $("#hruler .readout").val((controls.hruler != undefined) ? controls.hruler : 0);
+    $("#vruler .readout").val((controls.vruler != undefined) ? controls.vruler : 0);
+    $("#export_width").val((controls.export_width != undefined) ? controls.export_width : 1920);
+    $("#showrepeats").prop("checked", ((controls.showrepeats != undefined) ? controls.showrepeats : false));
+    $("#repeatstart .readout").val((controls.repeatstart != undefined) ? controls.repeatstart : 1);
+    $("#repeatend .readout").val((controls.repeatend != undefined) ? controls.repeatend : 1);
+    $("#numrepeats .readout").val((controls.numrepeats != undefined) ? controls.numrepeats : 1);
 
     if (controls.accordion) {
         for (const [key, value] of Object.entries(controls.accordion)) {
             var but = $("#" + key + " .accordion");
             if (value) {
                 but.addClass('active');
+                if (key === "controlbar") {
+                    $("#" + key).addClass('open');
+                }
             } else {
                 but.removeClass('active');
             }
@@ -88,8 +91,8 @@ function loadFromLocal() {
 }
 
 function updateDraft() {
-    var picks   = parseInt($("#mainrowcontrols .readout").val());
-    var holes   = parseInt($("#lowrowcontrols .readout").val());
+    var picks = parseInt($("#mainrowcontrols .readout").val());
+    var holes = parseInt($("#lowrowcontrols .readout").val());
     var tablets = parseInt($("#colcontrols .readout").val());
     var addright = $("#addright").prop("checked");
 
@@ -152,26 +155,22 @@ function redraw() {
     $('#draftcanvas svg').width(bbox.width * scale);
     $('#draftcanvas svg').height(bbox.height * scale);
 
-    var bot = $('#mainsection').position().top + bbox.height * scale;
-    var right = $('#mainsection').position().left + bbox.width * scale;
-
     var i;
-    for (i=0; i <= 12; i++) {
-        $("#NUM" + (i)).text(draft.threadCount(i-1));
+    for (i = 0; i <= 12; i++) {
+        $("#NUM" + (i)).text(draft.threadCount(i - 1));
     }
 
     if ($('#showrepeats').prop('checked')) {
-        $('#repeatsection').show();
-        $('#repeatsection').css('left', right + 10);
+        $('#repeatsection').addClass('show');
     } else {
-        $('#repeatsection').hide();
+        $('#repeatsection').removeClass('show');
     }
 
     $('#threadinginstructions').text("");
 
     if ($('#showtext').prop('checked')) {
-        for (i=0; i < draft.tablets(); i++) {
-            $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i) + " (" +  ($('#labelholescw').prop('checked')?'&#x21BB;': '&#x21BA;') + ")</li>");
+        for (i = 0; i < draft.tablets(); i++) {
+            $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i) + " (" + ($('#labelholescw').prop('checked') ? '&#x21BB;' : '&#x21BA;') + ")</li>");
             $('#threadinginstructions li').last().append('<ol type="A"></ol>');
             var ol = $('#threadinginstructions li').last().children().last();
             for (var j = 0; j < draft.holes(); j++) {
@@ -184,30 +183,18 @@ function redraw() {
         }
 
         $('#turninginstructions').text("");
-        for (i=0; i < draft.picks(); i++) {
+        for (i = 0; i < draft.picks(); i++) {
             $('#turninginstructions').append("<li class=\"instruction\">" + draft.describePick(i) + "</li>");
         }
 
-        $('#textinstructions').show();
-        $('#textinstructions').css('top', bot + 10);
-        $('#textinstructions').css('min-width', bbox.width - 10);
-
-        bot = $('#textinstructions').position().top + $('#textinstructions').height() + 10;
+        $('#textinstructions').addClass("show");
     } else {
         $('#textinstructions').hide();
     }
 
     if ($('#showrepeats').prop('checked')) {
         bbox = $('#repeatcanvas svg')[0].getBBox();
-
-        if ($('#repeatsection').position().top + bbox.height * scale > bot) {
-            bot = $('#repeatsection').position().top + bbox.height * scale;
-        }
     }
-
-    $('#copyright').css('position', 'absolute');
-    $('#copyright').css('top', bot + 10);
-    $('#copyright').css('botton', undefined);
 }
 
 function redrawControls() {
@@ -219,11 +206,11 @@ function redrawControls() {
 
     var i;
     for (i = 0; i < 12; i++) {
-        $('#BOX' + (i+1)).css("background-color", draft.colour(i).getCSSHexadecimalRGB());
+        $('#BOX' + (i + 1)).css("background-color", draft.colour(i).getCSSHexadecimalRGB());
         if (fgcol != i) {
-            $('#BOX' + (i+1)).removeClass("selected");
+            $('#BOX' + (i + 1)).removeClass("selected");
         } else {
-            $('#BOX' + (i+1)).addClass("selected");
+            $('#BOX' + (i + 1)).addClass("selected");
         }
     }
 
@@ -236,12 +223,12 @@ function redrawControls() {
         $('#BLUEVAL').val(c.b);
         $('#BLUESLIDE').val(c.b);
 
-        $('#REDVAL').prop( "disabled", false );
-        $('#GREENVAL').prop( "disabled", false );
-        $('#BLUEVAL').prop( "disabled", false );
-        $('#REDSLIDE').prop( "disabled", false );
-        $('#GREENSLIDE').prop( "disabled", false );
-        $('#BLUESLIDE').prop( "disabled", false );
+        $('#REDVAL').prop("disabled", false);
+        $('#GREENVAL').prop("disabled", false);
+        $('#BLUEVAL').prop("disabled", false);
+        $('#REDSLIDE').prop("disabled", false);
+        $('#GREENSLIDE').prop("disabled", false);
+        $('#BLUESLIDE').prop("disabled", false);
         $('#colourname').text(ntc.name(draft.colour(fgcol).getCSSHexadecimalRGB())[1]);
     } else {
         $('#REDVAL').val(0);
@@ -251,12 +238,12 @@ function redrawControls() {
         $('#BLUEVAL').val(0);
         $('#BLUESLIDE').val(0);
 
-        $('#REDVAL').prop( "disabled", true );
-        $('#GREENVAL').prop( "disabled", true );
-        $('#BLUEVAL').prop( "disabled", true );
-        $('#REDSLIDE').prop( "disabled", true );
-        $('#GREENSLIDE').prop( "disabled", true );
-        $('#BLUESLIDE').prop( "disabled", true );
+        $('#REDVAL').prop("disabled", true);
+        $('#GREENVAL').prop("disabled", true);
+        $('#BLUEVAL').prop("disabled", true);
+        $('#REDSLIDE').prop("disabled", true);
+        $('#GREENSLIDE').prop("disabled", true);
+        $('#BLUESLIDE').prop("disabled", true);
 
         $('#colourname').text("");
     }
@@ -267,7 +254,7 @@ function draftClick(e) {
         const pt = this.createSVGPoint();
         pt.x = e.clientX;
         pt.y = e.clientY;
-        const svgP = pt.matrixTransform( this.getScreenCTM().inverse() );
+        const svgP = pt.matrixTransform(this.getScreenCTM().inverse());
         var tablet = view.svg_coord_to_tablet(svgP.x, view, draft);
         var pick = view.svg_coord_to_pick(svgP.y, draft);
         var hole = view.svg_coord_to_hole(svgP.y, draft);
@@ -287,12 +274,12 @@ function draftClick(e) {
     }
 }
 
-function setupNumberInput(id, min_val, max_val, callback, increment=1) {
-    var validate = function(new_val, min_val, max_val) {
-        if (typeof(min_val) == "function") {
+function setupNumberInput(id, min_val, max_val, callback, increment = 1) {
+    var validate = function (new_val, min_val, max_val) {
+        if (typeof (min_val) == "function") {
             min_val = min_val();
         }
-        if (typeof(max_val) == "function") {
+        if (typeof (max_val) == "function") {
             max_val = max_val();
         }
         if (min_val != undefined && new_val < min_val) {
@@ -302,23 +289,23 @@ function setupNumberInput(id, min_val, max_val, callback, increment=1) {
         }
         return new_val;
     };
-    $("#" + id + " .readout").change(function() {
-        var new_val = validate(Math.round(parseFloat($("#" + id + " .readout").val())/increment)*increment, min_val, max_val);
+    $("#" + id + " .readout").change(function () {
+        var new_val = validate(Math.round(parseFloat($("#" + id + " .readout").val()) / increment) * increment, min_val, max_val);
         $("#" + id + " .readout").val(new_val);
         callback();
     });
-    $("#" + id + " .minus").click(function() {
-        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val())/increment) - 1)*increment, min_val, max_val);
+    $("#" + id + " .minus").click(function () {
+        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val()) / increment) - 1) * increment, min_val, max_val);
         $("#" + id + " .readout").val(new_val);
         callback();
     });
-    $("#" + id + " .plus").click(function() {
-        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val())/increment) + 1)*increment, min_val, max_val);
+    $("#" + id + " .plus").click(function () {
+        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val()) / increment) + 1) * increment, min_val, max_val);
         $("#" + id + " .readout").val(new_val);
         callback();
     });
 
-    $("#" + id + " .readout").val(validate(Math.round(parseFloat($("#" + id + " .readout").val())/increment)*increment, min_val, max_val));
+    $("#" + id + " .readout").val(validate(Math.round(parseFloat($("#" + id + " .readout").val()) / increment) * increment, min_val, max_val));
 }
 
 function updateRed(r) {
@@ -350,12 +337,12 @@ function setControlsFromDraft() {
     } else if ($("#hruler .readout").val() < -draft.holes()) {
         $("#hruler .readout").val(-draft.holes());
     }
-    view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
+    view.hRuler($('#showhruler').prop('checked') ? $('#hruler .readout').val() : undefined);
 
     if ($("#vruler .readout").val() > draft.tablets() + 1) {
         $("#vruler .readout").val(draft.tablets() + 1);
     }
-    view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
+    view.vRuler($('#showvruler').prop('checked') ? $('#vruler .readout').val() : undefined);
 
     if ($("#repeatstart .readout").val() > draft.picks()) {
         $("#repeatstart .readout").val(draft.picks());
@@ -371,7 +358,7 @@ function loadFile() {
     if (files.length > 0) {
         var reader = new FileReader();
 
-        reader.onload = (function(is_tdd) {
+        reader.onload = (function (is_tdd) {
             return function (e) {
                 try {
                     var data = e.target.result;
@@ -381,7 +368,7 @@ function loadFile() {
                     } else {
                         draft = json_to_tdd(JSON.parse(data));
                     }
-                } catch(err) {
+                } catch (err) {
                     alert("File is corrupted and could not be loaded.");
                     return;
                 }
@@ -404,7 +391,7 @@ function saveFile() {
         } else {
             filename = "draft.tdd";
         }
-        var blob = new Blob([draft.toString()], { type: "text/plain;charset=utf-8"});
+        var blob = new Blob([draft.toString()], { type: "text/plain;charset=utf-8" });
         saveAs(blob, filename);
     } catch (err) {
         alert("Could not save file, something went wrong");
@@ -444,24 +431,24 @@ function reset() {
 
 function textDescriptionString() {
     var desc = " " + draft.name;
-    desc += "\n" + ("=".repeat(draft.name.length+2));
-    
+    desc += "\n" + ("=".repeat(draft.name.length + 2));
+
     desc += "\n\nThreading:";
-    for (var i=0; i < draft.tablets(); i++) {
-        desc += "\n * " + draft.describeTablet(i) + " (" +  String.fromCharCode($('#labelholescw').prop('checked')?0x21BB:0x21BA) + ")";
-        for (var j=0; j < draft.holes(); j++) {
+    for (var i = 0; i < draft.tablets(); i++) {
+        desc += "\n * " + draft.describeTablet(i) + " (" + String.fromCharCode($('#labelholescw').prop('checked') ? 0x21BB : 0x21BA) + ")";
+        for (var j = 0; j < draft.holes(); j++) {
             var char = String.fromCharCode("A".charCodeAt(0) + j);
             desc += "\n    " + char + ": ";
             if ($('#labelholescw').prop('checked')) {
-                desc += draft.describeHole(i,j);
+                desc += draft.describeHole(i, j);
             } else {
-                desc += draft.describeHole(i,draft.holes() - j - 1);
+                desc += draft.describeHole(i, draft.holes() - j - 1);
             }
         }
     }
     desc += "\n\nTurning:";
-    for (i=0; i < draft.picks(); i++) {
-        desc += "\n " + (i+1) + ". " + draft.describePick(i);
+    for (i = 0; i < draft.picks(); i++) {
+        desc += "\n " + (i + 1) + ". " + draft.describePick(i);
     }
     desc += "\n";
     return desc;
@@ -474,13 +461,13 @@ function exportTextDescription() {
     } else {
         filename = "draft.txt";
     }
-    saveAs(new Blob([textDescriptionString()], {type: "text/plain"}), filename);
+    saveAs(new Blob([textDescriptionString()], { type: "text/plain" }), filename);
 }
 
 function exportDraft(mimetype, root) {
     var width = parseInt($("#export_width").val());
 
-    var process_blob = function(blob) {
+    var process_blob = function (blob) {
         var extension;
         var filename;
 
@@ -522,79 +509,86 @@ function applyAccordian() {
     });
 }
 
-$(function() {
+$(function () {
     Cookies.json = true;
 
     $("#draftname .readout").change(function () { draft.name = $("#draftname .readout").val(); saveToLocal(); });
 
-    setupNumberInput("scalecontrols", -100, 100, function() { saveToLocal(); redraw(); });
-    setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
-    setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
-    setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
-    $("#addright").change(function() { saveToLocal(); });
-    $("#lockdraft").change(function() { saveToLocal(); });
+    setupNumberInput("scalecontrols", -100, 100, function () { saveToLocal(); redraw(); });
+    setupNumberInput("mainrowcontrols", 1, undefined, function () { updateDraft(); redraw(); });
+    setupNumberInput("lowrowcontrols", 1, 8, function () { updateDraft(); redraw(); });
+    setupNumberInput("colcontrols", 1, undefined, function () { updateDraft(); redraw(); });
+    $("#addright").change(function () { saveToLocal(); });
+    $("#lockdraft").change(function () { saveToLocal(); });
 
-    setupNumberInput("hruler", function() { return -draft.holes(); }, function() { return draft.picks() + 1; }, function() {
-        view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
+    setupNumberInput("hruler", function () { return -draft.holes(); }, function () { return draft.picks() + 1; }, function () {
+        view.hRuler($('#showhruler').prop('checked') ? $('#hruler .readout').val() : undefined); saveToLocal(); redraw();
     });
-    setupNumberInput("vruler", 1, function() { return draft.tablets() + 1; }, function() {
-        view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
+    setupNumberInput("vruler", 1, function () { return draft.tablets() + 1; }, function () {
+        view.vRuler($('#showvruler').prop('checked') ? $('#vruler .readout').val() : undefined); saveToLocal(); redraw();
     });
-    $("#showhruler").change(function() {
-        view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
+    $("#showhruler").change(function () {
+        view.hRuler($('#showhruler').prop('checked') ? $('#hruler .readout').val() : undefined); saveToLocal(); redraw();
     });
-    $("#showvruler").change(function() {
-        view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
+    $("#showvruler").change(function () {
+        view.vRuler($('#showvruler').prop('checked') ? $('#vruler .readout').val() : undefined); saveToLocal(); redraw();
     });
 
-    $("#showovals").change(function() { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
-    $("#showupper").change(function() { view.showTurning($("#showupper").prop('checked')); saveToLocal(); redraw(); });
-    $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
-    $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
-    $("#showtext").change(function() {saveToLocal(); redraw(); });
-    $("#labelholescw").change(function() { view.labelHolesCW($("#labelholescw").prop('checked')); saveToLocal(); redraw(); });
+    $("#showovals").change(function () { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
+    $("#showupper").change(function () { view.showTurning($("#showupper").prop('checked')); saveToLocal(); redraw(); });
+    $("#showlower").change(function () { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
+    $("#showreversal").change(function () { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
+    $("#showtext").change(function () { saveToLocal(); redraw(); });
+    $("#labelholescw").change(function () { view.labelHolesCW($("#labelholescw").prop('checked')); saveToLocal(); redraw(); });
 
-    $('#EMPTYBOX').click(function() { fgcol = -1; saveToLocal(); redrawControls(); });
+    $('#EMPTYBOX').click(function () { fgcol = -1; saveToLocal(); redrawControls(); });
     var i;
-    for (i=0; i<12; i++) {
+    for (i = 0; i < 12; i++) {
         (function (i) {
-            $('#BOX' + (i+1)).click(function() { fgcol = i; saveToLocal(); redrawControls(); });
+            $('#BOX' + (i + 1)).click(function () { fgcol = i; saveToLocal(); redrawControls(); });
         })(i);
     }
 
-    $("#showrepeats").change(function() { saveToLocal(); redraw(); });
-    setupNumberInput("repeatstart", 1, function() { return $("#repeatend .readout").val(); }, function() { repeat.startPick(parseInt($("#repeatstart .readout").val())); saveToLocal(); redraw(); });
-    setupNumberInput("repeatend", function() { return $("#repeatstart .readout").val(); }, function() { return draft.picks(); }, function() { repeat.endPick(parseInt($("#repeatend .readout").val())); saveToLocal(); redraw(); });
-    setupNumberInput("numrepeats", 1, undefined, function() { repeat.setRepeats(parseInt($("#numrepeats .readout").val())); saveToLocal(); redraw(); });
+    $("#showrepeats").change(function () { saveToLocal(); redraw(); });
+    setupNumberInput("repeatstart", 1, function () { return $("#repeatend .readout").val(); }, function () { repeat.startPick(parseInt($("#repeatstart .readout").val())); saveToLocal(); redraw(); });
+    setupNumberInput("repeatend", function () { return $("#repeatstart .readout").val(); }, function () { return draft.picks(); }, function () { repeat.endPick(parseInt($("#repeatend .readout").val())); saveToLocal(); redraw(); });
+    setupNumberInput("numrepeats", 1, undefined, function () { repeat.setRepeats(parseInt($("#numrepeats .readout").val())); saveToLocal(); redraw(); });
 
-    $('#REDVAL').change(function() { updateRed($('#REDVAL').val()); redraw(); redrawControls(); });
-    $('#REDSLIDE').change(function() { updateRed($('#REDSLIDE').val()); redraw(); redrawControls(); });
-    $('#GREENVAL').change(function() { updateGreen($('#GREENVAL').val()); redraw(); redrawControls(); });
-    $('#GREENSLIDE').change(function() { updateGreen($('#GREENSLIDE').val()); redraw(); redrawControls(); });
-    $('#BLUEVAL').change(function() { updateBlue($('#BLUEVAL').val()); redraw(); redrawControls(); });
-    $('#BLUESLIDE').change(function() { updateBlue($('#BLUESLIDE').val()); redraw(); redrawControls(); });
+    $('#REDVAL').change(function () { updateRed($('#REDVAL').val()); redraw(); redrawControls(); });
+    $('#REDSLIDE').change(function () { updateRed($('#REDSLIDE').val()); redraw(); redrawControls(); });
+    $('#GREENVAL').change(function () { updateGreen($('#GREENVAL').val()); redraw(); redrawControls(); });
+    $('#GREENSLIDE').change(function () { updateGreen($('#GREENSLIDE').val()); redraw(); redrawControls(); });
+    $('#BLUEVAL').change(function () { updateBlue($('#BLUEVAL').val()); redraw(); redrawControls(); });
+    $('#BLUESLIDE').change(function () { updateBlue($('#BLUESLIDE').val()); redraw(); redrawControls(); });
 
-    $('#GREYSLIDER').change(function() { view.greySaturation(0x100 - $('#GREYSLIDER').val()); saveToLocal(); redraw(); });
+    $('#GREYSLIDER').change(function () { view.greySaturation(0x100 - $('#GREYSLIDER').val()); saveToLocal(); redraw(); });
 
-    $("#fileio #load").change(function() { loadFile(); saveToLocal(); });
-    $("#fileio #save").click(function() { saveFile(); });
+    $("#fileio #load").change(function () { loadFile(); saveToLocal(); });
+    $("#fileio #save").click(function () { saveFile(); });
 
-    $("#clear").click(function() { draft.clearTurning(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
-    $("#reset").click(function() { reset(); });
-    $("#resetpallette").click(function() { draft.resetPalette(); setControlsFromDraft(); saveToLocal; redraw(); redrawControls(); })
+    $("#clear").click(function () { draft.clearTurning(); setControlsFromDraft(); saveToLocal(); redraw(); redrawControls(); });
+    $("#reset").click(function () { reset(); });
+    $("#resetpallette").click(function () { draft.resetPalette(); setControlsFromDraft(); saveToLocal; redraw(); redrawControls(); })
 
-    $('#draftexport #svg').click(function() { exportDraft('image/svg+xml', view.root()); });
-    $('#draftexport #jpeg').click(function() { exportDraft('image/jpeg', view.root()); });
-    $('#draftexport #png').click(function() { exportDraft('image/png', view.root()); });
-    $('#draftexport #txt').click(function() { exportTextDescription(); });
+    $('#draftexport #svg').click(function () { exportDraft('image/svg+xml', view.root()); });
+    $('#draftexport #jpeg').click(function () { exportDraft('image/jpeg', view.root()); });
+    $('#draftexport #png').click(function () { exportDraft('image/png', view.root()); });
+    $('#draftexport #txt').click(function () { exportTextDescription(); });
 
-    $('#repeatexport #svg').click(function() { exportDraft('image/svg+xml', repeat.root()); });
-    $('#repeatexport #jpeg').click(function() { exportDraft('image/jpeg', repeat.root()); });
-    $('#repeatexport #png').click(function() { exportDraft('image/png', repeat.root()); });
+    $('#repeatexport #svg').click(function () { exportDraft('image/svg+xml', repeat.root()); });
+    $('#repeatexport #jpeg').click(function () { exportDraft('image/jpeg', repeat.root()); });
+    $('#repeatexport #png').click(function () { exportDraft('image/png', repeat.root()); });
 
-    $('#export_width').change(function() { saveToLocal(); });
+    $('#export_width').change(function () { saveToLocal(); });
 
-    $('.accordion').click(function() { $(this).toggleClass("active"); applyAccordian(); saveToLocal(); });
+    $('.accordion').click(function () {
+        $(this).toggleClass("active");
+        if ($(this).parent().attr("id") === 'controlbar') {
+            $(this).parent().toggleClass('open');
+        }
+        applyAccordian();
+        saveToLocal();
+    });
 
     loadFromLocal();
 
@@ -602,10 +596,10 @@ $(function() {
     view.showTurning($("#showupper").prop('checked'));
     view.showThreading($("#showlower").prop('checked'));
     view.showReversals($("#showreversal").prop('checked'));
-    view.greySaturation(0x100 - $('#GREYSLIDER').val()) ;
+    view.greySaturation(0x100 - $('#GREYSLIDER').val());
     view.labelHolesCW($("#labelholescw").prop('checked'));
-    view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
-    view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
+    view.hRuler($('#showhruler').prop('checked') ? $('#hruler .readout').val() : undefined);
+    view.vRuler($('#showvruler').prop('checked') ? $('#vruler .readout').val() : undefined);
 
     repeat.showOvals(true);
     repeat.showThreading(false);

@@ -10,6 +10,7 @@
     "turning": "回し方:"
   },
   "controlbar": {
+    "name": "メニュー",
     "draftname": "ドラフト名",
     "controls": {
       "name": "コントロール",
