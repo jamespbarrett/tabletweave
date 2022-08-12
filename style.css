@@ -1,8 +1,10 @@
 body {
   background-color: #ccccff;
   color: black;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
 }
-
 h1,
 h3 {
   text-align: center;
@@ -42,6 +44,7 @@ h4 {
 #mainsection {
   display: flex;
   justify-content: center;
+  height: fit-content;
 }
 
 #textinstructions {
@@ -60,24 +63,65 @@ h4 {
   display: none;
 }
 
-#repeatsection.show,
-#textinstructions.show {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 50px;
+.accordion {
+  display: block;
+  font-variant: small-caps;
+  font-size: larger;
+  color: black;
+  cursor: pointer;
+  padding: 18px;
+  min-width: 130px;
+  text-align: center;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+  text-decoration: none;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active,
+.accordion:hover {
+  background-color: #ccccff;
+}
+
+.accordion:after {
+  content: "\02795"; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
 
 #controlbar {
-  width: 10vw;
-  min-width: 130px;
   border: 1px solid black;
-  background-color: #eeeeff;
   position: fixed;
-  bottom: 10%;
+  top: 75px;
+  display: flex;
+  flex-direction: column;
+  width: 130px;
+  height: 65px;
+  transition: 0.3s;
+}
+
+.controlButton {
+  background-color: rgba(238, 238, 255, 0.4);
+  width: 100%;
+}
+
+.controlButton.active {
+  background-color: #c2c2ed;
 }
 
 #controlbar.open {
-  width: 30vw;
+  /* calculate the width so that its equal to the width of the page, minus the scrollbar and border */
+  width: calc(100vw - (100vw - 100%) - 2px);
+  background-color: #eeeeff;
+  height: 40vh;
+  top: 0;
 }
 
 div.controlpanel {
@@ -85,82 +129,40 @@ div.controlpanel {
 }
 
 .controls {
-  overflow: scroll;
-  display: flex;
+  display: none;
+  overflow-y: scroll;
   scroll-snap-type: inline mandatory;
 }
+
 .controls > div {
   display: inline;
   scroll-snap-align: start;
+  background-color: #fff;
 }
 
-div.controlpanel > div {
-  display: table;
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+  padding: 5px 18px;
+  display: none;
+  overflow: hidden;
+}
+
+.panel > div > span,
+.panel > span {
+  width: 320px;
+  display: flex;
   margin: auto;
+  justify-content: space-between;
 }
 
-div.controlpanel > div > span {
-  display: table-row;
-}
-
-div.controlpanel > div > span > label {
-  display: table-cell;
-}
-
-div.controlpanel > div > span > span {
-  display: table-cell;
-  white-space: nowrap;
-}
-
-#resets div span,
-#export > div > div > span,
-#loaddiv div span {
-  display: block;
-  margin: auto;
-  width: 30%;
-}
-
-#fileio > div {
-  display: table;
-  width: 90%;
-}
-
-#fileio > div > span {
-  display: table;
-  width: 100%;
-  margin-bottom: 5px;
-}
-
-#fileio > div > span > button {
-  display: table-cell;
-}
-
-#fileio > div > span > label {
-  display: table-cell;
-}
-
-#fileio > div > span > input {
-  display: table-cell;
-}
-
-#coloursliders {
-  display: table;
-  width: 90%;
-}
-
-#coloursliders > span {
-  display: table-row;
-}
-
-#coloursliders > span > label,
-#coloursliders > span > input {
-  display: table-cell;
+.panel > table {
+  width: fit-content;
+  margin: 0 auto;
 }
 
 #export button,
 #resets button,
-#fileio button,
-#loaddiv input {
+#fileio button {
   width: 100%;
 }
 
@@ -195,7 +197,8 @@ div.controlpanel > div > span > span {
 
 .draftcanvas {
   border: 1px solid #000000;
-  margin-bottom: 30px;
+  margin: 0 auto 30px;
+  width: fit-content;
 }
 
 .repeacanvas {
@@ -203,7 +206,7 @@ div.controlpanel > div > span > span {
 }
 
 .readout {
-  width: 4em;
+  width: 3em;
 }
 
 #draftname .readout {
@@ -248,47 +251,24 @@ div.controlpanel > div > span > span {
   border: 1px solid #999999;
 }
 
-.accordion {
-  font-variant: small-caps;
-  font-size: larger;
-  /* background-color: #eee; */
-  background-color: #eeeeff;
-  color: black;
-  /* color: #444; */
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  min-width: 130px;
-  text-align: left;
-  border: none;
-  outline: none;
-  transition: 0.4s;
+.show {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
 }
 
-/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.active,
-.accordion:hover {
-  background-color: #ccccff;
+.controls.show {
+  display: block;
 }
 
-/* Style the accordion panel. Note: hidden by default */
-.panel {
-  padding: 5px 18px;
-  /* background-color: white; */
-  display: none;
-  overflow: hidden;
-}
-
-.accordion:after {
-  content: "\02795"; /* Unicode character for "plus" sign (+) */
-  font-size: 13px;
-  color: #777;
-  float: right;
-  margin-left: 5px;
-}
-
-.active:after {
-  content: "\2796"; /* Unicode character for "minus" sign (-) */
+#repeatsection.show,
+#textinstructions.show {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 50px;
+  height: fit-content;
 }
 
 .switch {
@@ -296,6 +276,7 @@ div.controlpanel > div > span > span {
   display: inline-block;
   width: 60px;
   height: 17px;
+  margin-top: 30px;
 }
 
 .switch input {
@@ -391,9 +372,12 @@ label[for="addright"] {
 }
 
 @media screen and (min-width: 1024px) {
-  .controls {
-    flex-direction: column;
-    overflow: auto;
-    max-height: 80vh;
+  #content {
+    flex-direction: row;
+  }
+
+  #repeatsection.show,
+  #textinstructions.show {
+    margin-right: 10px;
   }
 }

@@ -189,7 +189,7 @@ function redraw() {
 
         $('#textinstructions').addClass("show");
     } else {
-        $('#textinstructions').hide();
+        $('#textinstructions').removeClass("show");
     }
 
     if ($('#showrepeats').prop('checked')) {
@@ -502,9 +502,9 @@ function exportDraft(mimetype, root) {
 function applyAccordian() {
     $(".accordion").each(function () {
         if ($(this).hasClass("active")) {
-            $(this).next().show();
+            $(this).next().addClass("show");
         } else {
-            $(this).next().hide();
+            $(this).next().removeClass("show");
         }
     });
 }

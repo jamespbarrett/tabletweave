@@ -67,16 +67,16 @@
       </div>
     </div>
     <div id="controlbar">
-      <button class="accordion" data-i18n="controlbar.name"></button>
+      <button class="accordion controlButton" data-i18n="controlbar.name"></button>
       <div class="controls">
         <div class="controlpanel name" id="name">
-          <button class="accordion" data-i18n="controlbar.draftname"></button>
+          <a class="accordion" href="#name" data-i18n="controlbar.draftname"></a>
           <div class="panel">
             <span id="draftname"><input class="readout" value=""></input></span>
           </div>
         </div>
         <div class="controlpanel" id="controls">
-          <button class="accordion active" data-i18n="controlbar.controls.name"></button>
+          <a class="accordion active" href="#controls" data-i18n="controlbar.controls.name"></a>
           <div class="panel">
             <span id="mainrowcontrols"><label data-i18n="controlbar.controls.picks"></label><span><button
                   class="minus">-</button><input class="readout" value="0"></input><button
@@ -96,7 +96,7 @@
           </div>
         </div>
         <div class="controlpanel" id="rulers">
-          <button class="accordion" data-i18n="controlbar.rulers.name"></button>
+          <a class="accordion" href="#rulers" data-i18n="controlbar.rulers.name"></a>
           <div class="panel">
             <span id="showcontrols"><label for="showhruler"
                 data-i18n="controlbar.rulers.showhruler"></label><span><input type="checkbox" id="showhruler"
@@ -113,7 +113,7 @@
           </div>
         </div>
         <div class="controlpanel" id="display">
-          <button class="accordion" data-i18n="controlbar.display.name"></button>
+          <a class="accordion" href="#display" data-i18n="controlbar.display.name"></a>
           <div class="panel">
             <span id="showcontrols"><label for="showovals" data-i18n="controlbar.display.showovals"></label><span><input
                   type="checkbox" id="showovals" checked=true></span></span>
@@ -136,9 +136,8 @@
                   class="plus">+</button></span></span>
           </div>
         </div>
-
         <div class="controlpanel" id="repeats">
-          <button class="accordion" data-i18n="controlbar.repeats.name"></button>
+          <a class="accordion" href="#repeats" data-i18n="controlbar.repeats.name"></a>
           <div class="panel">
             <span id="showrepeat"><label for="showrepeats"
                 data-i18n="controlbar.repeats.showrepeat"></label><span><input type="checkbox" id="showrepeats"
@@ -154,9 +153,8 @@
                   class="plus">+</button></span></span>
           </div>
         </div>
-
         <div id="resets">
-          <button class="accordion" data-i18n="controlbar.resets.name"></button>
+          <a class="accordion" href="#resets" data-i18n="controlbar.resets.name"></a>
           <div class="panel">
             <span>
               <button id="reset" data-i18n="controlbar.resets.reset"></button>
@@ -165,9 +163,8 @@
             </span>
           </div>
         </div>
-
         <div id="palete">
-          <button class="accordion active" data-i18n="controlbar.palete.name"></button>
+          <a class="accordion active" href="#palete" data-i18n="controlbar.palete.name"></a>
           <div id="fg" class="panel">
             <label data-i18n="controlbar.palete.fg"></label>
             <table>
@@ -215,9 +212,8 @@
             </div>
           </div>
         </div>
-
         <div id="export">
-          <button class="accordion" data-i18n="controlbar.export.name"></button>
+          <a class="accordion" href="#export" data-i18n="controlbar.export.name"></a>
           <div class="panel">
             <div class="controlpanel">
               <div>
@@ -240,9 +236,8 @@
             </div>
           </div>
         </div>
-
         <div id="fileio">
-          <button class="accordion" data-i18n="controlbar.fileio.name"></button>
+          <a class="accordion" href="#fileio" data-i18n="controlbar.fileio.name"></a>
           <div class="panel">
             <span><button id="save" data-i18n="controlbar.fileio.save"></button></span>
             <span><label data-i18n="controlbar.fileio.load"></label><input type="file" accept="application/json,.tdd"
