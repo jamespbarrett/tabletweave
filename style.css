@@ -38,7 +38,7 @@ h4 {
   flex-direction: column;
   width: 100%;
   justify-content: center;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 #mainsection {
@@ -377,7 +377,7 @@ label[for="addright"] {
   }
 
   #repeatsection.show,
-  #textinstructions.show {
+  #mainsection {
     margin-right: 10px;
   }
 }
