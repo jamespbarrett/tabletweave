@@ -9,6 +9,7 @@
     "turning": "Turning:"
   },
   "controlbar": {
+    "name": "Menu",
     "draftname": "Draft Name",
     "controls": {
       "name": "Controls",

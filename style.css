@@ -1,361 +1,383 @@
 body {
-    background-color:#CCCCFF;
-    color: black;
+  background-color: #ccccff;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
 }
-
-h1,h3 {
-    text-align: center;
-    font-variant: small-caps;
+h1,
+h3 {
+  text-align: center;
+  font-variant: small-caps;
 }
 
 h4 {
-    text-align: center;
-    font-size: smaller;
-    font-variant: small-caps;
+  text-align: center;
+  font-size: smaller;
+  font-variant: small-caps;
 }
 
 .instructionlink a {
-    font-size: x-large;
-    font-variant: small-caps;
+  font-size: x-large;
+  font-variant: small-caps;
 }
 
 .export_width_span {
-    width: 100%;
+  width: 100%;
+}
+
+#main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  overflow-x: auto;
 }
 
 #mainsection {
-    display: inline-block;
-    position: absolute;
-    left: 400px;
-    top: 200px;
+  display: flex;
+  justify-content: center;
+  height: fit-content;
 }
 
 #textinstructions {
-    display: inline-block;
-    position: absolute;
-    left: 400px;
-    top: 200px;
-    background-color: #FFFFFF;
-    border: 1px solid black;
-    padding: 5px 5px 5px;
+  display: none;
+}
+
+#textinstructions > ul {
+  list-style-type: none;
+  background-color: #ffffff;
+  border: 1px solid black;
+  padding: 5px 5px 5px;
+  margin: 0 auto;
 }
 
 #repeatsection {
-    display: inline-block;
-    position: absolute;
-    left: 900px;
-    top: 200px;
-}
-
-#controlbar {
-    position: fixed;
-    top: 190px;
-    left: 0px;
-    width: 350px;
-    bottom: 28px;
-    border: 1px solid black;
-    overflow-y: scroll;
-    background-color:#EEEEFF;
-}
-
-#controlbar > div {
-    width: 100%;
-    display: inline-block;
-    background-color:#EEEEFF;
-}
-
-div.controlpanel > div {
-    display: table;
-    width: 95%;
-    margin: auto;
-}
-
-div.controlpanel > div > span {
-    display: table-row;
-}
-
-div.controlpanel > div > span > label {
-    display: table-cell;
-}
-
-div.controlpanel > div > span > span {
-    display: table-cell;
-    white-space:nowrap;
-}
-
-#resets div {
-    width: 100%;
-}
-
-#resets div span, #export > div > span, #loaddiv div span {
-    display: block;
-    margin: auto;
-    width: 30%;
-}
-
-#fileio > div {
-    display: table;
-    width: 90%;
-}
-
-#fileio > div > span {
-    display: table;
-    width: 90%;
-}
-
-#fileio > div > span > button {
-    display: table-cell;
-}
-
-#fileio > div > span > label {
-    display: table-cell;
-}
-
-#fileio > div > span > input {
-    display: table-cell;
-}
-
-#coloursliders {
-    display: table;
-    width: 90%;
-}
-
-#coloursliders > span {
-    display: table-row;
-}
-
-#coloursliders > span > label, #coloursliders > span > input {
-    display: table-cell;
-}
-
-#export button, #resets button, #fileio button, #loaddiv input{
-    width:100%;
-}
-
-#instructions {
-    width:100%;
-}
-
-#blogvert {
-    width:100%;
-}
-
-#copyright_notice {
-    width:100%;
-}
-
-.instructionlink {
-    font-size: 200%;
-    text-align: center;
-    margin-bottom: 0em;
-    margin-top: 0em;
-}
-
-.blogvert {
-    font-size: 100%;
-    text-align: center;
-}
-
-.copyright_notice {
-    font-size: 100%;
-    text-align: center;
-}
-
-.draftcanvas {
-    border:1px solid #000000;
-    margin-bottom: 30px;
-}
-
-.repeacanvas {
-    border:1px solid #000000;
-}
-
-.readout {
-    width: 4em;
-}
-
-#draftname .readout {
-    width: 100%;
-}
-
-.colorbox {
-    width: 20px;
-    height: 20px;
-    font-size: 50%;
-    border: 2px solid transparent;
-}
-
-.selected {
-    border: 2px solid black;
-}
-
-#copyright {
-    background-color:#EEEEFF;
-    border: 1px, solid, black;
-    display: block;
-    width: 100%;
-    height: 20px;
-    position: fixed;
-    bottom: 5px;
-    left: 0;
-    margin: 2px;
-    z-index: -1;
-    text-align: center;
-    font-size: smaller;
-}
-
-#messagepopup {
-    background-color:#FFFFFF;
-    border:1px solid #999999;
-    cursor:default;
-    display:none;
-    margin-top: 15px;
-    position:absolute;
-    text-align:left;
-    width:80%;
-    z-index:50;
-    padding: 25px 25px 20px;
-}
-
-#previewcontainer {
-    padding: 5px 5px 5px;
-    border: 1px solid #999999;
+  display: none;
 }
 
 .accordion {
-    font-variant: small-caps;
-    font-size: larger;
-    /* background-color: #eee; */
-    background-color:#EEEEFF;
-    color: black;
-    /* color: #444; */
-    cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    text-align: left;
-    border: none;
-    outline: none;
-    transition: 0.4s;
+  display: block;
+  font-variant: small-caps;
+  font-size: larger;
+  color: black;
+  cursor: pointer;
+  padding: 18px;
+  min-width: 130px;
+  text-align: center;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+  text-decoration: none;
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.active, .accordion:hover {
-    background-color: #CCCCFF;
+.active,
+.accordion:hover {
+  background-color: #ccccff;
+}
+
+.accordion:after {
+  content: "\02795"; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+
+#controlbar {
+  border: 1px solid black;
+  position: fixed;
+  top: 75px;
+  display: flex;
+  flex-direction: column;
+  width: 130px;
+  height: 65px;
+  transition: 0.3s;
+}
+
+.controlButton {
+  background-color: rgba(238, 238, 255, 0.4);
+  width: 100%;
+}
+
+.controlButton.active {
+  background-color: #c2c2ed;
+}
+
+#controlbar.open {
+  /* calculate the width so that its equal to the width of the page, minus the scrollbar and border */
+  width: calc(100vw - (100vw - 100%) - 2px);
+  background-color: #eeeeff;
+  height: 40vh;
+  top: 0;
+}
+
+div.controlpanel {
+  display: inline-block;
+}
+
+.controls {
+  display: none;
+  overflow-y: scroll;
+  scroll-snap-type: inline mandatory;
+}
+
+.controls > div {
+  display: inline;
+  scroll-snap-align: start;
+  background-color: #fff;
 }
 
 /* Style the accordion panel. Note: hidden by default */
 .panel {
-    padding: 0 18px;
-    /* background-color: white; */
-    display: none;
-    overflow: hidden;
+  padding: 5px 18px;
+  display: none;
+  overflow: hidden;
 }
 
-.accordion:after {
-    content: '\02795'; /* Unicode character for "plus" sign (+) */
-    font-size: 13px;
-    color: #777;
-    float: right;
-    margin-left: 5px;
+.panel > div > span,
+.panel > span {
+  width: 320px;
+  display: flex;
+  margin: auto;
+  justify-content: space-between;
 }
 
-.active:after {
-    content: "\2796"; /* Unicode character for "minus" sign (-) */
+.panel > table {
+  width: fit-content;
+  margin: 0 auto;
+}
+
+#export button,
+#resets button,
+#fileio button {
+  width: 100%;
+}
+
+#instructions {
+  width: 100%;
+}
+
+#blogvert {
+  width: 100%;
+}
+
+#copyright_notice {
+  width: 100%;
+}
+
+.instructionlink {
+  font-size: 200%;
+  text-align: center;
+  margin-bottom: 0em;
+  margin-top: 0em;
+}
+
+.blogvert {
+  font-size: 100%;
+  text-align: center;
+}
+
+.copyright_notice {
+  font-size: 100%;
+  text-align: center;
+}
+
+.draftcanvas {
+  border: 1px solid #000000;
+  margin: 0 auto 30px;
+  width: fit-content;
+}
+
+.repeacanvas {
+  border: 1px solid #000000;
+}
+
+.readout {
+  width: 3em;
+}
+
+#draftname .readout {
+  width: 100%;
+  min-width: 150px;
+}
+
+.colorbox {
+  width: 20px;
+  height: 20px;
+  font-size: 50%;
+  border: 2px solid transparent;
+}
+
+.selected {
+  border: 2px solid black;
+}
+
+#copyright {
+  background-color: #eeeeff;
+  border: 1px solid black;
+  width: 100%;
+  text-align: center;
+  font-size: smaller;
+}
+
+#messagepopup {
+  background-color: #ffffff;
+  border: 1px solid #999999;
+  cursor: default;
+  display: none;
+  margin-top: 15px;
+  position: absolute;
+  text-align: left;
+  width: 80%;
+  z-index: 50;
+  padding: 25px 25px 20px;
+}
+
+#previewcontainer {
+  padding: 5px 5px 5px;
+  border: 1px solid #999999;
+}
+
+.show {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+}
+
+.controls.show {
+  display: block;
+}
+
+#repeatsection.show,
+#textinstructions.show {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-bottom: 50px;
+  height: fit-content;
 }
 
 .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 17px;
-  }
-  
-  .switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: -17px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #2196F3;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    content: "";
-    position: absolute;
-    text-align: center;
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 17px;
+  margin-top: 30px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: -17px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2196f3;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  text-align: center;
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+#labelholescw + .slider:before {
+  content: "↺";
+}
+
+#labelholescw:checked + .slider:before {
+  content: "↻";
+}
+
+#addright + .slider:before {
+  content: "←";
+}
+
+#addright:checked + .slider:before {
+  content: "→";
+}
+
+#lockdraft + .slider:before {
+  content: "🔓";
+}
+
+#lockdraft:checked + .slider:before {
+  content: "🔒";
+}
+
+#lockdraft + .slider {
+  background-color: #ccc;
+}
+
+#lockdraft:checked + .slider {
+  background-color: #f32121;
+}
+
+label[for="labelholescw"],
+label[for="lockdraft"],
+label[for="addright"] {
+  line-height: 60px;
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+@media screen and (min-width: 1024px) {
+  #content {
+    flex-direction: row;
   }
 
-  #labelholescw + .slider:before {
-      content: "↺"
+  #repeatsection.show,
+  #mainsection {
+    margin-right: 10px;
   }
-
-  #labelholescw:checked + .slider:before {
-      content: "↻"
-  }
-
-  #addright + .slider:before {
-    content: "←"
-  }
-
-  #addright:checked + .slider:before {
-    content: "→"
-  }
-
-  #lockdraft + .slider:before {
-      content: "🔓"
-  }
-
-  #lockdraft:checked + .slider:before {
-    content: "🔒"
-  }
-
-  #lockdraft + .slider {
-      background-color: #ccc;
-  }
-
-  #lockdraft:checked + .slider {
-    background-color: #F32121;
-  }
-
-  label[for="labelholescw"],label[for="lockdraft"],label[for="addright"] {
-      line-height: 60px;
-  }
-
-  /* Rounded sliders */
-  .slider.round {
-    border-radius: 34px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
+}
