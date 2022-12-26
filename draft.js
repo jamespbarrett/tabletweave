@@ -343,6 +343,15 @@ function updateBlue(b) {
     saveToLocal();
 }
 
+function updateGrey(g) {
+    if (g > 0xFF) g = 0xFF;
+    if (g < 0) g = 0;
+    view.greySaturation(0x100 - g);
+    $('#GREYSLIDER').val(g);
+    $('#GREYVAL').val(g);
+    saveToLocal();
+}
+
 function setControlsFromDraft() {
     $("#mainrowcontrols .readout").val(draft.picks());
     $("#lowrowcontrols .readout").val(draft.holes());
@@ -578,7 +587,8 @@ $(function() {
     $('#BLUEVAL').change(function() { updateBlue($('#BLUEVAL').val()); redraw(); redrawControls(); });
     $('#BLUESLIDE').change(function() { updateBlue($('#BLUESLIDE').val()); redraw(); redrawControls(); });
 
-    $('#GREYSLIDER').change(function() { view.greySaturation(0x100 - $('#GREYSLIDER').val()); saveToLocal(); redraw(); });
+    $('#GREYVAL').change(function() { updateGrey($('#GREYVAL').val()); redraw(); })
+    $('#GREYSLIDER').change(function() { updateGrey($('#GREYSLIDER').val()); redraw(); });
 
     $("#fileio #load").change(function() { loadFile(); saveToLocal(); });
     $("#fileio #save").click(function() { saveFile(); });
