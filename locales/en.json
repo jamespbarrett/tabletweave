@@ -41,7 +41,8 @@
       "showrepeat": "Show Repeats",
       "repeatstart": "Repeat Starting at Pick:",
       "repeatend": "Repeat Ending at Pick:",
-      "numrepeats": "Number of Repeats:"
+      "numrepeats": "Number of Repeats:",
+      "scalecontrols": "Visual Scale:"
     },
     "resets": {
       "name": "Resets",

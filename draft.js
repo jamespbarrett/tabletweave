@@ -18,6 +18,7 @@ function control_vals() {
         lockdraft: $("#lockdraft").prop("checked"),
         fgcol: fgcol,
         scale: $('#scalecontrols .readout').val(),
+        rscale: $('#rscalecontrols .readout').val(),
         showtext: $("#showtext").prop("checked"),
         showovals: $("#showovals").prop("checked"),
         showupper: $("#showupper").prop("checked"), 
@@ -52,6 +53,7 @@ function loadFromLocal() {
     fgcol = (controls.fgcol != undefined)?controls.fgcol:-1;
 
     $('#scalecontrols .readout').val((controls.scale != undefined)?controls.scale:0);
+    $('#rscalecontrols .readout').val((controls.rscale != undefined?controls.rscale:0));
     $("#addright").prop("checked", ((controls.addright != undefined)?controls.addright:true));
     $("#lockdraft").prop("checked", ((controls.lockdraft != undefined)?controls.lockdraft:false));
     $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
@@ -142,6 +144,7 @@ function updateDraft() {
 
 function redraw() {
     var scale = Math.pow(2, parseInt($('#scalecontrols .readout').val()) / 10);
+    var rscale = Math.pow(2, parseInt($('#rscalecontrols .readout').val()) / 10);
 
     view.conform(draft);
     if ($('#showrepeats').prop('checked')) {
@@ -200,8 +203,11 @@ function redraw() {
     if ($('#showrepeats').prop('checked')) {
         bbox = $('#repeatcanvas svg')[0].getBBox();
 
-        if ($('#repeatsection').position().top + bbox.height * scale > bot) {
-            bot = $('#repeatsection').position().top + bbox.height * scale;
+        $('#repeatcanvas svg').width(bbox.width * rscale);
+        $('#repeatcanvas svg').height(bbox.height * rscale);
+
+        if ($('#repeatsection').position().top + bbox.height * rscale > bot) {
+            bot = $('#repeatsection').position().top + bbox.height * rscale;
         }
     }
 
@@ -541,6 +547,7 @@ $(function() {
     $("#draftname .readout").change(function () { draft.name = $("#draftname .readout").val(); saveToLocal(); });
 
     setupNumberInput("scalecontrols", -100, 100, function() { saveToLocal(); redraw(); });
+    setupNumberInput("rscalecontrols", -100, 100, function() { saveToLocal(); redraw(); });
     setupNumberInput("mainrowcontrols", 1, undefined, function() { updateDraft(); redraw(); });
     setupNumberInput("lowrowcontrols", 1, 8, function() { updateDraft(); redraw(); });
     setupNumberInput("colcontrols", 1, undefined, function() { updateDraft(); redraw(); });
