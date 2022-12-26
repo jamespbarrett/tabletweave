@@ -287,7 +287,7 @@ function draftClick(e) {
     }
 }
 
-function setupNumberInput(id, min_val, max_val, callback, increment=1) {
+function setupNumberInput(id, min_val, max_val, callback, increment=1, wrap=false) {
     var validate = function(new_val, min_val, max_val) {
         if (typeof(min_val) == "function") {
             min_val = min_val();
@@ -295,10 +295,14 @@ function setupNumberInput(id, min_val, max_val, callback, increment=1) {
         if (typeof(max_val) == "function") {
             max_val = max_val();
         }
-        if (min_val != undefined && new_val < min_val) {
-            new_val = min_val;
-        } else if (max_val != undefined && new_val > max_val) {
-            new_val = max_val;
+        if (!wrap) {
+            if (min_val != undefined && new_val < min_val) {
+                new_val = min_val;
+            } else if (max_val != undefined && new_val > max_val) {
+                new_val = max_val;
+            }
+        } else {
+            new_val = min_val + ((new_val - min_val) % (max_val + 1 - min_val));
         }
         return new_val;
     };
@@ -536,10 +540,10 @@ $(function() {
 
     setupNumberInput("hruler", function() { return -draft.holes(); }, function() { return draft.picks() + 1; }, function() {
         view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
-    });
+    }, 1, true);
     setupNumberInput("vruler", 1, function() { return draft.tablets() + 1; }, function() {
         view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
-    });
+    }, 1, true);
     $("#showhruler").change(function() {
         view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
     });
