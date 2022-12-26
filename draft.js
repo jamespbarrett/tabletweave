@@ -179,16 +179,28 @@ function redraw() {
             var ol = $('#threadinginstructions li').last().children().last();
             for (var j = 0; j < draft.holes(); j++) {
                 if ($('#labelholescw').prop('checked')) {
-                    ol.append('<li>' + draft.describeHole(i, j) + '</li>');
+                    if ($('#showhruler').val() && $('#hruler .readout').val() == (- j - 1)) {
+                        ol.append('<li><b>' + draft.describeHole(i, j) + ' (selected)</b></li>');
+                    } else {
+                        ol.append('<li>' + draft.describeHole(i, j) + '</li>');
+                    }
                 } else {
-                    ol.append('<li>' + draft.describeHole(i, draft.holes() - j - 1) + '</li>');
+                    if ($('#showhruler').val() && $('#hruler .readout').val() == (j - draft.holes())) {
+                        ol.append('<li><b>' + draft.describeHole(i, draft.holes() - j - 1) + ' (selected)</b></li>');
+                    } else {
+                        ol.append('<li>' + draft.describeHole(i, draft.holes() - j - 1) + '</li>');
+                    }
                 }
             }
         }
 
         $('#turninginstructions').text("");
         for (i=0; i < draft.picks(); i++) {
-            $('#turninginstructions').append("<li class=\"instruction\">" + draft.describePick(i) + "</li>");
+            if($('#showhruler').val() && $('#hruler .readout').val() == (i+1)) {
+                $('#turninginstructions').append("<li class=\"instruction\"><b>" + draft.describePick(i) + " (selected)</b></li>");
+            } else {
+                $('#turninginstructions').append("<li class=\"instruction\">" + draft.describePick(i) + "</li>");
+            }
         }
 
         $('#textinstructions').show();
@@ -308,7 +320,8 @@ function setupNumberInput(id, min_val, max_val, callback, increment=1, wrap=fals
                 new_val = max_val;
             }
         } else {
-            new_val = min_val + ((new_val - min_val) % (max_val + 1 - min_val));
+            var mod = (max_val + 1 - min_val);
+            new_val = min_val + ((((new_val - min_val) % mod) + mod) % mod);
         }
         return new_val;
     };
