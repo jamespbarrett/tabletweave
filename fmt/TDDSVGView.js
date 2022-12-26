@@ -524,8 +524,10 @@ class TDDSVGView {
     }
 
     conform_rulers (draft) {
+        const num_picks = (this.repeats == undefined)?draft.picks():(this.end_pick - this.start_pick + 1)*this.repeats;
+
         const threading_start_y = (this.show_turning)?(
-            (cellborder + cellheight)*draft.picks() +
+            (cellborder + cellheight)*num_picks +
             intertablegap
         ):intertablegap;
 

@@ -42,7 +42,8 @@
       "showrepeat": "リピートの表示",
       "repeatstart": "リピート開始行:",
       "repeatend": "リピート終了行:",
-      "numrepeats": "リピート回数:"
+      "numrepeats": "リピート回数:",
+      "scalecontrols": "表示サイズ:"
     },
     "resets": {
       "name": "リセット",
