@@ -306,7 +306,7 @@ function draftClick(e) {
 }
 
 function setupNumberInput(id, min_val, max_val, callback, increment=1, wrap=false) {
-    var validate = function(new_val, min_val, max_val) {
+    var validate = function(new_val, min_val, max_val, inc=false) {
         if (typeof(min_val) == "function") {
             min_val = min_val();
         }
@@ -318,6 +318,10 @@ function setupNumberInput(id, min_val, max_val, callback, increment=1, wrap=fals
                 new_val = min_val;
             } else if (max_val != undefined && new_val > max_val) {
                 new_val = max_val;
+            }
+        } else if (inc) {
+            if (new_val > max_val) {
+                new_val = 1;
             }
         } else {
             var mod = (max_val + 1 - min_val);
@@ -336,7 +340,7 @@ function setupNumberInput(id, min_val, max_val, callback, increment=1, wrap=fals
         callback();
     });
     $("#" + id + " .plus").click(function() {
-        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val())/increment) + 1)*increment, min_val, max_val);
+        var new_val = validate((Math.round(parseFloat($("#" + id + " .readout").val())/increment) + 1)*increment, min_val, max_val, true);
         $("#" + id + " .readout").val(new_val);
         callback();
     });
