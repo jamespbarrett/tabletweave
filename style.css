@@ -359,3 +359,7 @@ div.controlpanel > div > span > span {
   .slider.round:before {
     border-radius: 50%;
   }
+
+  #GREYSLIDER {
+    width: 50%;
+  }
