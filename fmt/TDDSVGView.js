@@ -52,6 +52,9 @@ class TDDSVGView {
             {fill: "#ffffff", stroke: "#000000", strokeWidth: 0}
         );
 
+        // The Twist diagram
+        this.twist = [];
+
         // The turning diagram
         this.turning = [];
 
@@ -70,8 +73,10 @@ class TDDSVGView {
         this.show_threading=true;
         this.showing_turning=true;
         this.showing_threading=true;
+        this.showing_twist=true;
         this.show_ovals=true;
         this.show_squares=true;
+        this.show_twist=true;
         this.show_reversals=true;
         this.labelholescw=true;
         this.labelingholescw=true;
@@ -91,6 +96,7 @@ class TDDSVGView {
         this.repeats=undefined;
 
         // Stuctural elements for arranging the svg
+        this.twist_group = this.svg.group();
         this.main_group = this.svg.group();
         this.tablet_label_group = this.svg.group();
         this.overlay = this.svg.group();
@@ -147,6 +153,10 @@ class TDDSVGView {
 
     showSquares(val) {
         this.show_squares = val;
+    }
+
+    showTwist(val) {
+        this.show_twist = val;
     }
 
     showReversals(val) {
@@ -233,11 +243,13 @@ class TDDSVGView {
             (this.threading.length > 0 && this.threading[0].holes.length != draft.holes()) ||
             (this.show_threading != this.showing_threading) ||
             (this.show_turning != this.showing_turning) ||
+            (this.show_twist != this.showing_twist) ||
             (this.labelholescw != this.labelingholescw)
         ) {
             this.conform_size(draft);
         }
 
+        this.conform_twist(draft);
         this.conform_threading(draft);
         this.conform_turning(draft);
         this.conform_rulers(draft);
@@ -247,13 +259,25 @@ class TDDSVGView {
         const num_picks = (this.repeats == undefined)?draft.picks():(this.end_pick - this.start_pick + 1)*this.repeats;
 
         // First calculate the sizes
-        const threading_start_y = (this.show_turning)?(
-            (cellborder + cellheight)*num_picks +
-            intertablegap
-        ):intertablegap;
+        const turning_start_y = (this.show_twist)?(
+            cellborder + cellheight
+        ):0;
+        const threading_start_y = turning_start_y + (
+            (this.show_turning)?(
+                (cellborder + cellheight)*num_picks +
+                intertablegap
+            ):intertablegap
+        );
 
         const fullheight = (
             (
+                (this.show_twist)?
+                (
+                    cellborder +
+                    cellheight +
+                    cellborder
+                ):0
+            ) + (
                 (this.show_turning)?
                 (
                     cellborder +
@@ -292,7 +316,7 @@ class TDDSVGView {
         }
         for (var y = 0; y < this.labels.picks.length; y++) {
             $(this.labels.picks[y]).attr('x', this.labelwidth - labelpadding);
-            $(this.labels.picks[y]).attr('y', (cellborder + cellheight)*(num_picks - y) - 5);
+            $(this.labels.picks[y]).attr('y', turning_start_y + (cellborder + cellheight)*(num_picks - y) - 5);
             if (this.repeats != undefined) {
                 $(this.labels.picks[y]).text("" + ((y%(this.end_pick - this.start_pick + 1)) + this.start_pick));
             }
@@ -306,7 +330,7 @@ class TDDSVGView {
             this.labels.picks.push(this.svg.text(
                 this.main_group,
                 this.labelwidth - labelpadding,
-                (cellborder + cellheight)*(num_picks - y) - 5,
+                turning_start_y + (cellborder + cellheight)*(num_picks - y) - 5,
                 label,
                 {stroke: "#000000", style: "font: 15px Arial; text-anchor: end;"}
             ));
@@ -354,6 +378,25 @@ class TDDSVGView {
             ));
         }
 
+        // Now we conform the labels of the twist diagram
+        while (draft.tablets() < this.twist.length) {
+            $(this.twist.pop()).remove();
+        }
+        for(var x = 0; x < this.twist.length; x++) {
+            $(this.twist[x]).attr('x', this.labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2);
+            $(this.twist[x]).attr('y', turning_start_y - cellborder - 2);
+        }
+        while(this.twist.length < draft.tablets()) {
+            x = this.twist.length;
+            this.twist.push(this.svg.text(
+                this.twist_group,
+                this.labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                turning_start_y - cellborder - 2,
+                "✅",
+                {stroke: "#000000", style: "font: 10px Arial; text-anchor: middle;"}
+            ));
+        }
+
         // Now we conform the cells of the turning diagram
         for (y = 0; y < num_picks; y++) {
             if (y >= this.turning.length) {
@@ -362,9 +405,10 @@ class TDDSVGView {
             for (x = 0; x < draft.tablets(); x++) {
                 if (x >= this.turning[y].length) {
                     this.turning[y].push(
-                        this.create_cell(x, y)
+                        this.create_cell(x, y, turning_start_y)
                     );
                 }
+                this.move_cell(this.turning[y][x], x, y, turning_start_y);
                 // Conform cell
             }
             while (draft.tablets() < this.turning[y].length) {
@@ -413,6 +457,39 @@ class TDDSVGView {
             while (tablet.holes.length > 0) {
                 this.remove_cell(tablet.holes.pop());
             }
+        }
+    }
+
+    conform_twist (draft) {
+        if (this.show_twist) {
+            $(this.root()).append(this.twist_group);
+            $(this.twist_group).attr('visibility', 'visible');
+
+            for (var x = 0; x < draft.tablets(); x++) {
+                var twist = 0;
+                for (var y = 0; y < draft.picks(); y++) {
+                    if(draft.turning[y][x] == "/") {
+                        twist++;
+                    }
+                    else if (draft.turning[y][x] == "\\") {
+                        twist--;
+                    }
+                }
+
+                if (twist < 0) {
+                    $(this.twist[x]).text("" + (-twist) + "B");
+                }
+                else if (twist == 0) {
+                    $(this.twist[x]).text("✅");
+                }
+                else {
+                    $(this.twist[x]).text("" + twist + "F");
+                }
+            }
+            this.showing_twist = true;
+        } else {
+            $(this.twist_group).detach();
+            this.showing_twist = false;
         }
     }
 
@@ -539,10 +616,15 @@ class TDDSVGView {
     conform_rulers (draft) {
         const num_picks = (this.repeats == undefined)?draft.picks():(this.end_pick - this.start_pick + 1)*this.repeats;
 
-        const threading_start_y = (this.show_turning)?(
-            (cellborder + cellheight)*num_picks +
-            intertablegap
-        ):intertablegap;
+        const turning_start_y = (this.show_twist)?(
+            cellborder + cellheight
+        ):0;
+        const threading_start_y = turning_start_y + (
+            (this.show_turning)?(
+                (cellborder + cellheight)*num_picks +
+                intertablegap
+            ):intertablegap
+        );
 
         if (this.hruler_position == undefined || (!this.showing_turning && this.hruler_position > 0) || (!this.show_threading && this.hruler_position <= 0)) {
             $(this.hruler).attr('visibility', 'hidden');
@@ -556,8 +638,8 @@ class TDDSVGView {
 
             if (this.hruler_position > 0) {
                 $(this.hruler).attr('visibility', 'visible');
-                $(this.hruler).attr('y1', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
-                $(this.hruler).attr('y2', (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
+                $(this.hruler).attr('y1', turning_start_y + (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
+                $(this.hruler).attr('y2', turning_start_y + (cellborder + cellheight)*(draft.picks() - this.hruler_position + 1));
                 this.ruler_group.append(this.hruler);
             } else {
                 $(this.hruler).attr('visibility', 'visible');
@@ -570,9 +652,9 @@ class TDDSVGView {
         if (this.vruler_position == undefined) {
             $(this.vruler.turning).attr('visibility', 'hidden');
             $(this.vruler.turning).attr('x1', this.labelwidth);
-            $(this.vruler.turning).attr('y1', 0);
+            $(this.vruler.turning).attr('y1', turning_start_y);
             $(this.vruler.turning).attr('x2', this.labelwidth);
-            $(this.vruler.turning).attr('y2', 0);
+            $(this.vruler.turning).attr('y2', turning_start_y);
 
             $(this.vruler.threading).attr('visibility', 'hidden');
             $(this.vruler.threading).attr('x1', this.labelwidth);
@@ -583,15 +665,15 @@ class TDDSVGView {
             if (this.show_turning) {
                 $(this.vruler.turning).attr('visibility', 'visible');
                 $(this.vruler.turning).attr('x1', this.labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
-                $(this.vruler.turning).attr('y1', 0);
+                $(this.vruler.turning).attr('y1', turning_start_y);
                 $(this.vruler.turning).attr('x2', this.labelwidth + (cellwidth + cellborder)*(this.vruler_position - 1));
-                $(this.vruler.turning).attr('y2', (cellheight + cellborder)*draft.picks() + cellborder);
+                $(this.vruler.turning).attr('y2', turning_start_y + (cellheight + cellborder)*draft.picks() + cellborder);
             } else {
                 $(this.vruler.turning).attr('visibility', 'hidden');
                 $(this.vruler.turning).attr('x1', this.labelwidth);
-                $(this.vruler.turning).attr('y1', 0);
+                $(this.vruler.turning).attr('y1', turning_start_y);
                 $(this.vruler.turning).attr('x2', this.labelwidth);
-                $(this.vruler.turning).attr('y2', 0);
+                $(this.vruler.turning).attr('y2', turning_start_y);
             }
 
             if (this.show_threading) {
@@ -740,18 +822,26 @@ class TDDSVGView {
     }
     
     svg_coord_to_pick(y, draft) {
-        if (!this.show_turning || y >= (cellborder + cellheight)*draft.picks()) {
+        const turning_start_y = (this.show_twist)?(
+            cellborder + cellheight
+        ):0;
+        if (!this.show_turning || y >= (turning_start_y + (cellborder + cellheight)*draft.picks())) {
           return -1;
         } else {
-          return draft.picks() - parseInt(y/(cellborder + cellheight)) - 1;
+          return draft.picks() - parseInt((y - turning_start_y)/(cellborder + cellheight)) - 1;
         }
     }
     
     svg_coord_to_hole(y, draft) {
-        const threading_start_y = (this.show_turning)?(
-          (cellborder + cellheight)*draft.picks() +
-          intertablegap
+        const turning_start_y = (this.show_twist)?(
+            cellborder + cellheight
         ):0;
+        const threading_start_y = turning_start_y + (
+            (this.show_turning)?(
+            (cellborder + cellheight)*draft.picks() +
+            intertablegap
+            ):0
+        );
     
         const threading_end_y = (
           threading_start_y +

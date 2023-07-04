@@ -29,6 +29,7 @@
       "name": "Display",
       "showovals": "Show Threads",
       "showsquares": "Only Show Thread Colour",
+      "showtwist": "Show twist",
       "showupper": "Show Turning Diagram",
       "showlower": "Show Threading Diagram",
       "showreversal": "Show Reversal Points",
