@@ -71,6 +71,7 @@ class TDDSVGView {
         this.showing_turning=true;
         this.showing_threading=true;
         this.show_ovals=true;
+        this.show_squares=true;
         this.show_reversals=true;
         this.labelholescw=true;
         this.labelingholescw=true;
@@ -142,6 +143,10 @@ class TDDSVGView {
 
     showOvals(val) {
         this.show_ovals = val;
+    }
+
+    showSquares(val) {
+        this.show_squares = val;
     }
 
     showReversals(val) {
@@ -492,17 +497,25 @@ class TDDSVGView {
                         var fg;
                         this.set_cell_direction(this.turning[y][x], draft.turning[y][x]);
                         if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
-                            this.set_cell_background(this.turning[y][x], this.forwardcolour);
                             fg = draft.threadColour(x, tablet_position[x]);
+                            if(this.show_squares) {
+                                this.set_cell_background(this.turning[y][x], fg);
+                            } else {
+                                this.set_cell_background(this.turning[y][x], this.forwardcolour);
+                            }
                             this.turning[y][x].b = false;
                             tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
                         } else {
-                            this.set_cell_background(this.turning[y][x], this.backwardcolour);
                             fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
+                            if(this.show_squares) {
+                                this.set_cell_background(this.turning[y][x], fg);
+                            } else {
+                                this.set_cell_background(this.turning[y][x], this.backwardcolour);
+                            }
                             this.turning[y][x].b = true;
                             tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
                         }
-                        if (this.show_ovals) {
+                        if (!this.show_squares && this.show_ovals) {
                             this.set_cell_colour(this.turning[y][x], fg);
                         } else {
                             this.set_cell_colour(this.turning[y][x], undefined);

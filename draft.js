@@ -21,6 +21,7 @@ function control_vals() {
         rscale: $('#rscalecontrols .readout').val(),
         showtext: $("#showtext").prop("checked"),
         showovals: $("#showovals").prop("checked"),
+        showsquares: $("#showsquares").prop("checked"),
         showupper: $("#showupper").prop("checked"), 
         showlower: $("#showlower").prop("checked"),
         showreversal: $("#showreversal").prop("checked"),
@@ -57,6 +58,7 @@ function loadFromLocal() {
     $("#addright").prop("checked", ((controls.addright != undefined)?controls.addright:true));
     $("#lockdraft").prop("checked", ((controls.lockdraft != undefined)?controls.lockdraft:false));
     $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
+    $("#showsquares").prop("checked", ((controls.showsquares != undefined)?controls.showsquares:false));
     $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
     $("#showupper").prop("checked", ((controls.showupper != undefined)?controls.showupper:true));
     $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
@@ -454,6 +456,7 @@ function reset() {
     $('#scalecontrols .readout').val(0);
     $("#lockdraft").prop("checked", false);
     $("#showovals").prop("checked", true);
+    $("#showsquares").prop("checked", false);
     $("#showupper").prop("checked", true);
     $("#showlower").prop("checked", true);
     $("#showreversal").prop("checked", true);
@@ -585,6 +588,7 @@ $(function() {
     });
 
     $("#showovals").change(function() { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
+    $("#showsquares").change(function() { view.showSquares($("#showsquares").prop('checked')); saveToLocal(); redraw(); });
     $("#showupper").change(function() { view.showTurning($("#showupper").prop('checked')); saveToLocal(); redraw(); });
     $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
     $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
@@ -637,6 +641,7 @@ $(function() {
     loadFromLocal();
 
     view.showOvals($("#showovals").prop('checked'));
+    view.showSquares($("#showsquares").prop('checked'));
     view.showTurning($("#showupper").prop('checked'));
     view.showThreading($("#showlower").prop('checked'));
     view.showReversals($("#showreversal").prop('checked'));
