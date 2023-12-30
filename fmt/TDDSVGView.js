@@ -10,6 +10,8 @@ const labelpadding = 3;
 
 const hole_labels = [ "A", "B", "C", "D", "E", "F", "G", "H" ];
 
+emptycellColour = new RGBColour(0xFF, 0xFF, 0xFF);
+
 class TDDSVGView {
     constructor () {
         var parent = document.createElement("div");
@@ -51,6 +53,10 @@ class TDDSVGView {
             0, 0, fullwidth, fullheight,
             {fill: "#ffffff", stroke: "#000000", strokeWidth: 0}
         );
+
+        var fillpat = this.svg.pattern("fillpat", 0, 0, 4, 4, {patternUnits: "userSpaceOnUse"});
+        this.svg.rect(fillpat, 0, 0, 2, 2, {fill: "#000000", stroke: "#000000", strokeWidth: 0});
+        this.svg.rect(fillpat, 2, 2, 2, 2, {fill: "#000000", stroke: "#000000", strokeWidth: 0});
 
         // The Twist diagram
         this.twist = [];
@@ -799,7 +805,12 @@ class TDDSVGView {
     }
 
     set_cell_background (cell, colour) {
-        $(cell.rect).attr('fill', colour.getCSSHexadecimalRGB());
+        if (colour == undefined) {
+            $(cell.rect).attr('fill', "url(#fillpat)");
+        }
+        else {
+            $(cell.rect).attr('fill', colour.getCSSHexadecimalRGB());
+        }
     }
 
     set_cell_reverse_marker(cell, val) {
