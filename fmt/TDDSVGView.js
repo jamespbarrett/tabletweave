@@ -86,6 +86,8 @@ class TDDSVGView {
         this.show_reversals=true;
         this.labelholescw=true;
         this.labelingholescw=true;
+        this.invertsz=false;
+        this.invertingsz=false;
         var grey_saturation=0x99;
         this.hruler_position=undefined;
         this.vruler_position=undefined;
@@ -173,6 +175,10 @@ class TDDSVGView {
         this.labelholescw = val;
     }
 
+    invertSZ(val) {
+        this.invertsz = val;
+    }
+
     greySaturation(val) {
         this.backwardcolour = new RGBColour(
             val,
@@ -250,7 +256,8 @@ class TDDSVGView {
             (this.show_threading != this.showing_threading) ||
             (this.show_turning != this.showing_turning) ||
             (this.show_twist != this.showing_twist) ||
-            (this.labelholescw != this.labelingholescw)
+            (this.labelholescw != this.labelingholescw) ||
+            (this.invertsz != this.invertingholessz)
         ) {
             this.conform_size(draft);
         }
@@ -505,7 +512,7 @@ class TDDSVGView {
             $(this.threading_group).attr('visibility', 'visible');
 
             for (var x = 0; x < draft.tablets(); x++) {
-                $(this.threading[x].direction).text(draft.threading[x]);
+                $(this.threading[x].direction).text(((draft.threading[x] == "S") != this.invertsz)?"S":"Z");
 
                 for (var y = 0; y < draft.holes(); y++) {
                     if (draft.threading[x] == "S")
@@ -519,6 +526,7 @@ class TDDSVGView {
                         this.set_cell_colour(this.threading[x].holes[y], undefined);
                 }
             }
+            this.invertingsz = this.invertsz;
             this.showing_threading = true;
         } else {
             $(this.threading_group).detach();

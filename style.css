@@ -347,6 +347,14 @@ div.controlpanel > div > span > span {
     background-color: #F32121;
   }
 
+  #invertsz + .slider {
+    background-color: #ccc;
+  }
+
+  #invertsz:checked + .slider {
+    background-color: #F32121;
+  }
+
   label[for="labelholescw"],label[for="lockdraft"],label[for="addright"] {
       line-height: 60px;
   }

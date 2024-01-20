@@ -37,7 +37,8 @@
       "showtext": "テキストでの説明表示",
       "saturationcontrols": "後方回転時の背景の彩度:",
       "scalecontrols": "表示サイズ:",
-      "labelholescw": "右巻きに穴を銘打つ"
+      "labelholescw": "右巻きに穴を銘打つ",
+      "invertsz": "S↔Z"
     },
     "repeats": {
       "name": "リピート",

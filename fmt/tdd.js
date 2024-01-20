@@ -280,8 +280,8 @@ class TDDDraft {
     return desc;
   }
 
-  describeTablet (x) {
-    return this.threading[x] + " threaded tablet";
+  describeTablet (x, invertsz) {
+    return (((this.threading[x] == "S") != invertsz)?"S":"Z") + " threaded tablet";
   }
 
   describeHole(x, y) {

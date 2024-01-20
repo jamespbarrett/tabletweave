@@ -36,7 +36,8 @@
       "showtext": "Show Text Description",
       "saturationcontrols": "Backwards Turn Saturation:",
       "scalecontrols": "Visual Scale:",
-      "labelholescw": "Label Holes Clockwise"
+      "labelholescw": "Label Holes Clockwise",
+      "invertsz": "S↔Z"
     },
     "repeats": {
       "name": "Repeats",

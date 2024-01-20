@@ -27,6 +27,7 @@ function control_vals() {
         showlower: $("#showlower").prop("checked"),
         showreversal: $("#showreversal").prop("checked"),
         labelholescw: $("#labelholescw").prop("checked"),
+        invertsz: $("#invertsz").prop("checked"),
         grey_saturation: $("#GREYSLIDER").val(),
         showhruler: $("#showhruler").prop("checked"),
         showvruler: $("#showvruler").prop("checked"),
@@ -67,6 +68,7 @@ function loadFromLocal() {
     $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
     $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
     $("#labelholescw").prop("checked", ((controls.labelholescw != undefined)?controls.labelholescw:true));
+    $("#invertsz").prop("checked", ((controls.invertsz != undefined)?controls.invertsz:false));
     $("#showhruler").prop("checked", ((controls.showhruler != undefined)?controls.showhruler:true));
     $("#showvruler").prop("checked", ((controls.showvruler != undefined)?controls.showvruler:true));
     $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
@@ -177,8 +179,9 @@ function redraw() {
     $('#threadinginstructions').text("");
 
     if ($('#showtext').prop('checked')) {
+        var invertsz = $("#invertsz").prop('checked');
         for (i=0; i < draft.tablets(); i++) {
-            $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i) + " (" +  ($('#labelholescw').prop('checked')?'&#x21BB;': '&#x21BA;') + ")</li>");
+            $('#threadinginstructions').append("<li class=\"instruction\">" + draft.describeTablet(i, invertsz) + " (" +  ($('#labelholescw').prop('checked')?'&#x21BB;': '&#x21BA;') + ")</li>");
             $('#threadinginstructions li').last().append('<ol type="A"></ol>');
             var ol = $('#threadinginstructions li').last().children().last();
             for (var j = 0; j < draft.holes(); j++) {
@@ -467,6 +470,7 @@ function reset() {
     $("#GREYSLIDER").val(144);
     $("#addright").prop("checked", true);
     $("#labelholescw").prop("checked", true);
+    $("#invertsz").prop("checked", false);
 
     $("#showhruler").prop("checked", false);
     $("#showvruler").prop("checked", false);
@@ -489,8 +493,9 @@ function textDescriptionString() {
     desc += "\n" + ("=".repeat(draft.name.length+2));
     
     desc += "\n\nThreading:";
+    var invertsz = $('#invertsz').prop('checked');
     for (var i=0; i < draft.tablets(); i++) {
-        desc += "\n * " + draft.describeTablet(i) + " (" +  String.fromCharCode($('#labelholescw').prop('checked')?0x21BB:0x21BA) + ")";
+        desc += "\n * " + draft.describeTablet(i, invertsz) + " (" +  String.fromCharCode($('#labelholescw').prop('checked')?0x21BB:0x21BA) + ")";
         for (var j=0; j < draft.holes(); j++) {
             var char = String.fromCharCode("A".charCodeAt(0) + j);
             desc += "\n    " + char + ": ";
@@ -598,6 +603,7 @@ $(function() {
     $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
     $("#showtext").change(function() {saveToLocal(); redraw(); });
     $("#labelholescw").change(function() { view.labelHolesCW($("#labelholescw").prop('checked')); saveToLocal(); redraw(); });
+    $("#invertsz").change(function() { view.invertSZ($("#invertsz").prop('checked')); saveToLocal(); redraw(); });
 
     $('#EMPTYBOX').click(function() { fgcol = -1; saveToLocal(); redrawControls(); });
     var i;
@@ -652,6 +658,7 @@ $(function() {
     view.showReversals($("#showreversal").prop('checked'));
     view.greySaturation(0x100 - $('#GREYSLIDER').val()) ;
     view.labelHolesCW($("#labelholescw").prop('checked'));
+    view.invertSZ($("#invertsz").prop('checked'));
     view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
     view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
 
