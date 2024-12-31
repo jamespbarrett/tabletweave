@@ -402,10 +402,12 @@ function setControlsFromDraft() {
 
     if ($("#repeatstart .readout").val() > draft.picks()) {
         $("#repeatstart .readout").val(draft.picks());
+        repeat.startPick(draft.picks());
     }
 
     if ($("#repeatend .readout").val() > draft.picks()) {
         $("#repeatend .readout").val(draft.picks());
+        repeat.endPick(draft.picks());
     }
 }
 
