@@ -20,6 +20,8 @@ class TDDSVGView {
 
         this.labelwidth = 30;
 
+        this.needs_full_redraw = true;
+
         // Height and width will really be set when we
         // conform to a draft, for now set some defaults
         const fullheight = (
@@ -84,6 +86,7 @@ class TDDSVGView {
         this.show_squares=true;
         this.show_twist=true;
         this.show_reversals=true;
+        this.show_grid=true;
         this.labelholescw=true;
         this.labelingholescw=true;
         this.invertsz=false;
@@ -171,6 +174,13 @@ class TDDSVGView {
         this.show_reversals = val;
     }
 
+    showGrid(val) {
+        if(this.show_grid != val) {
+            this.needs_full_redraw = true;
+        }
+        this.show_grid = val;
+    }
+
     labelHolesCW(val) {
         this.labelholescw = val;
     }
@@ -241,6 +251,7 @@ class TDDSVGView {
         }
 
         if (
+            this.needs_full_redraw ||
             (
                 this.repeats != undefined &&
                 (
@@ -266,6 +277,8 @@ class TDDSVGView {
         this.conform_threading(draft);
         this.conform_turning(draft);
         this.conform_rulers(draft);
+
+        this.needs_full_redraw = false;
     }
 
     conform_size(draft) {
@@ -718,7 +731,7 @@ class TDDSVGView {
             cellheight + cellborder,
             {
               fill: this.forwardcolour.getCSSHexadecimalRGB(),
-              strokeWidth: cellborder,
+              strokeWidth: this.show_grid ? cellborder : 0,
               stroke: "#000000"
             }
         );
@@ -784,6 +797,7 @@ class TDDSVGView {
     move_cell(cell, x, y, offset=0) {
         $(cell.rect).attr('x', this.labelwidth + (cellborder + cellwidth)*x);
         $(cell.rect).attr('y', offset + (cellborder + cellheight)*y);
+        $(cell.rect).css("strokeWidth", this.show_grid ? cellborder : 0);
         $(cell.revline).attr('x1', this.labelwidth + (cellborder + cellwidth)*x);
         $(cell.revline).attr('y1', offset + (cellborder + cellheight)*(y + 1));
         $(cell.revline).attr('x2', this.labelwidth + (cellborder + cellwidth)*(x + 1));
