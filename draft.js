@@ -423,6 +423,10 @@ function loadFile() {
                 try {
                     var data = e.target.result;
 
+                    if(!is_tdd && (data.substring(0, 5) === "# tdd")) {
+                        is_tdd = true;
+                    }
+
                     if (is_tdd) {
                         draft = TDDDraftFromString(data);
                     } else {
@@ -438,7 +442,7 @@ function loadFile() {
                 redrawControls();
                 redraw();
             };
-        })(/^.*\.tdd$/.test(files[0].name));
+        })(/^.*\.tdd(\.txt)?$/.test(files[0].name));
 
         reader.readAsText(files[0]);
     }
