@@ -298,12 +298,22 @@ function draftClick(e) {
         var tablet = view.svg_coord_to_tablet(svgP.x, view, draft);
         var pick = view.svg_coord_to_pick(svgP.y, draft);
         var hole = view.svg_coord_to_hole(svgP.y, draft);
+        var control = view.svg_coord_to_control(svgP.y, draft);
 
         if (tablet >= 0) {
             if (pick >= 0) {
                 draft.reverse(tablet, pick);
             } else if (hole >= 0) {
                 draft.setThreadColour(tablet, hole, fgcol);
+            } else if (control == "TOE") {
+                var phase = draft.phase(tablet);
+                if (phase == 'T') {
+                    draft.setPhase(tablet, "O");
+                } else if (phase == 'O') {
+                    draft.setPhase(tablet, "E");
+                } else {
+                    draft.setPhase(tablet, "T");
+                }
             } else {
                 draft.flip(tablet);
             }

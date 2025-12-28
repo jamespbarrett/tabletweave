@@ -15,6 +15,9 @@ class TDDDraft {
     this.threading = [
       'Z'
     ];
+    this.threadingPhases = [
+      'T'
+    ];
     this.turning = [
       ['\\']
     ];
@@ -38,7 +41,7 @@ class TDDDraft {
   }
 
   toString() {
-    var r = "# tdd v1.0\n";
+    var r = "# tdd v1.1\n";
     r += "# " + this.name + "\n";
     r += "\n";
 
@@ -58,6 +61,10 @@ class TDDDraft {
     });
 
     this.threading.forEach((col) => {
+      r += col;
+    });
+    r += '\n';
+    this.threadingPhases.forEach((col) => {
       r += col;
     });
     r += "\n\n";
@@ -112,6 +119,7 @@ class TDDDraft {
 
     for (j=0; j < num; j++) {
       this.threading.push(this.threading[this.threading.length - 1]);
+      this.threadingPhases.push(this.threadingPhases[this.threadingPhases.length - 1]);
 
       for (i=0; i < this.threadingColours.length; i++) {
         var elem = this.threadingColours[i][this.threadingColours[i].length - 1];
@@ -129,6 +137,7 @@ class TDDDraft {
       this.threadingColours[i] = this.threadingColours[i].slice(0, Math.max(this.threadingColours[i].length - num, 1));
     }
     this.threading = this.threading.slice(0, Math.max(this.threading.length - num, 1));
+    this.threadingPhases = this.threadingPhases.slice(0, Math.max(this.threadingPhases.length - num, 1));
   }
 
   addTabletsLeft(num) {
@@ -143,6 +152,7 @@ class TDDDraft {
 
     for (j=0; j < num; j++) {
       this.threading.unshift(this.threading[0]);
+      this.threadingPhases.unshift(this.threadingPhases[0]);
 
       for (i=0; i < this.threadingColours.length; i++) {
         this.threadingColours[i].unshift(this.threadingColours[i][0]);
@@ -159,6 +169,7 @@ class TDDDraft {
       this.threadingColours[i] = this.threadingColours[i].slice(Math.min(num, this.threadingColours[i].length - 1), this.threadingColours[i].length);
     }
     this.threading = this.threading.slice(Math.min(num, this.threading.length - 1), this.threading.length);
+    this.threadingPhases = this.threadingPhases.slice(Math.min(num, this.threadingPhases.length - 1), this.threadingPhases.length);
   }
 
   colour(num) {
@@ -225,6 +236,19 @@ class TDDDraft {
     this.reverse(tablet, 0);
   }
 
+  phase(tablet) {
+    return this.threadingPhases[tablet];
+  }
+
+  setPhase(tablet, phase) {
+    if (phase == 'O' || phase == 'E') {
+      this.threadingPhases[tablet] = phase;
+    }
+    else {
+      this.threadingPhases[tablet] = 'T';
+    }
+  }
+
   threadCount(c) {
     if (0 <= c && c < 10) {
       return this.threadingColours.reduce((count, colours) => (count + colours.filter(x => x == '' + c).length), 0);
@@ -257,9 +281,19 @@ class TDDDraft {
     for (var i = 0; i < this.tablets(); i++) {
       var new_dir;
       if ((this.turning[this.picks() - 1 - num][i] == "\\") == (this.threading[i] == "Z")) {
-        new_dir = "F";
+        if (this.threadingPhases[i] == "T" || (((num % 2) == 0) == (this.threadingPhases[i] == "O"))) {
+          new_dir = "F";
+        }
+        else {
+          new_dir = "I";
+        }
       } else {
-        new_dir = "B";
+        if (this.threadingPhases[i] == "T" || (((num % 2) == 0) == (this.threadingPhases[i] == "E"))) {
+          new_dir = "B";
+        }
+        else {
+          new_dir = "I";
+        }
       }
 
       if (new_dir == dir) {
@@ -281,7 +315,14 @@ class TDDDraft {
   }
 
   describeTablet (x, invertsz) {
-    return (((this.threading[x] == "S") != invertsz)?"S":"Z") + " threaded tablet";
+    var r = (((this.threading[x] == "S") != invertsz)?"S":"Z") + " threaded tablet";
+    if (this.threadingPhases[x] == 'O') {
+      r += " turning only on odd picks";
+    }
+    else if (this.threadingPhases[x] == 'E') {
+      r += " turning only on even picks";
+    }
+    return r;
   }
 
   describeHole(x, y) {
@@ -304,7 +345,7 @@ function TDDDraftFromString(raw) {
   if (!match)
     throw "Not a valid tdd file";
 
-  if (match[1] > 1 || (match[1] == 1 && match[2] > 0)) {
+  if (match[1] > 1 || (match[1] == 1 && match[2] > 1)) {
     alert("WARNING: Processing tdd file from future version of tdd. This may not work.")
   }
 
@@ -348,6 +389,11 @@ function TDDDraftFromString(raw) {
       for (let c of line) {
         r.threading.push(c);
       }
+    } else if (line.match(/^[TOE]+$/)) {
+      r.threadingPhases = [];
+      for (let c of line) {
+        r.threadingPhases.push(c);
+      }
     } else {
       var row = [];
       for (let c of line) {
@@ -358,6 +404,12 @@ function TDDDraftFromString(raw) {
 
     line = lines.shift();
   }
+  for (i = 0; i < r.threading.length; ++i) {
+    if ( i > r.threadingPhases.length ) {
+      r.threadingPhases.push('T');
+    }
+  }
+  r.threadingPhases = r.threadingPhases.slice(0, r.threading.length);
 
   // Discard empty lines
   var line = lines.shift();

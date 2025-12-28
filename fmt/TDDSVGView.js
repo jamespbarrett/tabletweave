@@ -244,6 +244,7 @@ class TDDSVGView {
             while (this.threading.length > 0) {
                 var tablet = this.threading.pop();
                 $(tablet.direction).remove();
+                $(tablet.phase).remove();
                 while (tablet.holes.length > 0) {
                     this.remove_cell(tablet.holes.pop());
                 }
@@ -316,7 +317,7 @@ class TDDSVGView {
               (
                 intertablegap +
                 cellborder +
-                (cellborder + cellheight)*draft.holes()
+                (cellborder + cellheight)*(draft.holes() + 1)
               ):0
             )
         );
@@ -459,11 +460,20 @@ class TDDSVGView {
                         "S",
                         {stroke: "#000000", style: "font: 15px Arial; text-anchor: middle;"}
                     ),
+                    phase: this.svg.text(
+                        this.threading_main_group,
+                        this.labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
+                        threading_start_y + (cellborder + cellheight)*(draft.holes() + 1) + 15,
+                        "T",
+                        {stroke: "#000000", style: "font: 15px Arial; text-anchor: middle;"}
+                    ),
                     holes: []
                 });
             }
             $(this.threading[x].direction).attr('x', this.labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2);
             $(this.threading[x].direction).attr('y', threading_start_y + (cellborder + cellheight)*draft.holes() + 15);
+            $(this.threading[x].phase).attr('x', this.labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2);
+            $(this.threading[x].phase).attr('y', threading_start_y + (cellborder + cellheight)*(draft.holes() + 1) + 15);
             for (y = 0; y < draft.holes(); y++) {
                 if (y >= this.threading[x].holes.length) {
                     this.threading[x].holes.push(
@@ -480,6 +490,7 @@ class TDDSVGView {
         while (this.threading.length > draft.tablets()) {
             var tablet = this.threading.pop();
             $(tablet.direction).remove();
+            $(tablet.phase).remove();
             while (tablet.holes.length > 0) {
                 this.remove_cell(tablet.holes.pop());
             }
@@ -495,10 +506,18 @@ class TDDSVGView {
                 var twist = 0;
                 for (var y = 0; y < draft.picks(); y++) {
                     if(draft.turning[y][x] == "/") {
-                        twist++;
+                        if (draft.threadingPhases[x] == 'T' || (
+                            (draft.threadingPhases[x] == 'O') == ((y + 1 - draft.picks()) % 2 == 0)
+                        )) {
+                            twist++;
+                        }
                     }
                     else if (draft.turning[y][x] == "\\") {
-                        twist--;
+                        if (draft.threadingPhases[x] == 'T' || (
+                            (draft.threadingPhases[x] == 'E') == ((y + 1 - draft.picks()) % 2 == 0)
+                        )) {
+                            twist--;
+                        }
                     }
                 }
 
@@ -526,6 +545,7 @@ class TDDSVGView {
 
             for (var x = 0; x < draft.tablets(); x++) {
                 $(this.threading[x].direction).text(((draft.threading[x] == "S") != this.invertsz)?"S":"Z");
+                $(this.threading[x].phase).text(draft.threadingPhases[x]);
 
                 for (var y = 0; y < draft.holes(); y++) {
                     if (draft.threading[x] == "S")
@@ -582,11 +602,19 @@ class TDDSVGView {
                             if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
                                 fg = draft.threadColour(x, tablet_position[x]);
                                 this.turning[cell][x].b = false;
-                                tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+                                if (draft.threadingPhases[x] == 'T' || (
+                                    (draft.threadingPhases[x] == 'E') == ((y + 1 - draft.picks() + this.start_pick) % 2 == 0)
+                                )) {
+                                    tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+                                }
                             } else {
                                 fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
                                 this.turning[cell][x].b = true;
-                                tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+                                if (draft.threadingPhases[x] == 'T' || (
+                                    (draft.threadingPhases[x] == 'O') == ((y + 1 - draft.picks() + this.start_pick) % 2 == 0)
+                                )) {
+                                    tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+                                }
                             }
                             this.set_cell_colour(this.turning[cell][x], fg);
                             this.set_cell_reverse_marker(this.turning[cell][x], false);
@@ -598,7 +626,8 @@ class TDDSVGView {
             } else {
                 for (var y = draft.picks() - 1; y >= 0; y--) {
                     for (var x = 0; x < draft.tablets(); x++) {
-                        var fg;
+                        var idling = false;
+                        var fg = undefined;
                         this.set_cell_direction(this.turning[y][x], draft.turning[y][x]);
                         if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
                             fg = draft.threadColour(x, tablet_position[x]);
@@ -607,8 +636,14 @@ class TDDSVGView {
                             } else {
                                 this.set_cell_background(this.turning[y][x], this.forwardcolour);
                             }
+                            if (draft.threadingPhases[x] == 'T' || (
+                                (draft.threadingPhases[x] == 'E') == ((y + 1 - draft.picks()) % 2 == 0)
+                            )) {
+                                tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+                            } else {
+                                idling = true;
+                            }
                             this.turning[y][x].b = false;
-                            tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
                         } else {
                             fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
                             if(this.show_squares) {
@@ -616,10 +651,17 @@ class TDDSVGView {
                             } else {
                                 this.set_cell_background(this.turning[y][x], this.backwardcolour);
                             }
+                            if (draft.threadingPhases[x] == 'T' || (
+                                (draft.threadingPhases[x] == 'O') == ((y + 1 - draft.picks()) % 2 == 0)
+                            )) {   
+                                tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+                            }
+                            else {
+                                idling = true;
+                            }
                             this.turning[y][x].b = true;
-                            tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
                         }
-                        if (!this.show_squares && this.show_ovals) {
+                        if (!this.show_squares && this.show_ovals && !idling) {
                             this.set_cell_colour(this.turning[y][x], fg);
                         } else {
                             this.set_cell_colour(this.turning[y][x], undefined);
@@ -887,6 +929,38 @@ class TDDSVGView {
           return parseInt((y - threading_start_y)/(cellborder + cellheight));
         } else {
           return -1;
+        }
+    }
+
+    svg_coord_to_control(y, draft) {
+        const turning_start_y = (this.show_twist)?(
+            cellborder + cellheight
+        ):0;
+        const threading_start_y = turning_start_y + (
+            (this.show_turning)?(
+            (cellborder + cellheight)*draft.picks() +
+            intertablegap
+            ):0
+        );
+    
+        const threading_end_y = (
+          threading_start_y +
+          (cellborder + cellheight)*draft.holes()
+        );
+
+        const sz_end_y = (
+          threading_start_y +
+          (cellborder + cellheight)*(draft.holes() + 1)
+        );
+
+        if (y < threading_start_y) {
+          return "turning";
+        } else if (y < threading_end_y) {
+          return "threading"
+        } else if (y < sz_end_y) {
+          return "SZ";
+        } else {
+          return "TOE";
         }
     }
 }
