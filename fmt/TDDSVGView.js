@@ -516,14 +516,14 @@ class TDDSVGView {
                 for (var y = 0; y < draft.picks(); y++) {
                     if(draft.turning[y][x] == "/") {
                         if (draft.threadingPhases[x] == 'T' || (
-                            (draft.threadingPhases[x] == 'O') == ((y + 1 - draft.picks()) % 2 == 0)
+                            (draft.threadingPhases[x] == 'E') == ((y + 1 - draft.picks()) % 2 == 0)
                         )) {
                             twist++;
                         }
                     }
                     else if (draft.turning[y][x] == "\\") {
                         if (draft.threadingPhases[x] == 'T' || (
-                            (draft.threadingPhases[x] == 'E') == ((y + 1 - draft.picks()) % 2 == 0)
+                            (draft.threadingPhases[x] == 'O') == ((y + 1 - draft.picks()) % 2 == 0)
                         )) {
                             twist--;
                         }
