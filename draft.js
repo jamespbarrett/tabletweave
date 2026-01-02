@@ -21,6 +21,7 @@ function control_vals() {
         rscale: $('#rscalecontrols .readout').val(),
         showtext: $("#showtext").prop("checked"),
         showgrid: $("#showgrid").prop("checked"),
+        showidling: $("#showidling").prop("checked"),
         showovals: $("#showovals").prop("checked"),
         showsquares: $("#showsquares").prop("checked"),
         showtwist: $("#showtwist").prop("checked"),
@@ -65,6 +66,7 @@ function loadFromLocal() {
     $("#showtwist").prop("checked", ((controls.showtwist != undefined)?controls.showtwist:true));
     $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
     $("#showgrid").prop("checked", ((controls.showgrid != undefined)?controls.showgrid:true));
+    $("#showidling").prop("checked", ((controls.showidling != undefined)?controls.showidling:true));
     $("#showupper").prop("checked", ((controls.showupper != undefined)?controls.showupper:true));
     $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
     $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
@@ -486,6 +488,7 @@ function reset() {
     $("#showreversal").prop("checked", true);
     $("#showtext").prop("checked", false);
     $("#showgrid").prop("checked", true);
+    $("#showidling").prop("checked", true);
     $("#GREYSLIDER").val(144);
     $("#addright").prop("checked", true);
     $("#labelholescw").prop("checked", true);
@@ -622,6 +625,7 @@ $(function() {
     $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
     $("#showtext").change(function() {saveToLocal(); redraw(); });
     $("#showgrid").change(function() {  view.showGrid($("#showgrid").prop('checked')); repeat.showGrid($("#showgrid").prop('checked')); saveToLocal(); redraw(); });
+    $("#showidling").change(function() {  view.showIdling($("#showidling").prop('checked')); repeat.showIdling($("#showidling").prop('checked')); saveToLocal(); redraw(); });
     $("#labelholescw").change(function() { view.labelHolesCW($("#labelholescw").prop('checked')); saveToLocal(); redraw(); });
     $("#invertsz").change(function() { view.invertSZ($("#invertsz").prop('checked')); saveToLocal(); redraw(); });
 
@@ -671,6 +675,7 @@ $(function() {
     loadFromLocal();
 
     view.showGrid($("#showgrid").prop('checked'));
+    view.showIdling($("#showidling").prop('checked'));
     view.showOvals($("#showovals").prop('checked'));
     view.showSquares($("#showsquares").prop('checked'));
     view.showTwist($("#showtwist").prop('checked'));
@@ -684,6 +689,7 @@ $(function() {
     view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
 
     repeat.showGrid($("#showgrid").prop('checked'));
+    repeat.showIdling($("#showidling").prop('checked'));
     repeat.showOvals(true);
     repeat.showThreading(false);
     repeat.showReversals(false);

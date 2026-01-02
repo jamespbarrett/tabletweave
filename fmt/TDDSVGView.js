@@ -87,6 +87,7 @@ class TDDSVGView {
         this.show_twist=true;
         this.show_reversals=true;
         this.show_grid=true;
+        this.show_idling=true;
         this.labelholescw=true;
         this.labelingholescw=true;
         this.invertsz=false;
@@ -115,6 +116,7 @@ class TDDSVGView {
         this.ruler_group = this.svg.group();
         this.threading_main_group = this.svg.group(this.threading_group);
         this.threading_ruler_group = this.svg.group(this.threading_group);
+        this.idling_group = this.svg.group(this.threading_group);
 
         this.hruler = this.svg.line(
             this.ruler_group,
@@ -179,6 +181,13 @@ class TDDSVGView {
             this.needs_full_redraw = true;
         }
         this.show_grid = val;
+    }
+
+    showIdling(val) {
+        if(this.show_idling != val) {
+            this.needs_full_redraw = true;
+        }
+        this.show_idling = val;
     }
 
     labelHolesCW(val) {
@@ -317,7 +326,7 @@ class TDDSVGView {
               (
                 intertablegap +
                 cellborder +
-                (cellborder + cellheight)*(draft.holes() + 1)
+                (cellborder + cellheight)*(draft.holes() + (this.show_idling ? 1 : 0))
               ):0
             )
         );
@@ -461,7 +470,7 @@ class TDDSVGView {
                         {stroke: "#000000", style: "font: 15px Arial; text-anchor: middle;"}
                     ),
                     phase: this.svg.text(
-                        this.threading_main_group,
+                        this.idling_group,
                         this.labelwidth + cellborder + (cellborder + cellwidth)*x + cellwidth/2,
                         threading_start_y + (cellborder + cellheight)*(draft.holes() + 1) + 15,
                         "T",
@@ -540,6 +549,12 @@ class TDDSVGView {
 
     conform_threading (draft) {
         if (this.show_threading) {
+            if (this.show_idling) {
+                $(this.root()).append(this.idling_group);
+                $(this.idling_group).attr('visibility', 'visible');
+            } else {
+                $(this.idling_group).detach();
+            }
             $(this.root()).append(this.threading_group);
             $(this.threading_group).attr('visibility', 'visible');
 
@@ -563,6 +578,7 @@ class TDDSVGView {
             this.showing_threading = true;
         } else {
             $(this.threading_group).detach();
+            $(this.idling_group).detach();
             this.showing_threading = false;
         }
     }
