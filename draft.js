@@ -5,6 +5,23 @@ var view = new TDDSVGView();
 var repeat = new TDDSVGView();
 var fgcol = -1;
 
+var tickyboxes = {
+    'showidling' : {default: true,  setter: v => { view.showIdling(v); repeat.showIdling(v); }},
+    'showovals'  : {default: true,  setter: v => view.showOvals(v)},
+    'showgrid'   : {default: true,  setter: v => { view.showGrid(v); repeat.showGrid(v); }},
+    'showsquares': {default: false, setter: v => view.showSquares(v)},
+    'showtwist'  : {default: true,  setter: v => view.showTwist(v)},
+    'showupper'  : {default: true,  setter: v => view.showTurning(v)},
+    'showlower'  : {default: true,  setter: v => view.showThreading(v)},
+    'showreversal': {default: true, setter: v => view.showReversals(v)},
+    'labelholescw': {default: true, setter: v => view.labelHolesCW(v)},
+    'showtext': {default: false },
+    'invertsz': {default: false, setter: v => view.invertSZ(v)},
+    'showhruler': {default: false, setter: v => view.hRuler(v?$('#hruler .readout').val():undefined)},
+    'showvruler': {default: false, setter: v => view.vRuler(v?$('#vruler .readout').val():undefined)},
+    'showrepeats': { default: false }
+};
+
 function control_vals() {
     var accordion = {};
     $('.accordion').each(function () {
@@ -13,35 +30,27 @@ function control_vals() {
         accordion[id] = active;
     });
 
-    return {
+    vals = {
         addright: $("#addright").prop("checked"),
         lockdraft: $("#lockdraft").prop("checked"),
         fgcol: fgcol,
         scale: $('#scalecontrols .readout').val(),
         rscale: $('#rscalecontrols .readout').val(),
-        showtext: $("#showtext").prop("checked"),
-        showgrid: $("#showgrid").prop("checked"),
-        showidling: $("#showidling").prop("checked"),
-        showovals: $("#showovals").prop("checked"),
-        showsquares: $("#showsquares").prop("checked"),
-        showtwist: $("#showtwist").prop("checked"),
-        showupper: $("#showupper").prop("checked"), 
-        showlower: $("#showlower").prop("checked"),
-        showreversal: $("#showreversal").prop("checked"),
-        labelholescw: $("#labelholescw").prop("checked"),
-        invertsz: $("#invertsz").prop("checked"),
         grey_saturation: $("#GREYSLIDER").val(),
-        showhruler: $("#showhruler").prop("checked"),
-        showvruler: $("#showvruler").prop("checked"),
         hruler: $("#hruler .readout").val(),
         vruler: $("#vruler .readout").val(),
         export_width: $('#export_width').val(),
-        showrepeats: $("#showrepeats").prop("checked"),
         repeatstart: $("#repeatstart .readout").val(),
         repeatend: $("#repeatend .readout").val(),
         numrepeats: $("#numrepeats .readout").val(),
         accordion: accordion,
     };
+
+    Object.keys(tickyboxes).forEach((k,i) => {
+        vals[k] = $("#" + k).prop("checked");
+    });
+
+    return vals;
 }
 
 function saveToLocal() {
@@ -61,27 +70,17 @@ function loadFromLocal() {
     $('#rscalecontrols .readout').val((controls.rscale != undefined?controls.rscale:0));
     $("#addright").prop("checked", ((controls.addright != undefined)?controls.addright:true));
     $("#lockdraft").prop("checked", ((controls.lockdraft != undefined)?controls.lockdraft:false));
-    $("#showovals").prop("checked", ((controls.showovals != undefined)?controls.showovals:true));
-    $("#showsquares").prop("checked", ((controls.showsquares != undefined)?controls.showsquares:false));
-    $("#showtwist").prop("checked", ((controls.showtwist != undefined)?controls.showtwist:true));
-    $("#showtext").prop("checked", ((controls.showtext != undefined)?controls.showtext:false));
-    $("#showgrid").prop("checked", ((controls.showgrid != undefined)?controls.showgrid:true));
-    $("#showidling").prop("checked", ((controls.showidling != undefined)?controls.showidling:true));
-    $("#showupper").prop("checked", ((controls.showupper != undefined)?controls.showupper:true));
-    $("#showlower").prop("checked", ((controls.showlower != undefined)?controls.showlower:true));
-    $("#showreversal").prop("checked", ((controls.showreversal != undefined)?controls.showreversal:true));
     $("#GREYSLIDER").val(((controls.grey_saturation != undefined)?controls.grey_saturation:144));
-    $("#labelholescw").prop("checked", ((controls.labelholescw != undefined)?controls.labelholescw:true));
-    $("#invertsz").prop("checked", ((controls.invertsz != undefined)?controls.invertsz:false));
-    $("#showhruler").prop("checked", ((controls.showhruler != undefined)?controls.showhruler:true));
-    $("#showvruler").prop("checked", ((controls.showvruler != undefined)?controls.showvruler:true));
     $("#hruler .readout").val((controls.hruler != undefined)?controls.hruler:0);
     $("#vruler .readout").val((controls.vruler != undefined)?controls.vruler:0);
     $("#export_width").val((controls.export_width != undefined)?controls.export_width:1920);
-    $("#showrepeats").prop("checked", ((controls.showrepeats != undefined)?controls.showrepeats:false));
     $("#repeatstart .readout").val((controls.repeatstart != undefined)?controls.repeatstart:1);
     $("#repeatend .readout").val((controls.repeatend != undefined)?controls.repeatend:1);
     $("#numrepeats .readout").val((controls.numrepeats != undefined)?controls.numrepeats:1);
+
+    Object.keys(tickyboxes).forEach((k, i) => {
+        $('#' + k).prop("checked", ((controls[k] != undefined) ? controls[k] : tickyboxes[k].default));
+    });
 
     if (controls.accordion) {
         for (const [key, value] of Object.entries(controls.accordion)) {
@@ -480,29 +479,16 @@ function reset() {
 
     $('#scalecontrols .readout').val(0);
     $("#lockdraft").prop("checked", false);
-    $("#showovals").prop("checked", true);
-    $("#showsquares").prop("checked", false);
-    $("#showtwist").prop("checked", true);
-    $("#showupper").prop("checked", true);
-    $("#showlower").prop("checked", true);
-    $("#showreversal").prop("checked", true);
-    $("#showtext").prop("checked", false);
-    $("#showgrid").prop("checked", true);
-    $("#showidling").prop("checked", true);
     $("#GREYSLIDER").val(144);
     $("#addright").prop("checked", true);
-    $("#labelholescw").prop("checked", true);
-    $("#invertsz").prop("checked", false);
-
-    $("#showhruler").prop("checked", false);
-    $("#showvruler").prop("checked", false);
-
     $("#export_width").val(1920);
-
-    $("#showrepeats").prop("checked", false);
-    $("#repeatstart .readout").val(1);
+     $("#repeatstart .readout").val(1);
     $("#repeatend .readout").val(1);
     $("#numrepeats .readout").val(1);
+
+    Object.keys(tickyboxes).forEach((k, i) => {
+        $('#' + k).prop("checked", tickyboxes[k].default);
+    });
 
     saveToLocal();
     setControlsFromDraft();
@@ -610,24 +596,17 @@ $(function() {
     setupNumberInput("vruler", 1, function() { return draft.tablets() + 1; }, function() {
         view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
     }, 1, true);
-    $("#showhruler").change(function() {
-        view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined); saveToLocal(); redraw();
-    });
-    $("#showvruler").change(function() {
-        view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined); saveToLocal(); redraw();
-    });
 
-    $("#showovals").change(function() { view.showOvals($("#showovals").prop('checked')); saveToLocal(); redraw(); });
-    $("#showsquares").change(function() { view.showSquares($("#showsquares").prop('checked')); saveToLocal(); redraw(); });
-    $("#showtwist").change(function() { view.showTwist($("#showtwist").prop('checked')); saveToLocal(); redraw(); });
-    $("#showupper").change(function() { view.showTurning($("#showupper").prop('checked')); saveToLocal(); redraw(); });
-    $("#showlower").change(function() { view.showThreading($("#showlower").prop('checked')); saveToLocal(); redraw(); });
-    $("#showreversal").change(function() { view.showReversals($("#showreversal").prop('checked')); saveToLocal(); redraw(); });
-    $("#showtext").change(function() {saveToLocal(); redraw(); });
-    $("#showgrid").change(function() {  view.showGrid($("#showgrid").prop('checked')); repeat.showGrid($("#showgrid").prop('checked')); saveToLocal(); redraw(); });
-    $("#showidling").change(function() {  view.showIdling($("#showidling").prop('checked')); repeat.showIdling($("#showidling").prop('checked')); saveToLocal(); redraw(); });
-    $("#labelholescw").change(function() { view.labelHolesCW($("#labelholescw").prop('checked')); saveToLocal(); redraw(); });
-    $("#invertsz").change(function() { view.invertSZ($("#invertsz").prop('checked')); saveToLocal(); redraw(); });
+    Object.keys(tickyboxes).forEach((k, i) => {
+        $('#' + k).change(function() {
+            var val = $('#' + k).prop("checked");
+            if (tickyboxes[k].setter != undefined) {
+                tickyboxes[k].setter(val);
+            }
+            saveToLocal();
+            redraw();
+        });
+    });
 
     $('#EMPTYBOX').click(function() { fgcol = -1; saveToLocal(); redrawControls(); });
     var i;
@@ -637,7 +616,6 @@ $(function() {
         })(i);
     }
 
-    $("#showrepeats").change(function() { saveToLocal(); redraw(); });
     setupNumberInput("repeatstart", 1, function() { return $("#repeatend .readout").val(); }, function() { repeat.startPick(parseInt($("#repeatstart .readout").val())); saveToLocal(); redraw(); });
     setupNumberInput("repeatend", function() { return $("#repeatstart .readout").val(); }, function() { return draft.picks(); }, function() { repeat.endPick(parseInt($("#repeatend .readout").val())); saveToLocal(); redraw(); });
     setupNumberInput("numrepeats", 1, undefined, function() { repeat.setRepeats(parseInt($("#numrepeats .readout").val())); saveToLocal(); redraw(); });
@@ -674,22 +652,16 @@ $(function() {
 
     loadFromLocal();
 
-    view.showGrid($("#showgrid").prop('checked'));
-    view.showIdling($("#showidling").prop('checked'));
-    view.showOvals($("#showovals").prop('checked'));
-    view.showSquares($("#showsquares").prop('checked'));
-    view.showTwist($("#showtwist").prop('checked'));
-    view.showTurning($("#showupper").prop('checked'));
-    view.showThreading($("#showlower").prop('checked'));
-    view.showReversals($("#showreversal").prop('checked'));
     view.greySaturation(0x100 - $('#GREYSLIDER').val()) ;
     view.labelHolesCW($("#labelholescw").prop('checked'));
-    view.invertSZ($("#invertsz").prop('checked'));
-    view.hRuler($('#showhruler').prop('checked')?$('#hruler .readout').val():undefined);
-    view.vRuler($('#showvruler').prop('checked')?$('#vruler .readout').val():undefined);
 
-    repeat.showGrid($("#showgrid").prop('checked'));
-    repeat.showIdling($("#showidling").prop('checked'));
+    Object.keys(tickyboxes).forEach((k, i) => {
+        var val = $('#' + k).prop("checked");
+        if (tickyboxes[k].setter != undefined) {
+            tickyboxes[k].setter(val);
+        }
+    });
+
     repeat.showOvals(true);
     repeat.showThreading(false);
     repeat.showReversals(false);
