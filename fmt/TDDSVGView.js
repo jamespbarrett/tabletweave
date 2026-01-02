@@ -612,27 +612,35 @@ class TDDSVGView {
 
                         for (var x = 0; x < draft.tablets(); x++) {
                             var fg;
-
+                            var idling = false;
                             this.set_cell_direction(this.turning[cell][x], draft.turning[y][x]);
                             this.set_cell_background(this.turning[cell][x], this.forwardcolour);
                             if ((draft.threading[x] == "S") == (draft.turning[y][x] == "/")) {
                                 fg = draft.threadColour(x, tablet_position[x]);
                                 this.turning[cell][x].b = false;
                                 if (draft.threadingPhases[x] == 'T' || (
-                                    (draft.threadingPhases[x] == 'E') == ((y + 1 - draft.picks() + this.start_pick) % 2 == 0)
+                                    (draft.threadingPhases[x] == 'E') == ((cell + 1 - this.turning.length) % 2 == 0)
                                 )) {
                                     tablet_position[x] = (tablet_position[x] + draft.holes() - 1) % draft.holes();
+                                } else {
+                                    idling = true;
                                 }
                             } else {
                                 fg = draft.threadColour(x, (tablet_position[x] + 1)%draft.holes());
                                 this.turning[cell][x].b = true;
                                 if (draft.threadingPhases[x] == 'T' || (
-                                    (draft.threadingPhases[x] == 'O') == ((y + 1 - draft.picks() + this.start_pick) % 2 == 0)
+                                    (draft.threadingPhases[x] == 'O') == ((cell + cell + 1 - this.turning.length) % 2 == 0)
                                 )) {
                                     tablet_position[x] = (tablet_position[x] + 1) % draft.holes();
+                                } else {
+                                    idling = true;
                                 }
                             }
-                            this.set_cell_colour(this.turning[cell][x], fg);
+                            if (!idling) {
+                                this.set_cell_colour(this.turning[cell][x], fg);
+                            } else {
+                                this.set_cell_colour(this.turning[cell][x], undefined);
+                            }
                             this.set_cell_reverse_marker(this.turning[cell][x], false);
                         }
 
