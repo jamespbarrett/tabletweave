@@ -10,6 +10,7 @@ function json_to_tdd(json) {
   if (json['lower_cells'].length < 1) {
     /* This is a fall back for impossible values */
     r.threading = [ 'Z' ];
+    r.threadingPhases = [ 'T' ];
     r.threadingColours = [['0']];
   } else {
     /* This decodes the old json threading diagram to make the new one */
@@ -20,6 +21,7 @@ function json_to_tdd(json) {
       } else {
         r.threading.push('S');
       }
+      r.threadingPhases.push('T');
     }
 
     r.threadingColours = [];
