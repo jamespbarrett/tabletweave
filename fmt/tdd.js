@@ -405,7 +405,7 @@ function TDDDraftFromString(raw) {
     line = lines.shift();
   }
   for (i = 0; i < r.threading.length; ++i) {
-    if ( i > r.threadingPhases.length ) {
+    if ( i >= r.threadingPhases.length ) {
       r.threadingPhases.push('T');
     }
   }
